@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28010.2041
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "simple-shooter", "simple-shooter.vcxproj", "{499B4783-A93D-4033-9D19-85A7EC5FE62C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{499B4783-A93D-4033-9D19-85A7EC5FE62C}.Debug|x64.ActiveCfg = Debug|x64
+		{499B4783-A93D-4033-9D19-85A7EC5FE62C}.Debug|x64.Build.0 = Debug|x64
+		{499B4783-A93D-4033-9D19-85A7EC5FE62C}.Debug|x86.ActiveCfg = Debug|Win32
+		{499B4783-A93D-4033-9D19-85A7EC5FE62C}.Debug|x86.Build.0 = Debug|Win32
+		{499B4783-A93D-4033-9D19-85A7EC5FE62C}.Release|x64.ActiveCfg = Release|x64
+		{499B4783-A93D-4033-9D19-85A7EC5FE62C}.Release|x64.Build.0 = Release|x64
+		{499B4783-A93D-4033-9D19-85A7EC5FE62C}.Release|x86.ActiveCfg = Release|Win32
+		{499B4783-A93D-4033-9D19-85A7EC5FE62C}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6EC65E74-4BCA-4674-B3BC-A5159EEBE805}
+	EndGlobalSection
+EndGlobal
