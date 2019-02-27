@@ -10,6 +10,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "Shader.h"
+#include "Camera.h"
 
 int initSDL() {
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
@@ -200,24 +201,18 @@ int main(int argc, char *argv[])
 	glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
 
-	glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
-	glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
-	glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+	
 
 	bool firstMouse = true;
-	float yaw = -90.0f;	// yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector pointing to the right so we initially rotate a bit to the left.
-	float pitch = 0.0f;
-	float lastX = 800.0f / 2.0;
-	float lastY = 600.0 / 2.0;
-	float fov = 45.0f;
-	float sensitivity = 0.1f;
+	
 
 	float deltaTime = 0.0;
 	float lastFrame = 0.0;
 	
 	SDL_Event windowEvent;
 	SDL_SetRelativeMouseMode(SDL_TRUE);
-
+	Camera kamera;
+	Camera::Movement nextMove;
 	while (true)
 	{
 		float currentFrame = SDL_GetTicks() / 1000.0f;
@@ -234,19 +229,42 @@ int main(int argc, char *argv[])
 				
 				switch (windowEvent.key.keysym.sym ) {
 				case SDLK_w: {
-					cameraPos += cameraSpeed * cameraFront;
+					nextMove[Camera::MOVE_FORWARD] = 1;
 					break;
 				}
 				case SDLK_s: {
-					cameraPos -= cameraSpeed * cameraFront;
+					nextMove[Camera::MOVE_BACKWARD] = 1;
 					break;
 				}
 				case SDLK_a: {
-					cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+					nextMove[Camera::STRAFE_LEFT] = 1;
 					break;
 				}
 				case SDLK_d: {
-					cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+					nextMove[Camera::STRAFE_RIGHT] = 1;;
+					break;
+				}
+				default: break;
+				}
+				break;
+			}
+			case SDL_KEYUP: {
+
+				switch (windowEvent.key.keysym.sym) {
+				case SDLK_w: {
+					nextMove[Camera::MOVE_FORWARD] = 0;
+					break;
+				}
+				case SDLK_s: {
+					nextMove[Camera::MOVE_BACKWARD] = 0;
+					break;
+				}
+				case SDLK_a: {
+					nextMove[Camera::STRAFE_LEFT] = 0;
+					break;
+				}
+				case SDLK_d: {
+					nextMove[Camera::STRAFE_RIGHT] = 0;;
 					break;
 				}
 				default: break;
@@ -254,26 +272,7 @@ int main(int argc, char *argv[])
 				break;
 			}
 			case SDL_MOUSEMOTION: {
-				if (firstMouse)
-				{
-					lastX = windowEvent.motion.x;
-					lastY = windowEvent.motion.y;
-					firstMouse = false;
-				}
-				float xoffset = windowEvent.motion.xrel * sensitivity;
-				float yoffset = windowEvent.motion.yrel * sensitivity;
-				yaw += xoffset;
-				pitch -= yoffset;
-				if (pitch > 89.0f)
-					pitch = 89.0f;
-				if (pitch < -89.0f)
-					pitch = -89.0f;
-				glm::vec3 front;
-				front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-				front.y = sin(glm::radians(pitch));
-				front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-				cameraFront = glm::normalize(front);
-				break;
+				kamera.turnCamera(windowEvent.motion);
 			}
 			default: break;
 			}
@@ -281,11 +280,9 @@ int main(int argc, char *argv[])
 
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		
+		kamera.moveCamera(nextMove, deltaTime);
 		ourShader.use();
-		glm::mat4 view = glm::mat4(1.0f);
-		view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
-		ourShader.setMat4("view", view);
+		ourShader.setMat4("view", kamera.getViewMatrix());
 		glBindVertexArray(VAO);
 		for (int i = 0; i < 10; ++i) {
 			glm::mat4 model = glm::mat4(1.0f);
