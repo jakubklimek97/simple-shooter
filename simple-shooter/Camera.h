@@ -14,7 +14,7 @@ public:
 		STRAFE_LEFT = 2,
 		STRAFE_RIGHT = 3
 	};
-	Camera();
+	Camera(glm::vec3 position, glm::vec3 front, glm::vec3 up, float sensitivity, float moveSpeed);
 	~Camera();
 	glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
 	glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
@@ -22,9 +22,6 @@ public:
 	glm::vec3 cameraRight;
 	float yaw = -90.0f;
 	float pitch = 0.0f;
-	float lastX = 800.0f / 2.0;
-	float lastY = 600.0 / 2.0;
-	float fov = 45.0f;
 	float sensitivity = 0.1f;
 	float moveSpeed = 1.0f;
 	void turnCamera(SDL_MouseMotionEvent &event);

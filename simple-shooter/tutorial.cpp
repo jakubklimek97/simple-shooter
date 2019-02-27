@@ -211,7 +211,7 @@ int main(int argc, char *argv[])
 	
 	SDL_Event windowEvent;
 	SDL_SetRelativeMouseMode(SDL_TRUE);
-	Camera kamera;
+	Camera kamera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.1f, 1.0f);
 	Camera::Movement nextMove;
 	while (true)
 	{
