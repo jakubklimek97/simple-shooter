@@ -1,7 +1,10 @@
 cmake_minimum_required(VERSION 3.12)
 set(CMAKE_CONFIGURATION_TYPES "Debug;Release")
 
+
 project(simple-shooter)
+set_property( DIRECTORY PROPERTY VS_STARTUP_PROJECT "simple-shooter" )
+
 
 
 set(SDL2_DIR "" CACHE PATH "SDL2 library")
