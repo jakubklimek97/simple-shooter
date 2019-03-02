@@ -29,7 +29,7 @@ PUBLIC "${LIB_SDL2_DIR}/include"
 PUBLIC "${LIB_SDL2_image_DIR}/include"
 PUBLIC "${LIB_glew_DIR}/include"
 PUBLIC "${CMAKE_CURRENT_BINARY_DIR}/glm"
-PUBLIC "${ASSIMP_INCLUDE_DIR}"
+PUBLIC "${LIB_ASSIMP_INCLUDE_DIR}"
 )
 target_link_directories(simple-shooter 
 PUBLIC "${LIB_SDL2_DIR}/lib/x86"
