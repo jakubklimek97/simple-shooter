@@ -45,7 +45,6 @@ SDL2main.lib
 SDL2_image.lib
 glew32.lib
 opengl32.lib
-${ASSIMP_LIB}
 )
 
 file(COPY 
@@ -56,8 +55,7 @@ ${LIB_SDL2_image_DIR}/lib/x86/libtiff-5.dll
 ${LIB_SDL2_image_DIR}/lib/x86/libwebp-7.dll
 ${LIB_SDL2_image_DIR}/lib/x86/SDL2_image.dll
 ${LIB_SDL2_image_DIR}/lib/x86/zlib1.dll
-${LIB_glew_DIR}/bin/Release/Win32/glew32.dll
-${ASSIMP_DLL}	
+${LIB_glew_DIR}/bin/Release/Win32/glew32.dll	
 DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 make_directory(${CMAKE_CURRENT_BINARY_DIR}/glm)
 file(COPY ${LIB_glm_DIR}/glm DESTINATION  ${CMAKE_CURRENT_BINARY_DIR}/glm)
