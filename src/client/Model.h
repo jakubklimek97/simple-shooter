@@ -16,6 +16,7 @@ class Model
 public:
 
 	Model(char *path);	
+	~Model();
 	void Draw(Shader shader);
 private:
 	std::vector<Texture> textures_loaded;
