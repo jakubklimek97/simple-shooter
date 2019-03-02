@@ -11,8 +11,9 @@ set(LIB_SDL2_DIR "" CACHE PATH "SDL2 library")
 set(LIB_SDL2_image_DIR "" CACHE PATH "SDL2image library")
 set(LIB_glew_DIR "" CACHE PATH "glew library")
 set(LIB_glm_DIR "" CACHE PATH "glm library")
-set(LIB_ASSIMP_INCLUDE_DIR CACHE PATH "Assimp include dir" )
-set(LIB_ASSIMP_BINARY_DIR CACHE PATH "Assimp build results")
+set(LIB_ASSIMP_INCLUDE_DIR " " CACHE PATH "Assimp include dir" )
+set(LIB_ASSIMP_BINARY_DIR "" CACHE PATH "Assimp build results")
+option(CONFIGURE_WITH_ASSIMP "Add assimp to project" OFF)
 option(MOVE_SCRIPT_AUTO_CLOSE "Auto close file moving script" ON)
 
 file(GLOB ZRODLA 
@@ -20,9 +21,7 @@ file(GLOB ZRODLA
 "src/client/*.h"
 "src/client/shaders/*.vs"
 "src/client/shaders/*.fs")
-file(GLOB ASSIMP_LIB RELATIVE "${LIB_ASSIMP_BINARY_DIR}" "${LIB_ASSIMP_BINARY_DIR}/*.lib")
-message("Assimp found: ${ASSIMP_LIB}")
-file(GLOB ASSIMP_DLL "${LIB_ASSIMP_BINARY_DIR}/*.dll" )
+
 add_executable(simple-shooter ${ZRODLA})
 target_include_directories(simple-shooter 
 PUBLIC "${LIB_SDL2_DIR}/include"
@@ -45,7 +44,6 @@ SDL2main.lib
 SDL2_image.lib
 glew32.lib
 opengl32.lib
-${ASSIMP_LIB}
 )
 
 file(COPY 
@@ -56,9 +54,19 @@ ${LIB_SDL2_image_DIR}/lib/x86/libtiff-5.dll
 ${LIB_SDL2_image_DIR}/lib/x86/libwebp-7.dll
 ${LIB_SDL2_image_DIR}/lib/x86/SDL2_image.dll
 ${LIB_SDL2_image_DIR}/lib/x86/zlib1.dll
-${LIB_glew_DIR}/bin/Release/Win32/glew32.dll
-${ASSIMP_DLL}	
+${LIB_glew_DIR}/bin/Release/Win32/glew32.dll	
 DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
+if(NOT ${CONFIGURE_WITH_ASSIMP})
+message("Configuring without Assimp")
+else()
+file(GLOB ASSIMP_LIB RELATIVE "${LIB_ASSIMP_BINARY_DIR}" "${LIB_ASSIMP_BINARY_DIR}/*.lib")
+message("Assimp found: ${ASSIMP_LIB}")
+file(GLOB ASSIMP_DLL "${LIB_ASSIMP_BINARY_DIR}/*.dll" )
+target_link_libraries(simple-shooter ${ASSIMP_LIB})
+file(COPY ${ASSIMP_DLL} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+endif()
+
 make_directory(${CMAKE_CURRENT_BINARY_DIR}/glm)
 file(COPY ${LIB_glm_DIR}/glm DESTINATION  ${CMAKE_CURRENT_BINARY_DIR}/glm)
 file(COPY res DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
