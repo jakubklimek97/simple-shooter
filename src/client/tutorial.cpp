@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
 	//wyswietlane jako siatka glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	Shader ourShader("vertex.vs", "fragment.fs");
-	Model ourModel("res/obj/headphones_UVW.fbx");
+	Model ourModel("res/models/headphones_UVW.fbx");
 
 	float deltaTime = 0.0;
 	float lastFrame = 0.0;
