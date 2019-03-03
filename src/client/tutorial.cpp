@@ -55,12 +55,13 @@ int main(int argc, char *argv[])
 
 	Shader ourShader("vertex.vs", "fragment.fs");
 	Model ourModel("res/models/headphones_UVW.fbx");
+	Model pistolet("res/models/pistolet/pistolet.obj");
 
 	float deltaTime = 0.0;
 	float lastFrame = 0.0;
 	SDL_Event windowEvent;
 	SDL_SetRelativeMouseMode(SDL_TRUE);
-	Camera kamera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.1f, 1.0f);
+	Camera kamera(glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.1f, 1.0f);
 	Camera::Movement nextMove;
 	while (true)
 	{
@@ -134,14 +135,23 @@ int main(int argc, char *argv[])
 		ourShader.use();
 		glm::mat4 projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
 		glm::mat4 view = kamera.getViewMatrix();
+		//glm::mat4 view = glm::mat4(1.0f);
 		ourShader.setMat4("projection", projection);
 		ourShader.setMat4("view", view);
 		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::rotate(model, (float)glm::radians(45.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(0.015f, 0.015f, 0.015f));
+		model = glm::rotate(model, (float)glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(0.03f, 0.03f, 0.03f));
 		ourShader.setMat4("model", model);
 		ourModel.Draw(ourShader);
-		
+		// note that we're translating the scene in the reverse direction of where we want to move
+		view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -0.1f, -0.5f));
+		ourShader.setMat4("view", view);
+		model = glm::mat4(1.0f);
+		std::cout << kamera.cameraPos.x << " " << kamera.cameraPos.y << " " << kamera.cameraPos.z << std::endl;
+		model = glm::rotate(model, (float)glm::radians(-90.0f), glm::vec3(0.0f,1.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(0.03f, 0.03f, 0.03f));
+		ourShader.setMat4("model", model);
+		pistolet.Draw(ourShader);
 		SDL_GL_SwapWindow(window);
 	}
 
