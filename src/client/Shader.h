@@ -11,7 +11,7 @@ class Shader
 public:
 	unsigned int ID;
 
-	Shader(const GLchar* vertexPath, const GLchar* fragmentPath);
+	Shader(const GLchar* vertexPath, const GLchar* fragmentPath); // nie wiem po co jak nic nie robi :}
 	void use();
 
 	void setBool(const std::string &name, bool value) const;
