@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
 
 	//wyswietlane jako siatka glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-	Shader ourShader("vertex.vs", "fragment.fs");
+	 Shader ourShader("vertex.vs", "fragment.fs");
 	Model ourModel("res/models/headphones_UVW.fbx");
 	Model pistolet("res/models/pistolet/pistolet.obj");
 
@@ -139,7 +139,8 @@ int main(int argc, char *argv[])
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		kamera.moveCamera(nextMove, deltaTime);
-		ourShader.use();
+
+		 ourShader.use();
 		glm::mat4 projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
 		glm::mat4 view = kamera.getViewMatrix();
 		//glm::mat4 view = glm::mat4(1.0f);
@@ -155,12 +156,10 @@ int main(int argc, char *argv[])
 		ourShader.setMat4("view", view);
 		model = glm::mat4(1.0f);
 		std::cout << kamera.cameraPos.x << " " << kamera.cameraPos.y << " " << kamera.cameraPos.z << std::endl;
-		model = glm::rotate(model, (float)glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		 model = glm::rotate(model, (float)glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 		model = glm::scale(model, glm::vec3(0.03f, 0.03f, 0.03f));
 		ourShader.setMat4("model", model);
 		pistolet.Draw(ourShader);
-		
-		SDL_GL_SwapWindow(window);
 	}
 
 	SDL_GL_DeleteContext(context);
