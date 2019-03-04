@@ -11,19 +11,20 @@
 
 #include "Shader.h"
 #include "Camera.h"
+#include "Model.h"
 
 int initSDL() {
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-		std::cout << "Nie mozna zainicjowac SDLA: " <<  SDL_GetError()<< std::endl;
+		std::cout << "Nie mozna zainicjowac SDLA: " << SDL_GetError() << std::endl;
 		return -1;
 	}
-	if (IMG_Init(IMG_INIT_JPG|IMG_INIT_PNG) < 0) {
+	if (IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG) < 0) {
 		std::cout << "Nie mozna zainicjowac SDL_image: " << IMG_GetError() << std::endl;
 		return -1;
 	}
 	return 0;
 }
-//test
+
 
 int main(int argc, char *argv[])
 {
@@ -39,7 +40,7 @@ int main(int argc, char *argv[])
 		SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
 		//utworzenie okna
 		window = SDL_CreateWindow("Simple Shooter", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, SDL_WINDOW_OPENGL);
-		
+
 		//"zawartosc" okna
 		context = SDL_GL_CreateContext(window);
 
@@ -50,22 +51,17 @@ int main(int argc, char *argv[])
 
 	}
 	glEnable(GL_DEPTH_TEST);
-
 	//wyswietlane jako siatka glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	Shader ourShader("vertex.vs", "fragment.fs");
 	Model ourModel("res/models/headphones_UVW.fbx");
 	Model pistolet("res/models/pistolet/pistolet.obj");
 
-
-	//wyswietlane jako siatka
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	float deltaTime = 0.0;
 	float lastFrame = 0.0;
-	
 	SDL_Event windowEvent;
 	SDL_SetRelativeMouseMode(SDL_TRUE);
-	Camera kamera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.1f, 1.0f);
+	Camera kamera(glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.1f, 1.0f);
 	Camera::Movement nextMove;
 	while (true)
 	{
@@ -80,8 +76,8 @@ int main(int argc, char *argv[])
 			}
 			switch (windowEvent.type) {
 			case SDL_KEYDOWN: {
-				
-				switch (windowEvent.key.keysym.sym ) {
+
+				switch (windowEvent.key.keysym.sym) {
 				case SDLK_w: {
 					nextMove[Camera::MOVE_FORWARD] = 1;
 					break;
@@ -107,22 +103,18 @@ int main(int argc, char *argv[])
 				switch (windowEvent.key.keysym.sym) {
 				case SDLK_w: {
 					nextMove[Camera::MOVE_FORWARD] = 0;
-					std::cout << "gora";
 					break;
 				}
 				case SDLK_s: {
 					nextMove[Camera::MOVE_BACKWARD] = 0;
-					std::cout << "dol";
 					break;
 				}
 				case SDLK_a: {
 					nextMove[Camera::STRAFE_LEFT] = 0;
-					std::cout << "lewo";
 					break;
 				}
 				case SDLK_d: {
-					nextMove[Camera::STRAFE_RIGHT] = 0;
-					std::cout << "prawo";
+					nextMove[Camera::STRAFE_RIGHT] = 0;;
 					break;
 				}
 				default: break;
@@ -160,6 +152,7 @@ int main(int argc, char *argv[])
 		model = glm::scale(model, glm::vec3(0.03f, 0.03f, 0.03f));
 		ourShader.setMat4("model", model);
 		pistolet.Draw(ourShader);
+		SDL_GL_SwapWindow(window);
 	}
 
 	SDL_GL_DeleteContext(context);
