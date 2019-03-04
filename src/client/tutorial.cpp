@@ -12,6 +12,7 @@
 #include "Shader.h"
 #include "Camera.h"
 #include "Model.h"
+#include "Entity.h"
 
 int initSDL() {
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
@@ -59,7 +60,15 @@ int main(int argc, char *argv[])
 	SDL_Event windowEvent;
 	SDL_SetRelativeMouseMode(SDL_TRUE);
 	Camera kamera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.1f, 1.0f);
+
+	Entity cube(kostka, glm::vec3(0.0f, -1.0f, 0.0f), 0.0f, glm::vec3(0.5f, 0.5f, 0.5f));
+	Entity cube2(kostka, glm::vec3(1.5f, -1.0f, 0.0f), 0.0f, glm::vec3(0.5f, 0.5f, 0.5f));
+	Entity cube3(pistolet, glm::vec3(-1.5f, -1.0f, 0.0f), 0.0f, glm::vec3(0.1f, 0.1f, 0.1f));
+	cube.setShader(ourShader);
+	cube2.setShader(ourShader);
+	cube3.setShader(ourShader);
 	Camera::Movement nextMove;
+	
 	float ostatniWystrzal = 0.0;
 	while (true)
 	{
@@ -136,28 +145,18 @@ int main(int argc, char *argv[])
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		kamera.moveCamera(nextMove, deltaTime);
 
-		ourShader.use();
 		glm::mat4 projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
 		glm::mat4 view = kamera.getViewMatrix();
-		ourShader.setMat4("projection", projection);
-		ourShader.setMat4("view", view);
-		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::rotate(model, (float)glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(0.03f, 0.03f, 0.03f));
-		ourShader.setMat4("model", model);
-		//ourModel.Draw(ourShader);
+		glm::mat4 model;
 
-		
-		model = glm::mat4(1.0f);
-		model = glm::scale(model , glm::vec3(0.5f, 0.5f, 0.5f));
-		ourShader.setMat4("model", model);
-		kostka.Draw(ourShader);
-		model = glm::mat4(1.0f);
-		model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));
-		model = glm::translate(model, glm::vec3(2.0f, 0.0f, 0.0f));
-		
-		ourShader.setMat4("model", model);
-		kostka.Draw(ourShader);
+		float rotation = glm::sin(currentFrame) / 10;
+		cube.rotate(rotation);
+		cube.Draw(projection, view);
+		cube2.rotate(rotation);
+		cube2.Draw(projection, view);
+		cube3.rotate(rotation);
+		cube3.Draw(projection, view);
+
 
 		//rysowanie broni
 		ourShader.setMat4("view", glm::mat4(1.0f));
