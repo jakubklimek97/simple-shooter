@@ -24,38 +24,35 @@ int initSDL() {
 	}
 	return 0;
 }
+void initOpenGL(SDL_Window* &pWindow, SDL_GLContext &context) {
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+	SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
+	//utworzenie okna
+	pWindow = SDL_CreateWindow("Simple Shooter", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, SDL_WINDOW_OPENGL);
 
+	//"zawartosc" okna
+	context = SDL_GL_CreateContext(pWindow);
 
+	//inicjalizacja glewa
+	glewExperimental = GL_TRUE;
+	glewInit();
+	glViewport(0, 0, 800, 600);
+	glEnable(GL_DEPTH_TEST);
+}
 int main(int argc, char *argv[])
 {
 	if (initSDL() < 0) return -1;
 	SDL_Window* window;
 	SDL_GLContext context;
-	//inicjalizacje opengla i glewa, utworzenie okna i jego zawartosci
-	{
-		//ustawienie wersji opengla
-		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-		SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
-		//utworzenie okna
-		window = SDL_CreateWindow("Simple Shooter", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, SDL_WINDOW_OPENGL);
-
-		//"zawartosc" okna
-		context = SDL_GL_CreateContext(window);
-
-		//inicjalizacja glewa
-		glewExperimental = GL_TRUE;
-		glewInit();
-		glViewport(0, 0, 800, 600);
-
-	}
-	glEnable(GL_DEPTH_TEST);
+	initOpenGL(window, context);
 	//wyswietlane jako siatka glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	Shader ourShader("vertex.vs", "fragment.fs");
 	Model ourModel("res/models/headphones_UVW.fbx");
 	Model pistolet("res/models/pistolet/pistolet.obj");
+	Model kostka("res/models/kostka/kos.obj");
 
 	float deltaTime = 0.0;
 	float lastFrame = 0.0;
@@ -148,11 +145,24 @@ int main(int argc, char *argv[])
 		model = glm::rotate(model, (float)glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 		model = glm::scale(model, glm::vec3(0.03f, 0.03f, 0.03f));
 		ourShader.setMat4("model", model);
-		ourModel.Draw(ourShader);
-		//view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -0.1f, -0.5f));
+		//ourModel.Draw(ourShader);
+
+		
+		model = glm::mat4(1.0f);
+		model = glm::scale(model , glm::vec3(0.5f, 0.5f, 0.5f));
+		ourShader.setMat4("model", model);
+		kostka.Draw(ourShader);
+		model = glm::mat4(1.0f);
+		model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));
+		model = glm::translate(model, glm::vec3(2.0f, 0.0f, 0.0f));
+		
+		ourShader.setMat4("model", model);
+		kostka.Draw(ourShader);
+
+		//rysowanie broni
 		ourShader.setMat4("view", glm::mat4(1.0f));
 		model = glm::mat4(1.0f);
-		std::cout << kamera.cameraPos.x << " " << kamera.cameraPos.y << " " << kamera.cameraPos.z << std::endl;
+		//std::cout << kamera.cameraPos.x << " " << kamera.cameraPos.y << " " << kamera.cameraPos.z << std::endl;
 		model = glm::translate(model, glm::vec3(0.0f, -0.1f, -0.5f));
 		model = glm::rotate(model, (float)glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 		if (ostatniWystrzal != 0.0) {
@@ -160,16 +170,14 @@ int main(int argc, char *argv[])
 				ostatniWystrzal = 0.0;
 			}
 			else {
-				//std::cout << glm::sin(ostatniWystrzal - currentFrame / 10.0*glm::pi<float>() / 2) << std::endl;
 				std::cout << glm::cos((ostatniWystrzal - currentFrame) / 2.0f) << std::endl;
 				model = glm::rotate(model, -glm::sin((ostatniWystrzal - currentFrame) / 0.5f) / 3.0f, glm::vec3(0.0f, 0.0f, 1.0f));
 			}
 		}
-
 		model = glm::scale(model, glm::vec3(0.03f, 0.03f, 0.03f));
-
 		ourShader.setMat4("model", model);
 		pistolet.Draw(ourShader);
+		//rysowanie broni - koniec
 			SDL_GL_SwapWindow(window);
 	}
 
