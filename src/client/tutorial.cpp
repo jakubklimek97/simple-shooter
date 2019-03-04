@@ -148,7 +148,7 @@ int main(int argc, char *argv[])
 		ourShader.setMat4("view", view);
 		model = glm::mat4(1.0f);
 		std::cout << kamera.cameraPos.x << " " << kamera.cameraPos.y << " " << kamera.cameraPos.z << std::endl;
-		model = glm::rotate(model, (float)glm::radians(-90.0f), glm::vec3(0.0f,1.0f, 0.0f));
+		model = glm::rotate(model, (float)glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 		model = glm::scale(model, glm::vec3(0.03f, 0.03f, 0.03f));
 		ourShader.setMat4("model", model);
 		pistolet.Draw(ourShader);
