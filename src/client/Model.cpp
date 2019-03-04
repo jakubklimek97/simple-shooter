@@ -161,6 +161,6 @@ unsigned int TextureFromFile(const char *path, const std::string &directory, boo
 	{
 		std::cout << "Texture failed to load at path: " << path << std::endl;
 	}
-
+	SDL_FreeSurface(ptr);
 	return textureID;
 }
