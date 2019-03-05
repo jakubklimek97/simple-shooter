@@ -11,6 +11,7 @@
 #include <sstream>
 #include <iostream>
 #include <vector>
+#include<SDL_image.h>
 
 struct Vertex {
 	glm::vec3 Position;
@@ -31,6 +32,7 @@ public:
 	std::vector<Vertex> vertices;
 	std::vector<unsigned int> indices;
 	std::vector<Texture> textures;
+	static void loadHeighData();
 	Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures);
 	~Mesh();
 	void Draw(Shader shader);
