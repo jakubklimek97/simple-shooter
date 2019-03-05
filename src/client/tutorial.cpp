@@ -11,7 +11,8 @@
 #include "Shader.h"
 #include "Camera.h"
 #include "Model.h"
-#include "Terrain.h"
+
+
 
 
 int initSDL() {
