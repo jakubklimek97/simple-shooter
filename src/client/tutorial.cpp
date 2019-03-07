@@ -62,11 +62,11 @@ int main(int argc, char *argv[])
 	Camera kamera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.1f, 1.0f);
 
 	Entity cube(kostka, glm::vec3(0.0f, -1.0f, 0.0f), 0.0f, glm::vec3(0.5f, 0.5f, 0.5f));
-	Entity cube2(kostka, glm::vec3(1.5f, -1.0f, 0.0f), 0.0f, glm::vec3(0.5f, 0.5f, 0.5f));
-	Entity cube3(pistolet, glm::vec3(-1.5f, -1.0f, 0.0f), 0.0f, glm::vec3(0.1f, 0.1f, 0.1f));
+	//Entity cube2(kostka, glm::vec3(1.5f, -1.0f, 0.0f), 0.0f, glm::vec3(0.5f, 0.5f, 0.5f));
+	//Entity cube3(pistolet, glm::vec3(-1.5f, -1.0f, 0.0f), 0.0f, glm::vec3(0.1f, 0.1f, 0.1f));
 	cube.setShader(ourShader);
-	cube2.setShader(ourShader);
-	cube3.setShader(ourShader);
+	//cube2.setShader(ourShader);
+	//cube3.setShader(ourShader);
 	Camera::Movement nextMove;
 	
 	float ostatniWystrzal = 0.0;
@@ -149,13 +149,13 @@ int main(int argc, char *argv[])
 		glm::mat4 view = kamera.getViewMatrix();
 		glm::mat4 model;
 
-		float rotation = glm::sin(currentFrame) / 10;
-		cube.rotate(rotation);
+		//float rotation = glm::sin(currentFrame) / 10;
+		//cube.rotate(rotation);
 		cube.Draw(projection, view);
-		cube2.rotate(rotation);
-		cube2.Draw(projection, view);
-		cube3.rotate(rotation);
-		cube3.Draw(projection, view);
+		//cube2.rotate(rotation);
+		//cube2.Draw(projection, view);
+		//cube3.rotate(rotation);
+		//cube3.Draw(projection, view);
 
 
 		//rysowanie broni
