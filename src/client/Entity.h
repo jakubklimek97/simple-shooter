@@ -9,8 +9,6 @@ class LightObject;
 class Entity
 {
 public:
-	
-
 	Entity(Model& model, glm::vec3 position, float rotation, glm::vec3 scale);
 	void rotateX(float radians);
 	void rotateY(float radians);

@@ -13,6 +13,7 @@
 #include "Camera.h"
 #include "Model.h"
 #include "Entity.h"
+#include "Scene.h"
 #include "LightObject.h"
 
 int initSDL() {
@@ -26,7 +27,7 @@ int initSDL() {
 	}
 	return 0;
 }
-void initOpenGL(SDL_Window* &pWindow, SDL_GLContext &context) {
+void initOpenGL(SDL_Window* &pWindow, SDL_GLContext &context) {	
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
@@ -56,23 +57,21 @@ int main(int argc, char *argv[])
 	Shader simpleShader("simpleColorShader.vs", "simpleColorShader.fs");
 	Model kostka("res/models/kostka/kos.obj");
 	Model pistolet("res/models/pistolet/pistolet.obj");
-	
 
+	
+	
 	float deltaTime = 0.0;
 	float lastFrame = 0.0;
 	SDL_Event windowEvent;
 	SDL_SetRelativeMouseMode(SDL_TRUE);
-	Camera kamera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.1f, 1.0f);
 
-	Entity cube(kostka, glm::vec3(0.0f, -1.0f, 0.0f), 0.0f, glm::vec3(0.5f, 0.5f, 0.5f));
-	cube.rotateY(glm::radians(180.0f));
 
-	cube.setShader(lightShader);
-
-	LightObject lamp(kostka, glm::vec3(2.5f,1.0f, 2.0f), 0.0f, glm::vec3(0.2f), &simpleShader, glm::vec3(1.0f, 1.0f, 1.0f));
-
-	Camera::Movement nextMove;
+	Scene testowa(glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f), new Camera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.1f, 1.0f));
+	testowa.SetLight(new LightObject(kostka, glm::vec3(2.5f, 1.0f, 2.0f), 0.0f, glm::vec3(0.2f), &simpleShader, glm::vec3(1.0f, 1.0f, 1.0f)));
+	Entity* testCube = testowa.addObject(new Entity(kostka, glm::vec3(0.0f, -1.0f, 0.0f), 0.0f, glm::vec3(0.5f, 0.5f, 0.5f)));
+	testCube->setShader(lightShader);
 	
+	Camera::Movement nextMove;
 	float ostatniWystrzal = 0.0;
 	while (true)
 	{
@@ -134,7 +133,7 @@ int main(int argc, char *argv[])
 				break;
 			}
 			case SDL_MOUSEMOTION: {
-				kamera.turnCamera(windowEvent.motion);
+				testowa.getCamera()->turnCamera(windowEvent.motion);
 			}
 			case SDL_MOUSEBUTTONDOWN: {
 				if (windowEvent.button.button == SDL_BUTTON_LEFT) {
@@ -147,23 +146,18 @@ int main(int argc, char *argv[])
 
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		kamera.moveCamera(nextMove, deltaTime);
 
-		glm::mat4 projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
-		glm::mat4 view = kamera.getViewMatrix();
-		glm::mat4 model;
-		cube.rotateZ(glm::radians(1.0f));
-		cube.rotateY(glm::radians(1.0f));
-		cube.Draw(projection, view, lamp, kamera);
-		
-		lamp.Draw(projection, view);
+		testowa.getCamera()->moveCamera(nextMove, deltaTime);
+		testCube->rotateZ(glm::radians(1.0f));
+		testCube->rotateY(glm::radians(1.0f));
+		testowa.DrawObjects();
 
-		ourShader.use();
 		//rysowanie broni
+		ourShader.use();
 		ourShader.setMat4("view", glm::mat4(1.0f));
-		ourShader.setMat4("projection", projection);
-		model = glm::mat4(1.0f);
-		//std::cout << kamera.cameraPos.x << " " << kamera.cameraPos.y << " " << kamera.cameraPos.z << std::endl;
+		ourShader.setMat4("projection", testowa.GetProjectionMatrix());
+
+		glm::mat4 model = glm::mat4(1.0f);
 		model = glm::translate(model, glm::vec3(0.0f, -0.1f, -0.5f));
 		model = glm::rotate(model, (float)glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 		if (ostatniWystrzal != 0.0) {
@@ -179,7 +173,8 @@ int main(int argc, char *argv[])
 		ourShader.setMat4("model", model);
 		pistolet.Draw(lightShader);
 		//rysowanie broni - koniec
-			SDL_GL_SwapWindow(window);
+
+		SDL_GL_SwapWindow(window);
 	}
 
 	SDL_GL_DeleteContext(context);
