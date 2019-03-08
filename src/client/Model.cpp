@@ -73,7 +73,7 @@ Mesh Model::processMesh(aiMesh * mesh, const aiScene * scene)
 		vector.y = mesh->mTangents[i].y;
 		vector.z = mesh->mTangents[i].z;
 		vertex.Tangent = vector;
-		vector.x = mesh->mBitangents[i].x;
+		vector.x = mesh->mBitangents[i].x; 
 		vector.y = mesh->mBitangents[i].y;
 		vector.z = mesh->mBitangents[i].z;
 		vertex.Bitangent = vector;
@@ -86,6 +86,8 @@ Mesh Model::processMesh(aiMesh * mesh, const aiScene * scene)
 			indices.push_back(face.mIndices[j]);
 	}
 	aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+	float shininess;
+	material->Get(AI_MATKEY_SHININESS, shininess);
 	std::vector<Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
 	textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
 	std::vector<Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
@@ -95,7 +97,23 @@ Mesh Model::processMesh(aiMesh * mesh, const aiScene * scene)
 	std::vector<Texture> heightMaps = loadMaterialTextures(material, aiTextureType_AMBIENT, "texture_height");
 	textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
 
-	return Mesh(vertices, indices, textures);
+	MaterialProperties properties;
+	material->Get(AI_MATKEY_SHININESS, properties.shininess);
+	if (diffuseMaps.empty()) {
+		aiColor3D diffuse;
+		material->Get(AI_MATKEY_COLOR_DIFFUSE, diffuse);
+		properties.diffuse.r = diffuse.r;
+		properties.diffuse.g = diffuse.g;
+		properties.diffuse.b = diffuse.b;
+	}
+	if (specularMaps.empty()) {
+		aiColor3D specular;
+		material->Get(AI_MATKEY_COLOR_DIFFUSE, specular);
+		properties.specular.r = specular.r;
+		properties.specular.g = specular.g;
+		properties.specular.b = specular.b;
+	}
+	return Mesh(vertices, indices, textures, properties);
 }
 std::vector<Texture> Model::loadMaterialTextures(aiMaterial * mat, aiTextureType type, std::string typeName)
 {
