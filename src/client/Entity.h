@@ -12,6 +12,8 @@ public:
 	void setShader(Shader& shader);
 	void setShader(Shader* shader);
 	void Draw(glm::mat4 &projectionMatrix, glm::mat4& viewMatrix);
+	void Draw(glm::mat4 &projectionMatrix, glm::mat4& viewMatrix, glm::vec3 lightColor);
+	Shader* GetShader();
 private:
 	Model& model;
 	void prepareModelMatrix();

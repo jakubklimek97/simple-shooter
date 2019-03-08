@@ -51,6 +51,7 @@ int main(int argc, char *argv[])
 	//wyswietlane jako siatka glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	Shader ourShader("vertex.vs", "fragment.fs");
+	Shader lightShader("LightShader.vs", "LightShader.fs");
 	Model ourModel("res/models/headphones_UVW.fbx");
 	Model pistolet("res/models/pistolet/pistolet.obj");
 	Model kostka("res/models/kostka/kos.obj");
@@ -64,7 +65,9 @@ int main(int argc, char *argv[])
 	Entity cube(kostka, glm::vec3(0.0f, -1.0f, 0.0f), 0.0f, glm::vec3(0.5f, 0.5f, 0.5f));
 	//Entity cube2(kostka, glm::vec3(1.5f, -1.0f, 0.0f), 0.0f, glm::vec3(0.5f, 0.5f, 0.5f));
 	//Entity cube3(pistolet, glm::vec3(-1.5f, -1.0f, 0.0f), 0.0f, glm::vec3(0.1f, 0.1f, 0.1f));
-	cube.setShader(ourShader);
+	cube.setShader(lightShader);
+	Entity lamp(kostka, glm::vec3(2.5f, 1.0f, 2.0f), 0.0f, glm::vec3(0.3f, 0.3f, 0.3f));
+	lamp.setShader(ourShader);
 	//cube2.setShader(ourShader);
 	//cube3.setShader(ourShader);
 	Camera::Movement nextMove;
@@ -151,15 +154,17 @@ int main(int argc, char *argv[])
 
 		//float rotation = glm::sin(currentFrame) / 10;
 		//cube.rotate(rotation);
-		cube.Draw(projection, view);
+		cube.Draw(projection, view, glm::vec3(1.0f, 1.0f, 1.0f));
+		lamp.Draw(projection, view);
 		//cube2.rotate(rotation);
 		//cube2.Draw(projection, view);
 		//cube3.rotate(rotation);
 		//cube3.Draw(projection, view);
 
-
+		ourShader.use();
 		//rysowanie broni
 		ourShader.setMat4("view", glm::mat4(1.0f));
+		ourShader.setMat4("projection", projection);
 		model = glm::mat4(1.0f);
 		//std::cout << kamera.cameraPos.x << " " << kamera.cameraPos.y << " " << kamera.cameraPos.z << std::endl;
 		model = glm::translate(model, glm::vec3(0.0f, -0.1f, -0.5f));
