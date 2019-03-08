@@ -1,7 +1,7 @@
 #include "Mesh.h"
 #include <cstddef>
 
-Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures):vertices(vertices), indices(indices), textures(textures)
+Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures, MaterialProperties materialProperties):vertices(vertices), indices(indices), textures(textures), materialProperties(materialProperties)
 {
 	setupMesh();
 }
@@ -28,6 +28,13 @@ void Mesh::Draw(Shader shader)
 		glUniform1i(glGetUniformLocation(shader.ID, (name + number).c_str()), i);
 		glBindTexture(GL_TEXTURE_2D, textures[i].id);
 	}
+
+	shader.setVec3("material.ambient", materialProperties.ambient);
+	shader.setVec3("material.diffuse", materialProperties.diffuse);
+	shader.setVec3("material.specular", materialProperties.specular);
+	shader.setFloat("material.shininess", materialProperties.shininess);
+	shader.setFloat("material.specularTexture", materialProperties.specularTexture);
+
 	glBindVertexArray(VAO);
 	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
