@@ -13,6 +13,7 @@
 #include "Camera.h"
 #include "Model.h"
 #include "Entity.h"
+#include "LightObject.h"
 
 int initSDL() {
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
@@ -52,9 +53,10 @@ int main(int argc, char *argv[])
 
 	Shader ourShader("vertex.vs", "fragment.fs");
 	Shader lightShader("LightShader.vs", "LightShader.fs");
-	Model ourModel("res/models/headphones_UVW.fbx");
-	Model pistolet("res/models/pistolet/pistolet.obj");
+	Shader simpleShader("simpleColorShader.vs", "simpleColorShader.fs");
 	Model kostka("res/models/kostka/kos.obj");
+	Model pistolet("res/models/pistolet/pistolet.obj");
+	
 
 	float deltaTime = 0.0;
 	float lastFrame = 0.0;
@@ -63,13 +65,12 @@ int main(int argc, char *argv[])
 	Camera kamera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.1f, 1.0f);
 
 	Entity cube(kostka, glm::vec3(0.0f, -1.0f, 0.0f), 0.0f, glm::vec3(0.5f, 0.5f, 0.5f));
-	//Entity cube2(kostka, glm::vec3(1.5f, -1.0f, 0.0f), 0.0f, glm::vec3(0.5f, 0.5f, 0.5f));
-	//Entity cube3(pistolet, glm::vec3(-1.5f, -1.0f, 0.0f), 0.0f, glm::vec3(0.1f, 0.1f, 0.1f));
+	cube.rotateY(glm::radians(180.0f));
+
 	cube.setShader(lightShader);
-	Entity lamp(kostka, glm::vec3(2.5f, 1.0f, 2.0f), 0.0f, glm::vec3(0.3f, 0.3f, 0.3f));
-	lamp.setShader(ourShader);
-	//cube2.setShader(ourShader);
-	//cube3.setShader(ourShader);
+
+	LightObject lamp(kostka, glm::vec3(2.5f,1.0f, 2.0f), 0.0f, glm::vec3(0.2f), &simpleShader, glm::vec3(1.0f, 1.0f, 1.0f));
+
 	Camera::Movement nextMove;
 	
 	float ostatniWystrzal = 0.0;
@@ -151,15 +152,11 @@ int main(int argc, char *argv[])
 		glm::mat4 projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
 		glm::mat4 view = kamera.getViewMatrix();
 		glm::mat4 model;
-
-		//float rotation = glm::sin(currentFrame) / 10;
-		//cube.rotate(rotation);
-		cube.Draw(projection, view, glm::vec3(1.0f, 1.0f, 1.0f));
+		cube.rotateZ(glm::radians(1.0f));
+		cube.rotateY(glm::radians(1.0f));
+		cube.Draw(projection, view, lamp, kamera);
+		
 		lamp.Draw(projection, view);
-		//cube2.rotate(rotation);
-		//cube2.Draw(projection, view);
-		//cube3.rotate(rotation);
-		//cube3.Draw(projection, view);
 
 		ourShader.use();
 		//rysowanie broni
@@ -180,7 +177,7 @@ int main(int argc, char *argv[])
 		}
 		model = glm::scale(model, glm::vec3(0.03f, 0.03f, 0.03f));
 		ourShader.setMat4("model", model);
-		pistolet.Draw(ourShader);
+		pistolet.Draw(lightShader);
 		//rysowanie broni - koniec
 			SDL_GL_SwapWindow(window);
 	}

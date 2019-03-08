@@ -99,6 +99,7 @@ Mesh Model::processMesh(aiMesh * mesh, const aiScene * scene)
 
 	MaterialProperties properties;
 	material->Get(AI_MATKEY_SHININESS, properties.shininess);
+	properties.shininess = 250.0f;
 	if (diffuseMaps.empty()) {
 		aiColor3D diffuse;
 		material->Get(AI_MATKEY_COLOR_DIFFUSE, diffuse);
@@ -108,10 +109,11 @@ Mesh Model::processMesh(aiMesh * mesh, const aiScene * scene)
 	}
 	if (specularMaps.empty()) {
 		aiColor3D specular;
-		material->Get(AI_MATKEY_COLOR_DIFFUSE, specular);
+		material->Get(AI_MATKEY_COLOR_SPECULAR, specular);
 		properties.specular.r = specular.r;
 		properties.specular.g = specular.g;
 		properties.specular.b = specular.b;
+		properties.specularTexture = 0.0f;
 	}
 	return Mesh(vertices, indices, textures, properties);
 }

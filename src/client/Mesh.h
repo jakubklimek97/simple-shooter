@@ -31,6 +31,7 @@ struct MaterialProperties {
 	glm::vec3 diffuse = glm::vec3(0.0f);
 	glm::vec3 specular = glm::vec3(0.0f);
 	float shininess;
+	float specularTexture = 1.0f; //0.0f if material doesn't have texture, 1.0f otherwise
 };
 class Mesh {
 public:
