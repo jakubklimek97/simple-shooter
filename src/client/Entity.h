@@ -6,6 +6,7 @@
 #include <glm/glm.hpp>
 
 class LightObject;
+class BoundingBox;
 class Entity
 {
 public:
@@ -18,6 +19,8 @@ public:
 	virtual void Draw(glm::mat4 &projectionMatrix, glm::mat4& viewMatrix);
 	virtual void Draw(glm::mat4 &projectionMatrix, glm::mat4& viewMatrix,const LightObject& lightObject, const Camera& camera);
 	Shader* GetShader();
+
+	friend class BoundingBox;
 protected:
 	Model& model;
 	void prepareModelMatrix();
