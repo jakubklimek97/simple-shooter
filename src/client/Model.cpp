@@ -154,6 +154,9 @@ unsigned int TextureFromFile(const char *path, const std::string &directory, boo
 	glGenTextures(1, &textureID);
 	int width = 1, height = 1, nrComponents = 1;
 	SDL_Surface* ptr = IMG_Load(filename.c_str());
+	if (!ptr) {
+		std::cout << "ERROR::TEXTURE_LOADER:: " << IMG_GetError() << std::endl;
+	}
 	width = ptr->w;
 	height = ptr->h;
 	nrComponents = ptr->format->BytesPerPixel;
