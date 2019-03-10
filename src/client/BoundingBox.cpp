@@ -1,11 +1,23 @@
 #include "BoundingBox.h"
+#include <limits>
 
 BoundingBox::BoundingBox(Entity & entity): entityRef(entity)
 {
-	entity.prepareModelMatrix();
-	for (const Mesh& mesh : entity.model.meshes) {
+	calculateBoundingBox();
+}
+
+BoundingBox::~BoundingBox()
+{
+}
+
+void BoundingBox::calculateBoundingBox()
+{
+	minX = minY = minZ = std::numeric_limits<float>::max();
+	maxX = maxY = maxZ = std::numeric_limits<float>::lowest();
+	entityRef.prepareModelMatrix();
+	for (const Mesh& mesh : entityRef.model.meshes) {
 		for (Vertex vertex : mesh.vertices) {
-			vertex.Position = glm::vec3(entity.modelMatrix * glm::vec4(vertex.Position, 1.0f));
+			vertex.Position = glm::vec3(entityRef.modelMatrix * glm::vec4(vertex.Position, 1.0f));
 			if (vertex.Position.x < minX)
 				minX = vertex.Position.x;
 			else if (vertex.Position.x > maxX)
@@ -20,8 +32,4 @@ BoundingBox::BoundingBox(Entity & entity): entityRef(entity)
 				maxZ = vertex.Position.z;
 		}
 	}
-}
-
-BoundingBox::~BoundingBox()
-{
 }

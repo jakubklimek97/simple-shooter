@@ -6,6 +6,7 @@ class BoundingBox
 public:
 	BoundingBox(Entity & entity);
 	~BoundingBox();
+	void calculateBoundingBox();
 private:
 	float minX, minY, minZ, maxX, maxY, maxZ;
 	Entity& entityRef;
