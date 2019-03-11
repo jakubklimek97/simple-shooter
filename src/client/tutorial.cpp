@@ -4,7 +4,7 @@
 
 #include <GL/glew.h>
 #include <SDL_opengl.h>
-
+#include <GL/GL.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -12,6 +12,92 @@
 #include "Shader.h"
 #include "Camera.h"
 #include "Model.h"
+//void MyOrtho2D(float* mat, float left, float right, float bottom, float top)
+//{
+//	// this is basically from
+//
+//	const float zNear = -1.0f;
+//	const float zFar = 1.0f;
+//	const float inv_z = 1.0f / (zFar - zNear);
+//	const float inv_y = 1.0f / (top - bottom);
+//	const float inv_x = 1.0f / (right - left);
+//
+//	//first column
+//	*mat++ = (2.0f*inv_x);
+//	*mat++ = (0.0f);
+//	*mat++ = (0.0f);
+//	*mat++ = (0.0f);
+//
+//	//second
+//	*mat++ = (0.0f);
+//	*mat++ = (2.0*inv_y);
+//	*mat++ = (0.0f);
+//	*mat++ = (0.0f);
+//
+//	//third
+//	*mat++ = (0.0f);
+//	*mat++ = (0.0f);
+//	*mat++ = (-2.0f*inv_z);
+//	*mat++ = (0.0f);
+//
+//	//fourth
+//	*mat++ = (-(right + left)*inv_x);
+//	*mat++ = (-(top + bottom)*inv_y);
+//	*mat++ = (-(zFar + zNear)*inv_z);
+//	*mat++ = (1.0f);
+//}
+//unsigned int HUDid;
+//void HUD() {
+//	HUDid = Model::TextureFromFile3("heart.png", "res/img",false);
+//	//glEnable(GL_TEXTURE_2D);//dodane
+//	glBindTexture(GL_TEXTURE_2D, HUDid);
+//	glColor3f(0.0, 0.0, 0.0);
+//	glBegin(GL_QUADS);
+//	glTexCoord2f(0.0, 1.0); glVertex2f(0.05, 0.05);
+//	glTexCoord2f(1.0, 1.0); glVertex2f(0.3, 0.05);
+//	glTexCoord2f(1.0, 0.0); glVertex2f(0.3, 0.15);
+//	glTexCoord2f(0.0, 0.0); glVertex2f(0.05, 0.15);
+//	glEnd();
+//}
+//
+//
+//
+//void drawHUD() {
+//
+//	glMatrixMode(GL_PROJECTION);
+//	glPushMatrix();
+//	glLoadIdentity();
+//	//float my_proj_matrix[16];
+//	//gluOrtho2D(0.0, 1.0, 1.0, 0.0);
+//	//MyOrtho2D(my_proj_matrix, 0.0f, 1.0f, 1.0f, 0.0f);
+//	glOrtho(0.0, 1.0, 1.0, 0.0, 1.0, 1.0);
+//	glMatrixMode(GL_MODELVIEW);
+//	glPushMatrix();
+//	glLoadIdentity();
+//	HUD();
+//	glMatrixMode(GL_PROJECTION);
+//	glPopMatrix();
+//	glMatrixMode(GL_MODELVIEW);
+//	glPopMatrix();
+//
+//
+//}
+
+
+void drawHealth4(float health) {
+	const int numDiv = 15;
+	const float sep = 0.04;
+	const float barHeight = 1.0 / (float)numDiv;
+	glBegin(GL_QUADS);
+	glColor3f(1, 0, 0);
+	for (float i = 0; i < health; i += (sep + barHeight)) {
+		glVertex2f(0, i);
+		glVertex2f(1, i);
+		glVertex2f(1, i + barHeight);
+		glVertex2f(0, i + barHeight);
+	}
+	glEnd();
+}
 
 int initSDL() {
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
@@ -28,7 +114,11 @@ int initSDL() {
 
 int main(int argc, char *argv[])
 {
+
+
+
 	if (initSDL() < 0) return -1;
+
 	SDL_Window* window;
 	SDL_GLContext context;
 	//inicjalizacje opengla i glewa, utworzenie okna i jego zawartosci
@@ -59,6 +149,7 @@ int main(int argc, char *argv[])
 
 	float deltaTime = 0.0;
 	float lastFrame = 0.0;
+	//drawHUD();
 	SDL_Event windowEvent;
 	SDL_SetRelativeMouseMode(SDL_TRUE);
 	Camera kamera(glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.1f, 1.0f);
@@ -131,7 +222,6 @@ int main(int argc, char *argv[])
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		kamera.moveCamera(nextMove, deltaTime);
-
 		ourShader.use();
 		glm::mat4 projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
 		glm::mat4 view = kamera.getViewMatrix();
@@ -152,9 +242,17 @@ int main(int argc, char *argv[])
 		model = glm::scale(model, glm::vec3(0.03f, 0.03f, 0.03f));
 		ourShader.setMat4("model", model);
 		pistolet.Draw(ourShader);
+		/*drawHealth4(0.3f);
+		glBegin(GL_QUADS);
+		glColor3f(1, 0, 0);
+		glVertex2f(0, 0);
+		glVertex2f(1, 0);
+		glVertex2f(1, 0.2);
+		glVertex2f(0, 0.2);*/
+		//glEnd();
 		SDL_GL_SwapWindow(window);
 	}
-
+	
 	SDL_GL_DeleteContext(context);
 	SDL_DestroyWindow(window);
 	IMG_Quit();
