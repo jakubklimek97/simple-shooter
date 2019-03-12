@@ -15,6 +15,7 @@
 #include "Entity.h"
 #include "Scene.h"
 #include "LightObject.h"
+#include "BoundingBox.h"
 
 int initSDL() {
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
@@ -54,6 +55,7 @@ int main(int argc, char *argv[])
 
 	Shader ourShader("vertex.vs", "fragment.fs");
 	Shader lightShader("LightShader.vs", "LightShader.fs");
+	Shader boundingBoxShader("boundingBox.vs", "boundingBox.fs");
 	Shader simpleShader("simpleColorShader.vs", "simpleColorShader.fs");
 	Model kostka("res/models/kostka/kos.obj");
 	Model pistolet("res/models/pistolet/pistolet.obj");
@@ -67,14 +69,20 @@ int main(int argc, char *argv[])
 
 
 	Scene testowa(glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f), new Camera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.1f, 1.0f));
-	testowa.SetLight(new LightObject(kostka, glm::vec3(2.5f, 1.0f, 2.0f), 0.0f, glm::vec3(0.2f), &simpleShader, glm::vec3(1.0f, 1.0f, 1.0f)));
-	Entity* testCube = testowa.addObject(new Entity(kostka, glm::vec3(0.0f, -1.0f, 0.0f), 0.0f, glm::vec3(0.5f, 0.5f, 0.5f)));
-	testCube->setShader(lightShader);
+	LightObject* light = testowa.SetLight(new LightObject(kostka, glm::vec3(2.5f, 1.0f, 2.0f), 0.0f, glm::vec3(0.2f), &simpleShader, glm::vec3(1.0f, 1.0f, 1.0f)));
+	Entity* testCube = testowa.addObject(new Entity(kostka, glm::vec3(5.0f, -1.0f, 0.0f), 0.0f, glm::vec3(0.5f, 0.5f, 0.5f)));
+
+	Entity* testBoundingBox = testowa.addObject(new Entity(kostka, glm::vec3(4.0f, 0.0f, 0.0f), 0.0f, glm::vec3(0.5f, 0.5f, 0.5f)));
+	testBoundingBox->setShader(lightShader);
+	testBoundingBox->rotateY(45.0f);
+	BoundingBox box(*testBoundingBox);
+	testowa.removeObject(testCube);
 	
 	Camera::Movement nextMove;
 	float ostatniWystrzal = 0.0;
 	while (true)
 	{
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		float currentFrame = SDL_GetTicks() / 1000.0f;
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
@@ -150,16 +158,17 @@ int main(int argc, char *argv[])
 		testowa.getCamera()->moveCamera(nextMove, deltaTime);
 		testCube->rotateZ(glm::radians(1.0f));
 		testCube->rotateY(glm::radians(1.0f));
+		testBoundingBox->rotateY(glm::radians(2.0f));
 		testowa.DrawObjects();
-
-		//rysowanie broni
-		ourShader.use();
-		ourShader.setMat4("view", glm::mat4(1.0f));
-		ourShader.setMat4("projection", testowa.GetProjectionMatrix());
+		box.calculateBoundingBox();
+		box.Draw(testowa.GetProjectionMatrix(), testowa.GetViewMatrix(), boundingBoxShader);
 
 		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(0.0f, -0.1f, -0.5f));
-		model = glm::rotate(model, (float)glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::translate(model, testowa.getCamera()->cameraPos + testowa.getCamera()->cameraFront);
+		model = glm::rotate(model,glm::radians(180.0f-testowa.getCamera()->yaw), glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::rotate(model,glm::radians(-testowa.getCamera()->pitch), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::translate(model, glm::vec3(0.35f, -0.15f, 0.0f));
+		std::cout << testowa.getCamera()->yaw << std::endl;
 		if (ostatniWystrzal != 0.0) {
 			if (currentFrame >= ostatniWystrzal) {
 				ostatniWystrzal = 0.0;
@@ -170,9 +179,14 @@ int main(int argc, char *argv[])
 			}
 		}
 		model = glm::scale(model, glm::vec3(0.03f, 0.03f, 0.03f));
-		ourShader.setMat4("model", model);
+		lightShader.use();
+		lightShader.setMat4("model", model);
+		lightShader.setMat4("projection", testowa.GetProjectionMatrix());
+		lightShader.setMat4("view", testowa.GetViewMatrix());
+		lightShader.setVec3("lightColor", light->GetColor());
+		lightShader.setVec3("lightPos", light->GetPosition());
+		lightShader.setVec3("viewPos", testowa.getCamera()->cameraPos);
 		pistolet.Draw(lightShader);
-		//rysowanie broni - koniec
 
 		SDL_GL_SwapWindow(window);
 	}
