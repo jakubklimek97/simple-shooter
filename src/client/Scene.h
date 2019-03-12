@@ -11,7 +11,7 @@ class Scene
 public:
 	Scene(glm::mat4 projectionMatrix, Camera* camera);
 	~Scene();
-	void SetLight(LightObject* light);
+	LightObject* SetLight(LightObject* light);
 	Entity* addObject(Entity* object);
 	void removeObject(Entity* object);
 	Camera* getCamera();

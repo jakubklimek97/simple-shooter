@@ -13,10 +13,11 @@ Scene::~Scene()
 	delete camera;
 }
 
-void Scene::SetLight(LightObject * light)
+LightObject* Scene::SetLight(LightObject * light)
 {
 	if (this->light) delete this->light;
 	this->light = light;
+	return light;
 }
 
 Entity* Scene::addObject(Entity* object)
