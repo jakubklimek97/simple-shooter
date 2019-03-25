@@ -1,5 +1,5 @@
 #pragma once
-#include"ResourceManager2D.h"
+//#include"ResourceManager2D.h"
 #include"Sprite.h"
 #include <GL/glew.h>
 
