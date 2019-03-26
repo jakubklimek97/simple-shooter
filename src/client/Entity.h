@@ -6,7 +6,8 @@
 #include <glm/glm.hpp>
 
 class LightObject;
-class BoundingBox;
+class 
+	ingBox;
 class Entity
 {
 public:

@@ -50,4 +50,6 @@ private:
 			}
 		}
 	}
+	unsigned int uiProgram;
+	bool bLinked;
 };

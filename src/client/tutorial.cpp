@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
 
 	Shader ourShader("vertex.vs", "fragment.fs");
 	Shader lightShader("LightShader.vs", "LightShader.fs");
-	Shader boundingBoxShader("boundingBox.vs", "boundingBox.fs");
+	//Shader boundingBoxShader("boundingBox.vs", "boundingBox.fs");
 	Shader simpleShader("simpleColorShader.vs", "simpleColorShader.fs");
 	Model kostka("res/models/kostka/kos.obj");
 	Model pistolet("res/models/pistolet/pistolet.obj");
@@ -75,7 +75,7 @@ int main(int argc, char *argv[])
 	Entity* testBoundingBox = testowa.addObject(new Entity(kostka, glm::vec3(4.0f, 0.0f, 0.0f), 0.0f, glm::vec3(0.5f, 0.5f, 0.5f)));
 	testBoundingBox->setShader(lightShader);
 	testBoundingBox->rotateY(45.0f);
-	BoundingBox box(*testBoundingBox);
+	//BoundingBox box(*testBoundingBox);
 	testowa.removeObject(testCube);
 	
 	Camera::Movement nextMove;
@@ -158,10 +158,10 @@ int main(int argc, char *argv[])
 		testowa.getCamera()->moveCamera(nextMove, deltaTime);
 		testCube->rotateZ(glm::radians(1.0f));
 		testCube->rotateY(glm::radians(1.0f));
-		testBoundingBox->rotateY(glm::radians(2.0f));
+		//testBoundingBox->rotateY(glm::radians(2.0f));
 		testowa.DrawObjects();
-		box.calculateBoundingBox();
-		box.Draw(testowa.GetProjectionMatrix(), testowa.GetViewMatrix(), boundingBoxShader);
+		//box.calculateBoundingBox();
+		//box.Draw(testowa.GetProjectionMatrix(), testowa.GetViewMatrix(), boundingBoxShader);
 
 		glm::mat4 model = glm::mat4(1.0f);
 		model = glm::translate(model, testowa.getCamera()->cameraPos + testowa.getCamera()->cameraFront);
