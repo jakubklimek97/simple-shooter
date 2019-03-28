@@ -1,13 +1,13 @@
 #include <iostream>
-#include <SDL.h>
-#include <SDL_image.h>
-
-#include <GL/glew.h>
-#include <SDL_opengl.h>
-
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
+//#include <SDL.h>
+//#include <SDL_image.h>
+//
+//#include <GL/glew.h>
+//#include <SDL_opengl.h>
+//
+//#include <glm/glm.hpp>
+//#include <glm/gtc/matrix_transform.hpp>
+//#include <glm/gtc/type_ptr.hpp>
 
 #include "Shader.h"
 #include "Camera.h"
@@ -16,7 +16,7 @@
 #include "Scene.h"
 #include "LightObject.h"
 #include "BoundingBox.h"
-
+#include"CommonHeader.h"
 int initSDL() {
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
 		std::cout << "Nie mozna zainicjowac SDLA: " << SDL_GetError() << std::endl;
@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
 
 	Shader ourShader("vertex.vs", "fragment.fs");
 	Shader lightShader("LightShader.vs", "LightShader.fs");
-	//Shader boundingBoxShader("boundingBox.vs", "boundingBox.fs");
+	Shader boundingBoxShader("boundingBox.vs", "boundingBox.fs");
 	Shader simpleShader("simpleColorShader.vs", "simpleColorShader.fs");
 	Model kostka("res/models/kostka/kos.obj");
 	Model pistolet("res/models/pistolet/pistolet.obj");
@@ -75,7 +75,7 @@ int main(int argc, char *argv[])
 	Entity* testBoundingBox = testowa.addObject(new Entity(kostka, glm::vec3(4.0f, 0.0f, 0.0f), 0.0f, glm::vec3(0.5f, 0.5f, 0.5f)));
 	testBoundingBox->setShader(lightShader);
 	testBoundingBox->rotateY(45.0f);
-	//BoundingBox box(*testBoundingBox);
+	BoundingBox box(*testBoundingBox);
 	testowa.removeObject(testCube);
 	
 	Camera::Movement nextMove;
@@ -151,17 +151,17 @@ int main(int argc, char *argv[])
 			default: break;
 			}
 		}
-
+		
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		testowa.getCamera()->moveCamera(nextMove, deltaTime);
 		testCube->rotateZ(glm::radians(1.0f));
 		testCube->rotateY(glm::radians(1.0f));
-		//testBoundingBox->rotateY(glm::radians(2.0f));
+		testBoundingBox->rotateY(glm::radians(2.0f));
 		testowa.DrawObjects();
-		//box.calculateBoundingBox();
-		//box.Draw(testowa.GetProjectionMatrix(), testowa.GetViewMatrix(), boundingBoxShader);
+		box.calculateBoundingBox();
+		box.Draw(testowa.GetProjectionMatrix(), testowa.GetViewMatrix(), boundingBoxShader);
 
 		glm::mat4 model = glm::mat4(1.0f);
 		model = glm::translate(model, testowa.getCamera()->cameraPos + testowa.getCamera()->cameraFront);
