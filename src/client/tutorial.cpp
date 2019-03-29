@@ -17,6 +17,13 @@
 #include "LightObject.h"
 #include "BoundingBox.h"
 #include"CommonHeader.h"
+#include"HeightMap.h"
+
+
+
+
+CMultiLayeredHeightmap hmWorld;
+
 int initSDL() {
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
 		std::cout << "Nie mozna zainicjowac SDLA: " << SDL_GetError() << std::endl;
@@ -60,7 +67,12 @@ int main(int argc, char *argv[])
 	Model kostka("res/models/kostka/kos.obj");
 	Model pistolet("res/models/pistolet/pistolet.obj");
 
-	
+	CMultiLayeredHeightmap::LoadTerrainShaderProgram();
+	hmWorld.LoadHeightMapFromImage("consider_this_question.bmp","res/img");
+
+
+
+
 	
 	float deltaTime = 0.0;
 	float lastFrame = 0.0;
@@ -78,6 +90,9 @@ int main(int argc, char *argv[])
 	BoundingBox box(*testBoundingBox);
 	testowa.removeObject(testCube);
 	
+
+
+
 	Camera::Movement nextMove;
 	float ostatniWystrzal = 0.0;
 	while (true)
@@ -188,7 +203,36 @@ int main(int argc, char *argv[])
 		lightShader.setVec3("viewPos", testowa.getCamera()->cameraPos);
 		pistolet.Draw(lightShader);
 
+		hmWorld.SetRenderSize(300.0f, 35.0f, 300.0f);
+		CShaderProgram* spTerrain = CMultiLayeredHeightmap::GetShaderProgram();
+
+		spTerrain->UseProgram();
+
+		spTerrain->SetUniform("matrices.projMatrix", testowa.GetProjectionMatrix());
+		spTerrain->SetUniform("matrices.viewMatrix", testowa.getCamera()->cameraPos);
+
+		//BIND 5 textures
+		FOR(i, 5)
+		{
+			char sSamplerName[256];
+			sprintf(sSamplerName, "gSampler[%d]", i);
+			tTextures[i].BindTExtures(i);
+			spTerrain->SetUniform(sSamplerName, i);
+		}
+
+		// ... set some uniforms
+		//spTerrain->SetModelAndNormalMatrix("matrices.modelMatrix", "matrices.normalMatrix", glm::mat4(1.0));
+		//spTerrain->SetUniform("vColor", glm::vec4(1, 1, 1, 1));
+
+	 // lightShader.SetUniformData(spTerrain, "sunLight");
+
+		// ... and finally render heightmap
+		hmWorld.RenderHeightmap();
+
+
 		SDL_GL_SwapWindow(window);
+
+
 	}
 
 	SDL_GL_DeleteContext(context);

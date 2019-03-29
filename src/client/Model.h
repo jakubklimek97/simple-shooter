@@ -20,19 +20,22 @@
 class Model
 {
 public:
-
+	unsigned uiTexture; // Texture name
+	unsigned uiSampler; // Sampler name
 	std::vector<Texture> textures_loaded;
 	std::vector<Mesh> meshes;
 	std::string directory;
 	bool gammaCorrection;
-
+	void BindTExtures(int Textureunit);
 	Model(std::string const &path, bool gamma = false);
 	~Model();
 	void Draw(Shader shader);
-	
+
 private:
 	void loadModel(std::string const &path);
 	void processNode(aiNode *node, const aiScene *scene);
 	Mesh processMesh(aiMesh *mesh, const aiScene *scene);
 	std::vector<Texture> loadMaterialTextures(aiMaterial *mat, aiTextureType type, std::string typeName);
 };
+#define NUMTEXTURES 5
+extern Model tTextures[NUMTEXTURES];

@@ -28,7 +28,7 @@ public:
 	static bool LoadTerrainShaderProgram();
 	static void ReleaseTerrainShaderProgram();
 
-	bool LoadHeightMapFromImage(string sImagePath, const char *path, bool gamma, std::string &directory);
+	bool LoadHeightMapFromImage2(const char *path, const std::string &directory);
 	void ReleaseHeightmap();
 
 	void RenderHeightmap();
