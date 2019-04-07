@@ -1,5 +1,4 @@
 
-
 #include "shaders.h"
 
 #include <glm/gtc/type_ptr.hpp>
@@ -25,16 +24,18 @@ Result:	Loads all shaders and creates shader programs.
 bool PrepareShaderPrograms()
 {
 	// Load shaders and create shader program
-
+//	GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)))
 	string sShaderFileNames[] = { "main_shader.vert", "main_shader.frag", "ortho2D.vert",
 		"ortho2D.frag", "font2D.frag", "dirLight.frag"
 	};
-
+//	GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)))
 	FOR(i, NUMSHADERS)
 	{
+	//	GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)))
 		string sExt = sShaderFileNames[i].substr(ESZ(sShaderFileNames[i]) - 4, 4);
 		int iShaderType = sExt == "vert" ? GL_VERTEX_SHADER : (sExt == "frag" ? GL_FRAGMENT_SHADER : GL_GEOMETRY_SHADER);
-		shShaders[i].LoadShader("data\\shaders\\" + sShaderFileNames[i], iShaderType);
+		shShaders[i].LoadShader("res\\shaders\\" + sShaderFileNames[i], iShaderType);
+	//	GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)))
 	}
 
 	// Create shader programs
@@ -43,18 +44,19 @@ bool PrepareShaderPrograms()
 	spMain.AddShaderToProgram(&shShaders[0]);
 	spMain.AddShaderToProgram(&shShaders[1]);
 	spMain.AddShaderToProgram(&shShaders[5]);
-
+//	GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)))
 	if (!spMain.LinkProgram())return false;
 
 	spOrtho2D.CreateProgram();
 	spOrtho2D.AddShaderToProgram(&shShaders[3]);
 	spOrtho2D.AddShaderToProgram(&shShaders[4]);
 	spOrtho2D.LinkProgram();
-
+//	GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)))
 	spFont2D.CreateProgram();
 	spFont2D.AddShaderToProgram(&shShaders[2]);
 	spFont2D.AddShaderToProgram(&shShaders[4]);
 	spFont2D.LinkProgram();
+//	GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)))
 
 	return true;
 }
@@ -78,17 +80,19 @@ bool CShader::LoadShader(string sFile, int a_iType)
 
 	const char** sProgram = new const char*[ESZ(sLines)];
 	FOR(i, ESZ(sLines))sProgram[i] = sLines[i].c_str();
-
+	//GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)))
 	uiShader = glCreateShader(a_iType);
-
+	//GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)));
 	glShaderSource(uiShader, ESZ(sLines), sProgram, NULL);
+	//GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)));
 	glCompileShader(uiShader);
 
+//	GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)))
 	delete[] sProgram;
 
 	int iCompilationStatus;
 	glGetShaderiv(uiShader, GL_COMPILE_STATUS, &iCompilationStatus);
-
+	//GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)))
 	if (iCompilationStatus == GL_FALSE)
 	{
 		char sInfoLog[1024];
@@ -233,6 +237,7 @@ Result:	Creates a new program.
 void CShaderProgram::CreateProgram()
 {
 	uiProgram = glCreateProgram();
+	//GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)))
 }
 
 /*-----------------------------------------------
@@ -249,9 +254,9 @@ Result:	Adds a shader (like source file) to
 bool CShaderProgram::AddShaderToProgram(CShader* shShader)
 {
 	if (!shShader->IsLoaded())return false;
-
+	//GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)))
 	glAttachShader(uiProgram, shShader->GetShaderID());
-
+//	GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)))
 	return true;
 }
 
@@ -268,9 +273,12 @@ Result:	Performs final linkage of OpenGL program.
 bool CShaderProgram::LinkProgram()
 {
 	glLinkProgram(uiProgram);
+//	GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)))
 	int iLinkStatus;
 	glGetProgramiv(uiProgram, GL_LINK_STATUS, &iLinkStatus);
+//	GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)))
 	bLinked = iLinkStatus == GL_TRUE;
+//	GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)))
 	return bLinked;
 }
 
@@ -304,6 +312,7 @@ Result:	Tells OpenGL to use this program.
 void CShaderProgram::UseProgram()
 {
 	if (bLinked)glUseProgram(uiProgram);
+//	GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)))
 }
 
 /*-----------------------------------------------

@@ -1,7 +1,7 @@
 #include "Shader.h"
+//#include"gldebug.h"
 
-
-
+#include"gldebug.h"
 Shader::Shader(const char* vertexPath, const char* fragmentPath)
 {
 	std::string vertexCode;
@@ -37,7 +37,7 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath)
 	glShaderSource(fragment, 1, &fShaderCode, NULL);
 	glCompileShader(fragment);
 	checkCompileErrors(fragment, "FRAGMENT");
-
+	//GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)));
 	ID = glCreateProgram();
 	glAttachShader(ID, vertex);
 	glAttachShader(ID, fragment);
@@ -45,12 +45,15 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath)
 	checkCompileErrors(ID, "PROGRAM");
 	glDeleteShader(vertex);
 	glDeleteShader(fragment);
+//	GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)));
 
 }
 
 void Shader::use()
 {
+	//GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)))
 	glUseProgram(ID);
+//	GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)))
 }
 void Shader::setBool(const std::string &name, bool value) const
 {

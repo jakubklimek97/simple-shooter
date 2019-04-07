@@ -1,6 +1,6 @@
 #pragma once
 #include <ctime>
-#include <windows.h>
+//#include <windows.h>
 
 #include <algorithm>
 #include <cmath>
@@ -53,7 +53,7 @@ private:
 	int iSize;
 	int iCurrentSize;
 	int iBufferType;
-	std::vector<BYTE> data;
+	std::vector<unsigned char> data;
 
 	bool bDataUploaded;
 };

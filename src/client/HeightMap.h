@@ -14,6 +14,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <string>
 
+
 #define FOR(q,n) for(int q=0;q<n;q++)
 #define SFOR(q,s,e) for(int q=s;q<=e;q++)
 #define RFOR(q,n) for(int q=n;q>=0;q--)
@@ -28,7 +29,7 @@ public:
 	static bool LoadTerrainShaderProgram();
 	static void ReleaseTerrainShaderProgram();
 
-	bool LoadHeightMapFromImage2(const char *path, const std::string &directory);
+	bool LoadHeightMapFromImage(const char *path, const std::string &directory);
 	void ReleaseHeightmap();
 
 	void RenderHeightmap();
@@ -44,7 +45,7 @@ public:
 	CMultiLayeredHeightmap();
 
 private:
-	UINT uiVAO;
+	unsigned int uiVAO;
 
 	bool bLoaded;
 	bool bShaderProgramLoaded;
@@ -58,5 +59,5 @@ private:
 
 	static CShaderProgram spTerrain;
 	static CShader shTerrainShaders[NUMTERRAINSHADERS];
-};;
+};
 
