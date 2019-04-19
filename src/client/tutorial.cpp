@@ -45,8 +45,8 @@ void initOpenGL(SDL_Window* &pWindow, SDL_GLContext &context) {
 	glViewport(0, 0, 800, 600);
 	glEnable(GL_DEPTH_TEST);
 }
-#define x_max 5
-#define z_max 5
+#define x_max 1
+#define z_max 1
 
 Uint32 getHeight(SDL_Surface* terrain, float posX, float posZ) {
 	if (abs(posX) > x_max || abs(posZ) > z_max)
@@ -73,9 +73,9 @@ int main(int argc, char *argv[])
 	Shader simpleShader("simpleColorShader.vs", "simpleColorShader.fs");
 	Model kostka("res/models/kostka/kos.obj");
 	Model pistolet("res/models/pistolet/pistolet.obj");
-	Model teren("res/models/teren/teren.obj");
+	Model teren("res/models/teren/test.obj");
 
-	SDL_Surface* terrainHeight = IMG_Load("res/models/teren/height.png");
+	SDL_Surface* terrainHeight = IMG_Load("res/models/teren/heightmap.png");
 	if (!terrainHeight) {
 		std::cout << "ERROR::TEXTURE_LOADER:: " << IMG_GetError() << std::endl;
 	}
@@ -90,7 +90,7 @@ int main(int argc, char *argv[])
 	Scene testowa(glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f), new Camera(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.1f, 1.0f));
 	LightObject* light = testowa.SetLight(new LightObject(kostka, glm::vec3(2.5f, 1.0f, 2.0f), 0.0f, glm::vec3(0.2f), &simpleShader, glm::vec3(1.0f, 1.0f, 1.0f)));
 	Entity* terrain = testowa.addObject(new Entity(teren,
-		glm::vec3(0.0f, -2.0f, 0.0f),
+		glm::vec3(0.0f, 0.0f, 0.0f),
 		0.0f,
 		glm::vec3(1.0f)));
 	terrain->setShader(lightShader);
@@ -197,7 +197,7 @@ int main(int argc, char *argv[])
 		Uint8 r, g, b;
 		SDL_GetRGB(getHeight(terrainHeight, testowa.getCamera()->cameraPos.x, testowa.getCamera()->cameraPos.z),
 			terrainHeight->format, &r, &g, &b);
-		std::cout << (int)r << " " << (int)g << " " << (int)b << std::endl;
+		std::cout << testowa.getCamera()->cameraPos.x << " " << testowa.getCamera()->cameraPos.z << " " <<(int)r << " " << (int)g << " " << (int)b << std::endl;
 		if (ostatniWystrzal != 0.0) {
 			if (currentFrame >= ostatniWystrzal) {
 				ostatniWystrzal = 0.0;
