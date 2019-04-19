@@ -4,6 +4,7 @@
 Scene::Scene(glm::mat4 projectionMatrix, Camera* camera): projectionMatrix(projectionMatrix), camera(camera)
 {
 	light = nullptr;
+	terrain = nullptr;
 }
 
 Scene::~Scene()
@@ -47,6 +48,11 @@ glm::mat4 & Scene::GetProjectionMatrix()
 	return projectionMatrix;
 }
 
+Terrain* Scene::addTerrain(Terrain* ptrTerrain)
+{
+	return terrain = ptrTerrain;
+}
+
 void Scene::DrawObjects()
 {
 	if(light == nullptr){
@@ -54,10 +60,18 @@ void Scene::DrawObjects()
 		return;
 	}
 	viewMatrix = camera->getViewMatrix();
+	if (terrain) terrain->Draw(projectionMatrix, viewMatrix, *light, *camera);
 	auto iter = objects.begin();
 	auto end = objects.end();
 	while (iter != end) {
 		(*(iter++))->Draw(projectionMatrix, viewMatrix, *light, *camera);
 	}
 	light->Draw(projectionMatrix, viewMatrix);
+}
+
+void Scene::movePlayer(Camera::Movement move, float deltaTime)
+{
+	camera->moveCamera(move, deltaTime);
+	camera->cameraPos.y = (int)(terrain->getHeight(camera->cameraPos) * 100) / 100.0f + 0.5f; //temp value, mby there's a way to do it smarter
+	//camera->cameraPos.y = terrain->getHeight(camera->cameraPos)+0.5f;
 }
