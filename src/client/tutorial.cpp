@@ -16,6 +16,7 @@
 #include "Scene.h"
 #include "LightObject.h"
 #include "BoundingBox.h"
+#include "Terrain.h"
 
 int initSDL() {
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
@@ -45,20 +46,9 @@ void initOpenGL(SDL_Window* &pWindow, SDL_GLContext &context) {
 	glViewport(0, 0, 800, 600);
 	glEnable(GL_DEPTH_TEST);
 }
-#define x_max 1
-#define z_max 1
+#define x_max 10
+#define z_max 10
 
-Uint32 getHeight(SDL_Surface* terrain, float posX, float posZ) {
-	if (abs(posX) > x_max || abs(posZ) > z_max)
-		return 0;
-	float relativeX = posX + x_max;
-	float relativeZ = posZ + z_max;
-	int row_length = terrain->pitch;
-	int column = static_cast<int>((relativeX / (2 * x_max))*row_length);
-	int row = static_cast<int>((relativeZ/(2*z_max))*row_length);
-	return  *((Uint8 *)terrain->pixels + row * terrain->pitch + column * terrain->format->BytesPerPixel);
-	//return ((Uint8*)(terrain->pixels))[column + row * row_length];
-}
 int main(int argc, char *argv[])
 {
 	if (initSDL() < 0) return -1;
@@ -73,27 +63,24 @@ int main(int argc, char *argv[])
 	Shader simpleShader("simpleColorShader.vs", "simpleColorShader.fs");
 	Model kostka("res/models/kostka/kos.obj");
 	Model pistolet("res/models/pistolet/pistolet.obj");
-	Model teren("res/models/teren/test.obj");
 
-	SDL_Surface* terrainHeight = IMG_Load("res/models/teren/heightmap.png");
+	SDL_Surface* terrainHeight = IMG_Load("res/models/teren/height.png");
 	if (!terrainHeight) {
 		std::cout << "ERROR::TEXTURE_LOADER:: " << IMG_GetError() << std::endl;
 	}
-	int height = getHeight(terrainHeight, 0.0f, 4.9f);
+	//int height = getHeight(terrainHeight, 0.0f, 4.9f);
 	
 	float deltaTime = 0.0;
 	float lastFrame = 0.0;
 	SDL_Event windowEvent;
 	SDL_SetRelativeMouseMode(SDL_TRUE);
 
-
-	Scene testowa(glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f), new Camera(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.1f, 1.0f));
+	
+	Scene testowa(glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f), new Camera(glm::vec3(5.0f, 1.0f, 5.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.1f, 2.0f));
+	Terrain terrain;
+	terrain.loadTerrain("res/models/teren/teren.obj", "res/models/teren/height.png", lightShader);
+	testowa.addTerrain(&terrain);
 	LightObject* light = testowa.SetLight(new LightObject(kostka, glm::vec3(2.5f, 1.0f, 2.0f), 0.0f, glm::vec3(0.2f), &simpleShader, glm::vec3(1.0f, 1.0f, 1.0f)));
-	Entity* terrain = testowa.addObject(new Entity(teren,
-		glm::vec3(0.0f, 0.0f, 0.0f),
-		0.0f,
-		glm::vec3(1.0f)));
-	terrain->setShader(lightShader);
 	//Entity* testCube = testowa.addObject(new Entity(kostka, glm::vec3(5.0f, -1.0f, 0.0f), 0.0f, glm::vec3(0.5f, 0.5f, 0.5f)));
 
 	/*Entity* testBoundingBox = testowa.addObject(new Entity(kostka, glm::vec3(4.0f, 0.0f, 0.0f), 0.0f, glm::vec3(0.5f, 0.5f, 0.5f)));
@@ -180,7 +167,7 @@ int main(int argc, char *argv[])
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		testowa.getCamera()->moveCamera(nextMove, deltaTime);
+		testowa.movePlayer(nextMove, deltaTime);
 		/*testCube->rotateZ(glm::radians(1.0f));
 		testCube->rotateY(glm::radians(1.0f));
 		testBoundingBox->rotateY(glm::radians(2.0f));*/
@@ -194,10 +181,7 @@ int main(int argc, char *argv[])
 		model = glm::rotate(model,glm::radians(180.0f-testowa.getCamera()->yaw), glm::vec3(0.0f, 1.0f, 0.0f));
 		model = glm::rotate(model,glm::radians(-testowa.getCamera()->pitch), glm::vec3(0.0f, 0.0f, 1.0f));
 		model = glm::translate(model, glm::vec3(0.35f, -0.15f, 0.0f));
-		Uint8 r, g, b;
-		SDL_GetRGB(getHeight(terrainHeight, testowa.getCamera()->cameraPos.x, testowa.getCamera()->cameraPos.z),
-			terrainHeight->format, &r, &g, &b);
-		std::cout << testowa.getCamera()->cameraPos.x << " " << testowa.getCamera()->cameraPos.z << " " <<(int)r << " " << (int)g << " " << (int)b << std::endl;
+		std::cout << terrain.getHeight(testowa.getCamera()->cameraPos) << std::endl;
 		if (ostatniWystrzal != 0.0) {
 			if (currentFrame >= ostatniWystrzal) {
 				ostatniWystrzal = 0.0;
