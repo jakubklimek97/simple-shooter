@@ -9,17 +9,16 @@ Terrain::~Terrain() {
 void Terrain::loadTerrain(std::string modelPath, std::string heightMapPath, Shader& shader)
 {
 	model = new Model(modelPath);
-	heightMap = IMG_Load("res/models/teren/height.png");
+	heightMap = IMG_Load(heightMapPath.c_str());
 	if (!heightMap) {
-		std::cout << "ERROR::TEXTURE_LOADER:: " << IMG_GetError() << std::endl;
+		std::cout << "ERROR::HEIGHT_LOADER:: " << IMG_GetError() << std::endl;
 	}
 	entity = new Entity(*model, glm::vec3(0.0f), 0.0f, glm::vec3(1.0f));
 	entity->setShader(&shader);
-
 }
-#define map_x 10
-#define map_y 2
-#define map_z 10 //for this game there will be only one map, therefore we can hardcode map dimensions
+#define map_x 50
+#define map_y 3
+#define map_z 50 //for this game there will be only one map, therefore we can hardcode map dimensions
 float Terrain::getHeight(glm::vec3 pos)
 {
 	if (!heightMap || pos.x < 0.0f || pos.z < 0.0f) return 0.0f;
