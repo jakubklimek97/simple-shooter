@@ -55,9 +55,9 @@ void Camera::updateCameraVectors()
 	front.y = sin(glm::radians(pitch));
 	front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
 	cameraFront = glm::normalize(front);
-	movementFront.x = front.x;
+	movementFront.x = cameraFront.x;
 	movementFront.y = 0.0f;
-	movementFront.z = front.z;
+	movementFront.z = cameraFront.z;
 	//nie wiem dlaczego obraca kamera. Trzeba przemyslec
 	//cameraRight = glm::normalize(glm::cross(cameraFront, cameraUp)); 
 	//cameraUp = glm::normalize(glm::cross(cameraRight, cameraFront));
