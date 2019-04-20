@@ -30,6 +30,8 @@ public:
 	Model(std::string const &path, bool gamma = false);
 	~Model();
 	void Draw(Shader shader);
+	Model() = default;
+	int TextureFromFile2(const char *path, const std::string &directory, bool gamma);
 
 private:
 	void loadModel(std::string const &path);

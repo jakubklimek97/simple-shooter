@@ -25,11 +25,10 @@ bool PrepareShaderPrograms()
 {
 	// Load shaders and create shader program
 //	GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)))
-	string sShaderFileNames[] = { "main_shader.vert", "main_shader.frag", "ortho2D.vert",
-		"ortho2D.frag", "font2D.frag", "dirLight.frag"
+	string sShaderFileNames[] = { "main_shader.vert", "main_shader.frag", "dirLight.frag"
 	};
 //	GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)))
-	FOR(i, NUMSHADERS)
+	FOR(i, 3)
 	{
 	//	GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)))
 		string sExt = sShaderFileNames[i].substr(ESZ(sShaderFileNames[i]) - 4, 4);
@@ -47,15 +46,15 @@ bool PrepareShaderPrograms()
 //	GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)))
 	if (!spMain.LinkProgram())return false;
 
-	spOrtho2D.CreateProgram();
+	/*spOrtho2D.CreateProgram();
 	spOrtho2D.AddShaderToProgram(&shShaders[3]);
 	spOrtho2D.AddShaderToProgram(&shShaders[4]);
-	spOrtho2D.LinkProgram();
+	spOrtho2D.LinkProgram();*/
 //	GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)))
-	spFont2D.CreateProgram();
+	/*spFont2D.CreateProgram();
 	spFont2D.AddShaderToProgram(&shShaders[2]);
 	spFont2D.AddShaderToProgram(&shShaders[4]);
-	spFont2D.LinkProgram();
+	spFont2D.LinkProgram();*/
 //	GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)))
 
 	return true;
@@ -76,37 +75,36 @@ bool CShader::LoadShader(string sFile, int a_iType)
 {
 	vector<string> sLines;
 
-	if (!GetLinesFromFile(sFile, false, &sLines))return false;
+	//if (!GetLinesFromFile(sFile, false, &sLines))return false;
 
 	const char** sProgram = new const char*[ESZ(sLines)];
 	FOR(i, ESZ(sLines))sProgram[i] = sLines[i].c_str();
-	//GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)))
+
 	uiShader = glCreateShader(a_iType);
-	//GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)));
+
 	glShaderSource(uiShader, ESZ(sLines), sProgram, NULL);
-	//GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)));
 	glCompileShader(uiShader);
 
-//	GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)))
 	delete[] sProgram;
 
 	int iCompilationStatus;
 	glGetShaderiv(uiShader, GL_COMPILE_STATUS, &iCompilationStatus);
-	//GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)))
+
 	if (iCompilationStatus == GL_FALSE)
 	{
 		char sInfoLog[1024];
 		char sFinalMessage[1536];
 		int iLogLength;
 		glGetShaderInfoLog(uiShader, 1024, &iLogLength, sInfoLog);
-		sprintf(sFinalMessage, "Error! Shader file %s wasn't compiled! The compiler returned:\n\n%s", sFile.c_str(), sInfoLog);
-		MessageBox(NULL, sFinalMessage, "Error", MB_ICONERROR); //windows
+		//sprintf(sFinalMessage, "Error! Shader file %s wasn't compiled! The compiler returned:\n\n%s", sFile.c_str(), sInfoLog);
+		MessageBox(NULL, sFinalMessage, "Error", MB_ICONERROR);
 		return false;
 	}
 	iType = a_iType;
 	bLoaded = true;
 
 	return true;
+
 }
 
 /*-----------------------------------------------
@@ -121,56 +119,56 @@ Result:  Loads and adds include part.
 
 /*---------------------------------------------*/
 
-bool CShader::GetLinesFromFile(string sFile, bool bIncludePart, vector<string>* vResult)
-{
-	FILE* fp = fopen(sFile.c_str(), "rt");
-	if (!fp)return false;
-
-	string sDirectory;
-	int slashIndex = -1;
-	RFOR(i, ESZ(sFile) - 1)
-	{
-		if (sFile[i] == '\\' || sFile[i] == '/')
-		{
-			slashIndex = i;
-			break;
-		}
-	}
-
-	sDirectory = sFile.substr(0, slashIndex + 1);
-
-	// Get all lines from a file
-
-	char sLine[255];
-
-	bool bInIncludePart = false;
-
-	while (fgets(sLine, 255, fp))
-	{
-		stringstream ss(sLine);
-		string sFirst;
-		ss >> sFirst;
-		if (sFirst == "#include")
-		{
-			string sFileName;
-			ss >> sFileName;
-			if (ESZ(sFileName) > 0 && sFileName[0] == '\"' && sFileName[ESZ(sFileName) - 1] == '\"')
-			{
-				sFileName = sFileName.substr(1, ESZ(sFileName) - 2);
-				GetLinesFromFile(sDirectory + sFileName, true, vResult);
-			}
-		}
-		else if (sFirst == "#include_part")
-			bInIncludePart = true;
-		else if (sFirst == "#definition_part")
-			bInIncludePart = false;
-		else if (!bIncludePart || (bIncludePart && bInIncludePart))
-			vResult->push_back(sLine);
-	}
-	fclose(fp);
-
-	return true;
-}
+//bool CShader::GetLinesFromFile(string sFile, bool bIncludePart, vector<string>* vResult)
+//{
+//	FILE* fp = fopen(sFile.c_str(), "rt");
+//	if (!fp)return false;
+//
+//	string sDirectory;
+//	int slashIndex = -1;
+//	RFOR(i, ESZ(sFile) - 1)
+//	{
+//		if (sFile[i] == '\\' || sFile[i] == '/')
+//		{
+//			slashIndex = i;
+//			break;
+//		}
+//	}
+//
+//	sDirectory = sFile.substr(0, slashIndex + 1);
+//
+//	// Get all lines from a file
+//
+//	char sLine[255];
+//
+//	bool bInIncludePart = false;
+//
+//	while (fgets(sLine, 255, fp))
+//	{
+//		stringstream ss(sLine);
+//		string sFirst;
+//		ss >> sFirst;
+//		if (sFirst == "#include")
+//		{
+//			string sFileName;
+//			ss >> sFileName;
+//			if (ESZ(sFileName) > 0 && sFileName[0] == '\"' && sFileName[ESZ(sFileName) - 1] == '\"')
+//			{
+//				sFileName = sFileName.substr(1, ESZ(sFileName) - 2);
+//				GetLinesFromFile(sDirectory + sFileName, true, vResult);
+//			}
+//		}
+//		else if (sFirst == "#include_part")
+//			bInIncludePart = true;
+//		else if (sFirst == "#definition_part")
+//			bInIncludePart = false;
+//		else if (!bIncludePart || (bIncludePart && bInIncludePart))
+//			vResult->push_back(sLine);
+//	}
+//	fclose(fp);
+//
+//	return true;
+//}
 
 /*-----------------------------------------------
 
@@ -197,7 +195,7 @@ Result:	Returns ID of a generated shader.
 
 /*---------------------------------------------*/
 
-unsigned CShader::GetShaderID()
+UINT CShader::GetShaderID()
 {
 	return uiShader;
 }

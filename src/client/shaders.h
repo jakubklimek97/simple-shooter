@@ -35,10 +35,10 @@ public:
 	bool LoadShader(string sFile, int a_iType);
 	void DeleteShader();
 
-	bool GetLinesFromFile(string sFile, bool bIncludePart, vector<string>* vResult);
+//	bool GetLinesFromFile(string sFile, bool bIncludePart, vector<string>* vResult);
 
 	bool IsLoaded();
-	unsigned GetShaderID();
+	UINT GetShaderID();
 
 	CShader();
 

@@ -4,11 +4,12 @@ uniform mat4 projectionMatrix;
 uniform mat4 modelViewMatrix;
 
 layout (location = 0) in vec3 inPosition;
+layout (location = 1) in vec2 inCoord;
 
-smooth out vec3 thePosition; // Interpolate position among fragments
+out vec2 texCoord;
 
 void main()
 {
 	gl_Position = projectionMatrix*modelViewMatrix*vec4(inPosition, 1.0);
-	thePosition = inPosition;
+	texCoord = inCoord;
 }

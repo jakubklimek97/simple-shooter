@@ -11,6 +11,48 @@ void Model::Draw(Shader shader)
 	for (unsigned int i = 0; i < meshes.size(); i++)
 		meshes[i].Draw(shader);
 }
+int Model::TextureFromFile2(const char * path, const std::string & directory, bool gamma)
+{
+
+	std::string filename = std::string(path);
+	filename = directory + '/' + filename;
+	unsigned int textureID;
+	glGenTextures(1, &textureID);
+	int width = 1, height = 1, nrComponents = 1;
+	SDL_Surface* ptr = IMG_Load(filename.c_str());
+	if (!ptr) {
+		std::cout << "ERROR::TEXTURE_LOADER:: " << IMG_GetError() << std::endl;
+	}
+	width = ptr->w;
+	height = ptr->h;
+	nrComponents = ptr->format->BytesPerPixel;
+	if (ptr)
+	{
+		GLenum format;
+		if (nrComponents == 1)
+			format = GL_RED;
+		else if (nrComponents == 3)
+			format = GL_RGB;
+		else if (nrComponents == 4)
+			format = GL_RGBA;
+
+		glBindTexture(GL_TEXTURE_2D, textureID);
+		glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, ptr->pixels);
+		glGenerateMipmap(GL_TEXTURE_2D);
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	}
+	else
+	{
+		std::cout << "Texture failed to load at path: " << path << std::endl;
+	}
+	SDL_FreeSurface(ptr);
+	return textureID;
+}
 void Model::BindTExtures(int Textureunit)
 {
 	glActiveTexture(GL_TEXTURE0 + Textureunit);

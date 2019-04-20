@@ -1,84 +1,74 @@
-enum ETextureFiltering
-{
-	TEXTURE_FILTER_MAG_NEAREST = 0, // Nearest criterion for magnification
-	TEXTURE_FILTER_MAG_BILINEAR, // Bilinear criterion for magnification
-	TEXTURE_FILTER_MIN_NEAREST, // Nearest criterion for minification
-	TEXTURE_FILTER_MIN_BILINEAR, // Bilinear criterion for minification
-	TEXTURE_FILTER_MIN_NEAREST_MIPMAP, // Nearest criterion for minification, but on closest mipmap
-	TEXTURE_FILTER_MIN_BILINEAR_MIPMAP, // Bilinear criterion for minification, but on closest mipmap
-	TEXTURE_FILTER_MIN_TRILINEAR, // Bilinear criterion for minification on two closest mipmaps, then averaged
-};
+//-----------------------------------------------------------------//
+// Texture.h                                                       //
+// The base class for all textures to be rendered on screen        //
+// Can load full textures, or clipped textures from a spritesheet  //
+// or convert a string into a texture to be rendered               //
+//                                                                 //
+// By: Ather Omar                                                  //
+//-----------------------------------------------------------------//
+#ifndef _TEXTURE_H
+#define _TEXTURE_H
+//---------------------------------------------------------------
+#include "GameEntity.h"
+#include "AssetManager.h"
+//---------------------------------------------------------------
+// QuickSDL
+//---------------------------------------------------------------
+namespace QuickSDL {
+	//-----------------------------------------------------------
+	// Texture : public GameEntity
+	//-----------------------------------------------------------
+	class Texture : public GameEntity {
 
-/********************************
+	protected:
 
-Class:		CTexture
+		//The SDL_Texture to be rendered
+		SDL_Texture* mTex;
 
-Purpose:	Wraps OpenGL texture
-			object and performs
-			their loading.
+		//Used to render the texture
+		Graphics* mGraphics;
 
-********************************/
-#include <algorithm>
-#include <cmath>
-#include <cstring>
-#include <vector>
-#include <sstream>
-#include <queue>
-#include <map>
-#include <set>
-#include<Windows.h>
-using namespace std;
+		//Width of the texture
+		int mWidth;
+		//Height of the texture
+		int mHeight;
 
-#include <gl/glew.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include"SDL_image.h"
-#include"SDL.h"
+		//True if the texture is loaded from a spritesheet
+		bool mClipped;
 
+		//Is used to render the texture on the screen
+		SDL_Rect mRenderRect;
+		//Is used to clip the texture from a spritesheet
+		SDL_Rect mClipRect;
 
+	public:
+		//--------------------------------------------------------------
+		//Loads a whole texture from a file (relative to the exe path)
+		//Note: For spritesheets use the other contructor
+		//--------------------------------------------------------------
+		Texture(std::string filename);
+		//-------------------------------------------------------------
+		//Loads a texture from from file (relative to the exe path)
+		//Supports spritesheets
+		//x - Starting pixel's X on the spritesheet
+		//y - Starting pixel's Y on the spritesheet
+		//w - The width of the clipped sprite
+		//h - The height of the clipped sprite
+		//-------------------------------------------------------------
+		Texture(std::string filename, int x, int y, int w, int h);
+		//------------------------------------------------------------
+		//Converts the given text into a texture to be rendered
+		//Note: fontpath is relative to the exe path
+		//size - The size of the text to be rendered
+		//color - The color of the text to be rendered
+		//------------------------------------------------------------
+		Texture(std::string text, std::string fontpath, int size, SDL_Color color);
+		~Texture();
 
-
-class CTexture
-{
-public:
-	void CreateEmptyTexture(int a_iWidth, int a_iHeight, GLenum format);
-	void CreateFromData(BYTE* bData, int a_iWidth, int a_iHeight, int a_iBPP, GLenum format, bool bGenerateMipMaps = false);
-
-	//bool ReloadTexture();
-
-	bool LoadTexture2D(string path, const string &directory, bool  bGenerateMipMaps);
-	void BindTexture(int iTextureUnit = 0);
-
-	void SetFiltering(int a_tfMagnification, int a_tfMinification);
-
-	void SetSamplerParameter(GLenum parameter, GLenum value);
-
-	int GetMinificationFilter();
-	int GetMagnificationFilter();
-
-	int GetWidth();
-	int GetHeight();
-	int GetBPP();
-
-	UINT GetTextureID();
-
-	string GetPath();
-
-	void DeleteTexture();
-
-	CTexture();
-private:
-
-	int iWidth, iHeight, iBPP; // Texture width, height, and bytes per pixel
-	UINT uiTexture; // Texture name
-	UINT uiSampler; // Sampler name
-	bool bMipMapsGenerated;
-
-	int tfMinification, tfMagnification;
-
-	string sPath;
-};
-#define NUMTEXTURES 5
-extern CTexture tTextures[NUMTEXTURES];
-void LoadAllTextures();
+		//----------------------------------------------
+		//Called to render the texture to the screen
+		//----------------------------------------------
+		virtual void Render();
+	};
+}
+#endif

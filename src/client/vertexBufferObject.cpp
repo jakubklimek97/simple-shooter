@@ -5,7 +5,7 @@
 CVertexBufferObject::CVertexBufferObject()
 {
 	bDataUploaded = false;
-	uiBuffer = 0;
+	//uiBuffer = 0;
 }
 
 /*-----------------------------------------------
@@ -23,7 +23,7 @@ void CVertexBufferObject::CreateVBO(int a_iSize)
 	glGenBuffers(1, &uiBuffer);
 	data.reserve(a_iSize);
 	iSize = a_iSize;
-	iCurrentSize = 0;
+//	iCurrentSize = 0;
 }
 
 /*-----------------------------------------------
@@ -143,7 +143,7 @@ Result:	Adds arbitrary data to VBO.
 void CVertexBufferObject::AddData(void* ptrData, unsigned int uiDataSize)
 {
 	data.insert(data.end(), (unsigned char*)ptrData, (unsigned char*)ptrData + uiDataSize);
-	iCurrentSize += uiDataSize;
+	//iCurrentSize += uiDataSize;
 }
 
 /*-----------------------------------------------
