@@ -71,7 +71,20 @@ void Scene::DrawObjects()
 
 void Scene::movePlayer(Camera::Movement move, float deltaTime)
 {
+	if (move.none()) return;
 	camera->moveCamera(move, deltaTime);
-	camera->cameraPos.y = (int)(terrain->getHeight(camera->cameraPos) * 100) / 100.0f + 0.5f; //temp value, mby there's a way to do it smarter
+	std::cout << "pos: " << camera->cameraPos.x << " " << camera->cameraPos.y << " " << camera->cameraPos.z << std::endl;
+	float middleHeight = (terrain->getHeight(camera->cameraPos));
+	float frontHeight = (terrain->getHeight(camera->cameraPos + camera->cameraFront * 0.85f));
+	
+	if (frontHeight >= middleHeight) {
+		camera->cameraPos.y = (int)(frontHeight * 100) / 100.0f + 0.85f;
+	}
+	else {
+		camera->cameraPos.y = (int)(middleHeight * 100) / 100.0f + 0.85f;
+	}
+	
+	//camera->cameraPos.y = (frontHeight > middleHeight ? (int)(frontHeight * 100)/ 100.0f + 0.85f : (int)(frontHeight * 100) / 100.0f + 0.85f); //temp value, mby there's a way to do it smarter
+	std::cout << "Middle: " << middleHeight << " Front: " << frontHeight << " Camera: " << camera->cameraPos.y << std::endl;
 	//camera->cameraPos.y = terrain->getHeight(camera->cameraPos)+0.5f;
 }
