@@ -51,6 +51,8 @@ namespace QuickSDL {
 
 		//Initialize Timer
 		mTimer = Timer::Instance();
+
+		menu = new Menu();
 	}
 
 	GameManager::~GameManager() {
@@ -69,6 +71,9 @@ namespace QuickSDL {
 
 		Timer::Release();
 		mTimer = NULL;
+
+		delete menu;
+		menu = NULL;
 	}
 
 	void GameManager::EarlyUpdate() {
@@ -80,6 +85,7 @@ namespace QuickSDL {
 	void GameManager::Update() {
 
 		//GameEntity Updates should happen here
+		menu->Update();
 	}
 
 	void GameManager::LateUpdate() {
@@ -96,6 +102,7 @@ namespace QuickSDL {
 		mGraphics->ClearBackBuffer();
 
 		//All other rendering is to happen here
+		menu->Render();
 
 		//Renders the current frame
 		mGraphics->Render();

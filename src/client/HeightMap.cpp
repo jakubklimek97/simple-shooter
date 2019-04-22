@@ -266,7 +266,7 @@ Result: Guess what it does :)
 
 void CMultiLayeredHeightmap::RenderHeightmap()
 {
-	spTerrain.UseProgram();
+	//spTerrain.UseProgram();
 
 	spTerrain.SetUniform("fRenderHeight", vRenderScale.y);
 	spTerrain.SetUniform("fMaxTextureU", float(iCols)*0.1f);

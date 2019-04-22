@@ -16,6 +16,8 @@
 #include"HeightMap.h"
 #include"vertexBufferObject.h"
 #include"DirLight.h"
+#include"TextureClass.h"
+
 CVertexBufferObject vboSceneObjects;
 UINT uiVAOSceneObjects;
 
@@ -29,10 +31,12 @@ Scene testowa2(glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.
 void initScene() {
 
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	
+	spMain.UseProgram();
 
 	PrepareShaderPrograms();
 
-	//LoadAllTextures();
+	LoadAllTextures();
 
 	glEnable(GL_DEPTH_TEST);
 	glClearDepth(1.0);
@@ -66,14 +70,14 @@ void renderScene() {
 	dlSun.vDirection = glm::vec3(-sin(fAngleOfDarkness*3.1415f / 180.0f), -cos(fAngleOfDarkness*3.1415f / 180.0f), 0.0f);
 	dlSun.SetUniformData(&spMain, "sunLight");
 
-	// Now we're going to render terrain
-	spMain.SetUniform("matrices.modelMatrix", glm::mat4(1.0));
-	//ol->hmWorld.SetRenderSize(300.0f, 35.0f, 300.0f); ol ???
+	//// Now we're going to render terrain
+
+	
 	hmWorld.SetRenderSize(300.0f, 35.0f, 300.0f);
 	CShaderProgram* spTerrain = CMultiLayeredHeightmap::GetShaderProgram();
 
-	spTerrain->UseProgram();
-
+  
+//	spTerrain->UseProgram();
 
 
 	spTerrain->SetUniform("matrices.projMatrix", testowa2.GetProjectionMatrix());
@@ -85,7 +89,7 @@ void renderScene() {
 	{
 		char sSamplerName[256];
 //		sprintf(sSamplerName, "gSampler[%d]", i);
-		//tTextures[i].BindTexture(i);
+		tTextures[i].BindTexture(i);
 		spTerrain->SetUniform(sSamplerName, i);
 	}
 
@@ -105,7 +109,6 @@ void renderScene() {
 }
 
 
-
 int initSDL() {
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
 		std::cout << "Nie mozna zainicjowac SDLA: " << SDL_GetError() << std::endl;
@@ -117,6 +120,7 @@ int initSDL() {
 	}
 	return 0;
 }
+
 void initOpenGL(SDL_Window* &pWindow, SDL_GLContext &context) {
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
@@ -134,21 +138,29 @@ void initOpenGL(SDL_Window* &pWindow, SDL_GLContext &context) {
 	glViewport(0, 0, 800, 600);
 	glEnable(GL_DEPTH_TEST);
 }
+
+
+
 //int main(int argc, char *argv[])
 //{
 //	if (initSDL() < 0) return -1;
 //	SDL_Window* window;
 //	SDL_GLContext context;
 //	initOpenGL(window, context);
-//	//wyswietlane jako siatka glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-//
-//	Shader ourShader("vertex.vs", "fragment.fs");
-//	Shader lightShader("LightShader.vs", "LightShader.fs");
+////	//wyswietlane jako siatka glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+/////*
+// 	Shader lightShader("LightShader.vs", "LightShader.fs");
 //	Shader boundingBoxShader("boundingBox.vs", "boundingBox.fs");
 //	Shader simpleShader("simpleColorShader.vs", "simpleColorShader.fs");
 //	Model kostka("res/models/kostka/kos.obj");
 //	Model pistolet("res/models/pistolet/pistolet.obj");
 //
+//
+//	/*spMain.UseProgram();
+//	CShaderProgram* spTerrain = CMultiLayeredHeightmap::GetShaderProgram();
+//
+//	spTerrain->UseProgram();
+//*/
 //	initScene();
 //
 //	float deltaTime = 0.0;
@@ -157,15 +169,15 @@ void initOpenGL(SDL_Window* &pWindow, SDL_GLContext &context) {
 //	SDL_SetRelativeMouseMode(SDL_TRUE);
 //
 //
-//	Scene testowa(glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f), new Camera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.1f, 1.0f));
-//	LightObject* light = testowa.SetLight(new LightObject(kostka, glm::vec3(2.5f, 1.0f, 2.0f), 0.0f, glm::vec3(0.2f), &simpleShader, glm::vec3(1.0f, 1.0f, 1.0f)));
-//	Entity* testCube = testowa.addObject(new Entity(kostka, glm::vec3(5.0f, -1.0f, 0.0f), 0.0f, glm::vec3(0.5f, 0.5f, 0.5f)));
+//	//Scene testowa(glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f), new Camera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.1f, 1.0f));
+//	//LightObject* light = testowa.SetLight(new LightObject(kostka, glm::vec3(2.5f, 1.0f, 2.0f), 0.0f, glm::vec3(0.2f), &simpleShader, glm::vec3(1.0f, 1.0f, 1.0f)));
+//	//Entity* testCube = testowa.addObject(new Entity(kostka, glm::vec3(5.0f, -1.0f, 0.0f), 0.0f, glm::vec3(0.5f, 0.5f, 0.5f)));
 //
-//	Entity* testBoundingBox = testowa.addObject(new Entity(kostka, glm::vec3(4.0f, 0.0f, 0.0f), 0.0f, glm::vec3(0.5f, 0.5f, 0.5f)));
-//	testBoundingBox->setShader(lightShader);
-//	testBoundingBox->rotateY(45.0f);
-//	BoundingBox box(*testBoundingBox);
-//	testowa.removeObject(testCube);
+//	//Entity* testBoundingBox = testowa.addObject(new Entity(kostka, glm::vec3(4.0f, 0.0f, 0.0f), 0.0f, glm::vec3(0.5f, 0.5f, 0.5f)));
+//	//testBoundingBox->setShader(lightShader);
+//	//testBoundingBox->rotateY(45.0f);
+//	//BoundingBox box(*testBoundingBox);
+//	//testowa.removeObject(testCube);
 //
 //	Camera::Movement nextMove;
 //	float ostatniWystrzal = 0.0;
@@ -230,7 +242,8 @@ void initOpenGL(SDL_Window* &pWindow, SDL_GLContext &context) {
 //				break;
 //			}
 //			case SDL_MOUSEMOTION: {
-//				testowa.getCamera()->turnCamera(windowEvent.motion);
+//				
+//				//testowa.getCamera()->turnCamera(windowEvent.motion);
 //			}
 //			case SDL_MOUSEBUTTONDOWN: {
 //				if (windowEvent.button.button == SDL_BUTTON_LEFT) {
@@ -245,8 +258,8 @@ void initOpenGL(SDL_Window* &pWindow, SDL_GLContext &context) {
 //		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 //
 //	//	renderScene();
-//
-//		testowa.getCamera()->moveCamera(nextMove, deltaTime);
+//		
+//		/*testowa.getCamera()->moveCamera(nextMove, deltaTime);
 //		testCube->rotateZ(glm::radians(1.0f));
 //		testCube->rotateY(glm::radians(1.0f));
 //		testBoundingBox->rotateY(glm::radians(2.0f));
@@ -278,9 +291,9 @@ void initOpenGL(SDL_Window* &pWindow, SDL_GLContext &context) {
 //		lightShader.setVec3("lightPos", light->GetPosition());
 //		lightShader.setVec3("viewPos", testowa.getCamera()->cameraPos);
 //		pistolet.Draw(lightShader);
+//*/
 //
-//
-//	//	renderScene();
+//		renderScene();
 //		
 //		SDL_GL_SwapWindow(window);
 //	}

@@ -10,10 +10,9 @@
 #ifndef _GAMEMANAGER_H
 #define _GAMEMANAGER_H
 //----------------------------------------------------------------
-#include "InputManager.h"
+#include "Menu.h"
 #include "AudioManager.h"
 #include "Timer.h"
-#include "Texture.h"
 //----------------------------------------------------------------
 // QuickSDL
 //----------------------------------------------------------------
@@ -44,6 +43,8 @@ namespace QuickSDL {
 
 		// Used to catch the event when the user exits the game
 		SDL_Event mEvents;
+
+		Menu* menu;
 
 	public:
 		//-----------------------------------------

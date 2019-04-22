@@ -89,11 +89,28 @@ namespace QuickSDL {
 	//Rotates the given vector by the given angle around the origin   
 	//(Does not change the original vector)                             
 	//----------------------------------------------------------------
-	inline Vector2 RotateVector(Vector2& vec, float angle) {
+	inline Vector2 RotateVector(const Vector2& vec, float angle) {
 		//converting the angle to radians to be used in sin and cos functions
 		float radAngle = (float)(angle*DEG_TO_RAD);
 
 		return Vector2((float)(vec.x * cos(radAngle) - vec.y * sin(radAngle)), (float)(vec.x * sin(radAngle) + vec.y * cos(radAngle)));
+	}
+	inline Vector2 Lerp(Vector2& start, Vector2& end, float time) {
+//time beetwen 0 and 1
+
+		if (time <= 0.0f)
+			return start;
+
+		if (time >= 1.0f)
+			return end;
+
+		//if not we interpolate
+
+		Vector2 dir = (end - start).Normalized();
+		float mag = (end - start).Magnitude();
+
+
+		return (start + dir * mag*time); // iterpolation function
 	}
 
 	const Vector2 VEC2_ZERO = { 0.0f, 0.0f };

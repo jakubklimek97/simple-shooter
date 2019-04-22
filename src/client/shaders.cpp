@@ -24,17 +24,16 @@ Result:	Loads all shaders and creates shader programs.
 bool PrepareShaderPrograms()
 {
 	// Load shaders and create shader program
-//	GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)))
-	string sShaderFileNames[] = { "main_shader.vert", "main_shader.frag", "dirLight.frag"
+	string sShaderFileNames[] = { "main_shader.vert", "main_shader.frag"
 	};
-//	GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)))
-	FOR(i, 3)
+
+	FOR(i, 2)
 	{
-	//	GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)))
+
 		string sExt = sShaderFileNames[i].substr(ESZ(sShaderFileNames[i]) - 4, 4);
 		int iShaderType = sExt == "vert" ? GL_VERTEX_SHADER : (sExt == "frag" ? GL_FRAGMENT_SHADER : GL_GEOMETRY_SHADER);
 		shShaders[i].LoadShader("res\\shaders\\" + sShaderFileNames[i], iShaderType);
-	//	GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)))
+
 	}
 
 	// Create shader programs
@@ -43,19 +42,19 @@ bool PrepareShaderPrograms()
 	spMain.AddShaderToProgram(&shShaders[0]);
 	spMain.AddShaderToProgram(&shShaders[1]);
 	spMain.AddShaderToProgram(&shShaders[5]);
-//	GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)))
+
 	if (!spMain.LinkProgram())return false;
 
 	/*spOrtho2D.CreateProgram();
 	spOrtho2D.AddShaderToProgram(&shShaders[3]);
 	spOrtho2D.AddShaderToProgram(&shShaders[4]);
 	spOrtho2D.LinkProgram();*/
-//	GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)))
+
 	/*spFont2D.CreateProgram();
 	spFont2D.AddShaderToProgram(&shShaders[2]);
 	spFont2D.AddShaderToProgram(&shShaders[4]);
 	spFont2D.LinkProgram();*/
-//	GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)))
+
 
 	return true;
 }
@@ -75,7 +74,7 @@ bool CShader::LoadShader(string sFile, int a_iType)
 {
 	vector<string> sLines;
 
-	//if (!GetLinesFromFile(sFile, false, &sLines))return false;
+	if (!GetLinesFromFile(sFile, false, &sLines))return false;
 
 	const char** sProgram = new const char*[ESZ(sLines)];
 	FOR(i, ESZ(sLines))sProgram[i] = sLines[i].c_str();
@@ -119,56 +118,56 @@ Result:  Loads and adds include part.
 
 /*---------------------------------------------*/
 
-//bool CShader::GetLinesFromFile(string sFile, bool bIncludePart, vector<string>* vResult)
-//{
-//	FILE* fp = fopen(sFile.c_str(), "rt");
-//	if (!fp)return false;
-//
-//	string sDirectory;
-//	int slashIndex = -1;
-//	RFOR(i, ESZ(sFile) - 1)
-//	{
-//		if (sFile[i] == '\\' || sFile[i] == '/')
-//		{
-//			slashIndex = i;
-//			break;
-//		}
-//	}
-//
-//	sDirectory = sFile.substr(0, slashIndex + 1);
-//
-//	// Get all lines from a file
-//
-//	char sLine[255];
-//
-//	bool bInIncludePart = false;
-//
-//	while (fgets(sLine, 255, fp))
-//	{
-//		stringstream ss(sLine);
-//		string sFirst;
-//		ss >> sFirst;
-//		if (sFirst == "#include")
-//		{
-//			string sFileName;
-//			ss >> sFileName;
-//			if (ESZ(sFileName) > 0 && sFileName[0] == '\"' && sFileName[ESZ(sFileName) - 1] == '\"')
-//			{
-//				sFileName = sFileName.substr(1, ESZ(sFileName) - 2);
-//				GetLinesFromFile(sDirectory + sFileName, true, vResult);
-//			}
-//		}
-//		else if (sFirst == "#include_part")
-//			bInIncludePart = true;
-//		else if (sFirst == "#definition_part")
-//			bInIncludePart = false;
-//		else if (!bIncludePart || (bIncludePart && bInIncludePart))
-//			vResult->push_back(sLine);
-//	}
-//	fclose(fp);
-//
-//	return true;
-//}
+bool CShader::GetLinesFromFile(string sFile, bool bIncludePart, vector<string>* vResult)
+{
+	FILE* fp = fopen(sFile.c_str(), "rt");
+	if (!fp)return false;
+
+	string sDirectory;
+	int slashIndex = -1;
+	RFOR(i, ESZ(sFile) - 1)
+	{
+		if (sFile[i] == '\\' || sFile[i] == '/')
+		{
+			slashIndex = i;
+			break;
+		}
+	}
+
+	sDirectory = sFile.substr(0, slashIndex + 1);
+
+	// Get all lines from a file
+
+	char sLine[255];
+
+	bool bInIncludePart = false;
+
+	while (fgets(sLine, 255, fp))
+	{
+		stringstream ss(sLine);
+		string sFirst;
+		ss >> sFirst;
+		if (sFirst == "#include")
+		{
+			string sFileName;
+			ss >> sFileName;
+			if (ESZ(sFileName) > 0 && sFileName[0] == '\"' && sFileName[ESZ(sFileName) - 1] == '\"')
+			{
+				sFileName = sFileName.substr(1, ESZ(sFileName) - 2);
+				GetLinesFromFile(sDirectory + sFileName, true, vResult);
+			}
+		}
+		else if (sFirst == "#include_part")
+			bInIncludePart = true;
+		else if (sFirst == "#definition_part")
+			bInIncludePart = false;
+		else if (!bIncludePart || (bIncludePart && bInIncludePart))
+			vResult->push_back(sLine);
+	}
+	fclose(fp);
+
+	return true;
+}
 
 /*-----------------------------------------------
 
