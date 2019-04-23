@@ -21,6 +21,7 @@ public:
 	Terrain* addTerrain(Terrain* ptrTerrain);
 	void DrawObjects();
 	void movePlayer(Camera::Movement move, float deltaTime);
+	void playerJumpStart();
 private:
 	std::forward_list<Entity*> objects; //docelowo lista list dla kazdego znanego typu
 	LightObject* light;
@@ -28,5 +29,10 @@ private:
 	glm::mat4 viewMatrix;
 	glm::mat4 projectionMatrix;
 	Terrain* terrain;
+	float jumpTime;
+	bool notJumping = true;
+	bool notFalling = true;
+	float jumpStartPos;
+	float jumpHeight = 6.0f;
 };
 

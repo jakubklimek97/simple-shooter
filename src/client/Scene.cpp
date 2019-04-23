@@ -1,6 +1,4 @@
 #include "Scene.h"
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
 #include <cassert>
 Scene::Scene(glm::mat4 projectionMatrix, Camera* camera): projectionMatrix(projectionMatrix), camera(camera)
 {
@@ -72,6 +70,46 @@ void Scene::DrawObjects()
 
 void Scene::movePlayer(Camera::Movement move, float deltaTime)
 {
+	if (move.none() && notFalling && notJumping) return;
+	glm::vec3 oldPos = camera->cameraPos;
 	camera->moveCamera(move, deltaTime);
-	camera->cameraPos.y = (int)(terrain->getHeight(camera->cameraPos) * 100) / 100.0f + 0.85f;
+	float newHeight = (int)(terrain->getHeight(camera->cameraPos) * 100) / 100.0f + 0.85f;
+	if (notJumping) {
+		camera->cameraPos.y = newHeight;
+		float heightDiff = camera->cameraPos.y - oldPos.y;
+		if (heightDiff < -0.3f) {
+			notFalling = false;
+			camera->cameraPos.y = oldPos.y + (heightDiff * deltaTime * 8);
+			return;
+		}
+		else if (heightDiff > 0.5f) {
+			camera->cameraPos = oldPos;
+		}
+		notFalling = true;
+	}
+	else {
+		jumpTime -= deltaTime;
+		if (jumpTime <= 0.0f) {
+			notJumping = true;
+			float heightDiff = newHeight - oldPos.y;
+			if (heightDiff < -0.3f) {
+				notFalling = false;
+				return;
+			}
+			else if (heightDiff > 0.5f) {
+				camera->cameraPos.x = oldPos.x;
+				camera->cameraPos.z = oldPos.z;
+			}
+		}
+		camera->cameraPos.y = jumpStartPos + (0.3f - jumpTime)*jumpHeight;
+	}
+}
+
+void Scene::playerJumpStart()
+{
+	if (notJumping && notFalling) {
+		notJumping = false;
+		jumpTime = 0.3f;
+		jumpStartPos = camera->cameraPos.y;
+	}
 }

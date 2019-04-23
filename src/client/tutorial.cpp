@@ -76,7 +76,7 @@ int main(int argc, char *argv[])
 	SDL_SetRelativeMouseMode(SDL_TRUE);
 
 	
-	Scene testowa(glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f), new Camera(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.1f, 5.0f));
+	Scene testowa(glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.01f, 100.0f), new Camera(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.1f, 8.0f));
 	Terrain terrain;
 	terrain.loadTerrain("res/models/teren_org/teren.obj", "res/models/teren_org/height.png", lightShader);
 	testowa.addTerrain(&terrain);
@@ -123,6 +123,10 @@ int main(int argc, char *argv[])
 				}
 				case SDLK_d: {
 					nextMove[Camera::STRAFE_RIGHT] = 1;;
+					break;
+				}
+				case SDLK_SPACE: {
+					testowa.playerJumpStart();
 					break;
 				}
 				default: break;
