@@ -60,6 +60,16 @@ Shader * Entity::GetShader()
 	return shader;
 }
 
+glm::vec3 Entity::getPosition()
+{
+	return position;
+}
+
+void Entity::setPosition(const glm::vec3& pos)
+{
+	position = pos;
+}
+
 void Entity::prepareModelMatrix()
 {
 	modelMatrix = glm::translate(glm::mat4(1.0f), position);

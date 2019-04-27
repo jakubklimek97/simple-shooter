@@ -19,6 +19,8 @@ public:
 	virtual void Draw(glm::mat4 &projectionMatrix, glm::mat4& viewMatrix);
 	virtual void Draw(glm::mat4 &projectionMatrix, glm::mat4& viewMatrix,const LightObject& lightObject, const Camera& camera);
 	Shader* GetShader();
+	glm::vec3 getPosition();
+	void setPosition(const glm::vec3& pos);
 
 	friend class BoundingBox;
 protected:

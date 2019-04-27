@@ -1,6 +1,7 @@
 #include <iostream>
 #include <SDL.h>
 #include <SDL_image.h>
+#include "SDL_net.h"
 
 #include <GL/glew.h>
 #include <SDL_opengl.h>
@@ -25,6 +26,10 @@ int initSDL() {
 	}
 	if (IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG) < 0) {
 		std::cout << "Nie mozna zainicjowac SDL_image: " << IMG_GetError() << std::endl;
+		return -1;
+	}
+	if (SDLNet_Init() < 0) {
+		std::cout << "Nie mozna zainicjowac SDL_net: " << SDLNet_GetError() << std::endl;
 		return -1;
 	}
 	return 0;
@@ -63,6 +68,7 @@ int main(int argc, char *argv[])
 	Shader simpleShader("simpleColorShader.vs", "simpleColorShader.fs");
 	Model kostka("res/models/kostka/kos.obj");
 	Model pistolet("res/models/pistolet/pistolet.obj");
+	Model charac("res/models/char/char.obj");
 
 	SDL_Surface* terrainHeight = IMG_Load("res/models/teren/height.png");
 	if (!terrainHeight) {
@@ -81,6 +87,8 @@ int main(int argc, char *argv[])
 	terrain.loadTerrain("res/models/teren_org/teren.obj", "res/models/teren_org/height.png", lightShader);
 	testowa.addTerrain(&terrain);
 	LightObject* light = testowa.SetLight(new LightObject(kostka, glm::vec3(0.0f, 10.0f, 0.0f), 0.0f, glm::vec3(0.2f), &simpleShader, glm::vec3(1.0f, 1.0f, 1.0f)));
+	Entity* character = testowa.addObject(new Entity(charac, glm::vec3(20.0f, 0.0f, 7.0f), 0.0f, glm::vec3(1.0f)));
+	character->setShader(lightShader);
 	//Entity* testCube = testowa.addObject(new Entity(kostka, glm::vec3(5.0f, -1.0f, 0.0f), 0.0f, glm::vec3(0.5f, 0.5f, 0.5f)));
 
 	/*Entity* testBoundingBox = testowa.addObject(new Entity(kostka, glm::vec3(4.0f, 0.0f, 0.0f), 0.0f, glm::vec3(0.5f, 0.5f, 0.5f)));
@@ -170,7 +178,6 @@ int main(int argc, char *argv[])
 
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 		testowa.movePlayer(nextMove, deltaTime);
 		/*testCube->rotateZ(glm::radians(1.0f));
 		testCube->rotateY(glm::radians(1.0f));
@@ -212,6 +219,7 @@ int main(int argc, char *argv[])
 
 	SDL_GL_DeleteContext(context);
 	SDL_DestroyWindow(window);
+	SDLNet_Quit();
 	IMG_Quit();
 	SDL_Quit();
 	return 0;
