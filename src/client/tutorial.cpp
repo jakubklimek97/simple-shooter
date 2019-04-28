@@ -1,4 +1,6 @@
 #include <iostream>
+#include <thread>
+#include <mutex>
 #include <SDL.h>
 #include <SDL_image.h>
 #include "SDL_net.h"
@@ -18,6 +20,49 @@
 #include "LightObject.h"
 #include "BoundingBox.h"
 #include "Terrain.h"
+#include "Networking.h"
+#include "utils.h"
+
+std::mutex loopLock;
+std::mutex posLock;
+std::mutex playerPosLock;
+float pos[3];
+float playerPos[3];
+
+void connectionHandlerThread() {
+	bool connection = true;
+	Networking::MessageType ctrl;
+	float posTemp[3];
+	while (connection) {
+		Networking::recvControlMsg(&ctrl);
+		if (ctrl == Networking::MessageType::POSITION_FOLLOWS) {
+			connection = Networking::recvData(posTemp);
+			if (connection) {
+				posLock.lock();
+				pos[0] = posTemp[0];
+				pos[1] = posTemp[1];
+				pos[2] = posTemp[2];
+				posLock.unlock();
+			}
+			else break;
+		}
+		else if (ctrl == Networking::MessageType::QUIT) {
+
+		}
+		Networking::sendControlMsg(Networking::MessageType::POSITION_FOLLOWS);
+		playerPosLock.lock();
+		posTemp[0] = playerPos[0];
+		posTemp[1] = playerPos[1];
+		posTemp[2] = playerPos[2];
+		playerPosLock.unlock();
+		Networking::sendData(posTemp);
+		SDL_Delay(16); //16ms opoznienia miedzy wiadomosciami
+	}
+}
+void serverConnectionHandlerThread() {
+
+
+}
 
 int initSDL() {
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
@@ -57,6 +102,7 @@ void initOpenGL(SDL_Window* &pWindow, SDL_GLContext &context) {
 int main(int argc, char *argv[])
 {
 	if (initSDL() < 0) return -1;
+	int serwer = parseParams(argc, argv);
 	SDL_Window* window;
 	SDL_GLContext context;
 	initOpenGL(window, context);
@@ -169,7 +215,7 @@ int main(int argc, char *argv[])
 			}
 			case SDL_MOUSEBUTTONDOWN: {
 				if (windowEvent.button.button == SDL_BUTTON_LEFT) {
-					ostatniWystrzal = currentFrame + 0.5;
+					ostatniWystrzal = currentFrame + 0.5f;
 				}
 			}
 			default: break;
