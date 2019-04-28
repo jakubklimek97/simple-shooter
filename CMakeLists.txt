@@ -5,8 +5,6 @@ set(CMAKE_CONFIGURATION_TYPES "Debug;Release")
 project(simple-shooter)
 set_property( DIRECTORY PROPERTY VS_STARTUP_PROJECT "simple-shooter" )
 
-
-
 set(LIB_SDL2_DIR "" CACHE PATH "SDL2 library")
 set(LIB_SDL2_image_DIR "" CACHE PATH "SDL2image library")
 set(LIB_glew_DIR "" CACHE PATH "glew library")
@@ -31,9 +29,9 @@ PUBLIC "${CMAKE_CURRENT_BINARY_DIR}/glm"
 PUBLIC "${LIB_ASSIMP_INCLUDE_DIR}"
 )
 target_link_directories(simple-shooter 
-PUBLIC "${LIB_SDL2_DIR}/lib/x86"
-PUBLIC "${LIB_SDL2_image_DIR}/lib/x86"
-PUBLIC "${LIB_glew_DIR}/lib/Release/Win32"
+PUBLIC "${LIB_SDL2_DIR}/lib/x64"
+PUBLIC "${LIB_SDL2_image_DIR}/lib/x64"
+PUBLIC "${LIB_glew_DIR}/lib/Release/x64"
 PUBLIC "${LIB_ASSIMP_BINARY_DIR}"
 )
 
@@ -47,14 +45,14 @@ opengl32.lib
 )
 
 file(COPY 
-${LIB_SDL2_DIR}/lib/x86/SDL2.dll
-${LIB_SDL2_image_DIR}/lib/x86/libjpeg-9.dll 
-${LIB_SDL2_image_DIR}/lib/x86/libpng16-16.dll
-${LIB_SDL2_image_DIR}/lib/x86/libtiff-5.dll
-${LIB_SDL2_image_DIR}/lib/x86/libwebp-7.dll
-${LIB_SDL2_image_DIR}/lib/x86/SDL2_image.dll
-${LIB_SDL2_image_DIR}/lib/x86/zlib1.dll
-${LIB_glew_DIR}/bin/Release/Win32/glew32.dll	
+${LIB_SDL2_DIR}/lib/x64/SDL2.dll
+${LIB_SDL2_image_DIR}/lib/x64/libjpeg-9.dll 
+${LIB_SDL2_image_DIR}/lib/x64/libpng16-16.dll
+${LIB_SDL2_image_DIR}/lib/x64/libtiff-5.dll
+${LIB_SDL2_image_DIR}/lib/x64/libwebp-7.dll
+${LIB_SDL2_image_DIR}/lib/x64/SDL2_image.dll
+${LIB_SDL2_image_DIR}/lib/x64/zlib1.dll
+${LIB_glew_DIR}/bin/Release/x64/glew32.dll	
 DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 if(NOT ${CONFIGURE_WITH_ASSIMP})
@@ -80,5 +78,28 @@ file(TO_NATIVE_PATH "${CMAKE_CURRENT_SOURCE_DIR}" MOVE_SCRIPT_SOURCE_DIR)
 
 configure_file(src/moveNewFiles.bat.in moveNewFiles.bat)
 
-
+##SDL2_NET HERE
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+message("Setting up...")
+    set(TEMP_DIR ${CMAKE_CURRENT_BINARY_DIR}/Temp)
+    set(LIB_DIR ${CMAKE_CURRENT_BINARY_DIR}/lib)
+    file(MAKE_DIRECTORY ${TEMP_DIR})
+    file(MAKE_DIRECTORY ${LIB_DIR})
+    message("Downloading SDL2_net...")
+    file(DOWNLOAD "https://www.libsdl.org/projects/SDL_net/release/SDL2_net-devel-2.0.1-VC.zip" ${TEMP_DIR}/SDL.zip) 
+    message("Extracting SDL2_net...")
+    execute_process(COMMAND ${CMAKE_COMMAND}  -E tar xf SDL.zip WORKING_DIRECTORY ${TEMP_DIR})
+    file(REMOVE ${TEMP_DIR}/SDL.zip)
+    file(GLOB LIB_SDLnet_DIR LIST_DIRECTORIES TRUE ${TEMP_DIR}/*)
+    message("Copying SDL2_net...")
+    execute_process(COMMAND ${CMAKE_COMMAND}  -E copy_directory ${LIB_SDLnet_DIR} lib/sdl2net/ WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+    file(REMOVE_RECURSE ${LIB_SDLnet_DIR})
+    set(SDL2_NET_PATH "${CMAKE_CURRENT_BINARY_DIR}/lib/sdl2net" CACHE STRING "SDL2_net lib file path" FORCE)
+	find_package(SDL2_net REQUIRED)
+	include_directories(${SDL2_NET_INCLUDE_DIRS})
+list(GET SDL2_NET_LIBRARY 0 LIB_SDLnet_DIR)
+	get_filename_component(LIB_SDLnet_DIR ${LIB_SDLnet_DIR} DIRECTORY)
+	file(INSTALL ${LIB_SDLnet_DIR}/SDL2_net.dll
+        DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+target_link_libraries(simple-shooter ${SDL2_NET_LIBRARIES})
 
