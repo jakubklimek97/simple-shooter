@@ -22,6 +22,8 @@
 #include "Terrain.h"
 #include "Networking.h"
 #include "utils.h"
+#include "Loader.h"
+#include "SceneGame.h"
 
 std::mutex loopLock;
 std::mutex posLock;
@@ -108,6 +110,7 @@ int main(int argc, char *argv[])
 	initOpenGL(window, context);
 	//wyswietlane jako siatka glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
+
 	Shader ourShader("vertex.vs", "fragment.fs");
 	Shader lightShader("LightShader.vs", "LightShader.fs");
 	Shader boundingBoxShader("boundingBox.vs", "boundingBox.fs");
@@ -115,25 +118,22 @@ int main(int argc, char *argv[])
 	Model kostka("res/models/kostka/kos.obj");
 	Model pistolet("res/models/pistolet/pistolet.obj");
 	Model charac("res/models/char/char.obj");
+	Loader::loadModels();
 
-	SDL_Surface* terrainHeight = IMG_Load("res/models/teren/height.png");
-	if (!terrainHeight) {
-		std::cout << "ERROR::TEXTURE_LOADER:: " << IMG_GetError() << std::endl;
-	}
-	//int height = getHeight(terrainHeight, 0.0f, 4.9f);
 	
 	float deltaTime = 0.0;
 	float lastFrame = 0.0;
 	SDL_Event windowEvent;
 	SDL_SetRelativeMouseMode(SDL_TRUE);
 
-	
+	SceneGame* test = new SceneGame(glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.01f, 100.0f), new Camera(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.1f, 8.0f));
+	delete test;
 	Scene testowa(glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.01f, 100.0f), new Camera(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.1f, 8.0f));
-	Terrain terrain;
-	terrain.loadTerrain("res/models/teren_org/teren.obj", "res/models/teren_org/height.png", lightShader);
-	testowa.addTerrain(&terrain);
-	LightObject* light = testowa.SetLight(new LightObject(kostka, glm::vec3(0.0f, 10.0f, 0.0f), 0.0f, glm::vec3(0.2f), &simpleShader, glm::vec3(1.0f, 1.0f, 1.0f)));
-	Entity* character = testowa.addObject(new Entity(charac, glm::vec3(20.0f, 0.0f, 7.0f), 0.0f, glm::vec3(1.0f)));
+	Terrain* terrain = new Terrain();
+	terrain->loadTerrain("res/models/teren_org/teren.obj", "res/models/teren_org/height.png", lightShader);
+	testowa.addTerrain(terrain);
+	LightObject* light = testowa.SetLight(new LightObject(Loader::getModel(Loader::LoadedModels::CUBE), glm::vec3(0.0f, 10.0f, 0.0f), 0.0f, glm::vec3(0.2f), &simpleShader, glm::vec3(1.0f, 1.0f, 1.0f)));
+	Entity* character = testowa.addObject(new Entity(Loader::getModel(Loader::LoadedModels::PLAYER), glm::vec3(20.0f, 0.0f, 7.0f), 0.0f, glm::vec3(1.0f)));
 	character->setShader(lightShader);
 	//Entity* testCube = testowa.addObject(new Entity(kostka, glm::vec3(5.0f, -1.0f, 0.0f), 0.0f, glm::vec3(0.5f, 0.5f, 0.5f)));
 
@@ -144,96 +144,27 @@ int main(int argc, char *argv[])
 	BoundingBox box(*testBoundingBox);
 	testowa.removeObject(testCube);
 	testowa.removeObject(testBoundingBox);*/
-	Camera::Movement nextMove;
-	float ostatniWystrzal = 0.0;
-	while (true)
+	float ostatniWystrzal = 0.0f;
+	bool quit = false;
+	while (!quit)
 	{
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		float currentFrame = SDL_GetTicks() / 1000.0f;
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
-		float cameraSpeed = 1.0f * deltaTime;
-		while (SDL_PollEvent(&windowEvent))
-		{
-			if (windowEvent.type == SDL_QUIT) {
-				break; //jakis hack na wyjscie, eventy musi pobierac w whilu zeby kamera byla plynna...
-			}
-			switch (windowEvent.type) {
-			case SDL_KEYDOWN: {
+		
 
-				switch (windowEvent.key.keysym.sym) {
-				case SDLK_w: {
-					nextMove[Camera::MOVE_FORWARD] = 1;
-					break;
-				}
-				case SDLK_s: {
-					nextMove[Camera::MOVE_BACKWARD] = 1;
-					break;
-				}
-				case SDLK_a: {
-					nextMove[Camera::STRAFE_LEFT] = 1;
-					break;
-				}
-				case SDLK_d: {
-					nextMove[Camera::STRAFE_RIGHT] = 1;;
-					break;
-				}
-				case SDLK_SPACE: {
-					testowa.playerJumpStart();
-					break;
-				}
-				default: break;
-				}
-				break;
-			}
-			case SDL_KEYUP: {
-
-				switch (windowEvent.key.keysym.sym) {
-				case SDLK_w: {
-					nextMove[Camera::MOVE_FORWARD] = 0;
-					break;
-				}
-				case SDLK_s: {
-					nextMove[Camera::MOVE_BACKWARD] = 0;
-					break;
-				}
-				case SDLK_a: {
-					nextMove[Camera::STRAFE_LEFT] = 0;
-					break;
-				}
-				case SDLK_d: {
-					nextMove[Camera::STRAFE_RIGHT] = 0;;
-					break;
-				}
-				default: break;
-				}
-				break;
-			}
-			case SDL_MOUSEMOTION: {
-				testowa.getCamera()->turnCamera(windowEvent.motion);
-			}
-			case SDL_MOUSEBUTTONDOWN: {
-				if (windowEvent.button.button == SDL_BUTTON_LEFT) {
-					ostatniWystrzal = currentFrame + 0.5f;
-				}
-			}
-			default: break;
-			}
-		}
-
-		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		testowa.movePlayer(nextMove, deltaTime);
+		
 		/*testCube->rotateZ(glm::radians(1.0f));
 		testCube->rotateY(glm::radians(1.0f));
 		testBoundingBox->rotateY(glm::radians(2.0f));*/
-		testowa.DrawObjects();
 		/* na razie cofnijmy sie do terenu
 		box.calculateBoundingBox();
 		box.Draw(testowa.GetProjectionMatrix(), testowa.GetViewMatrix(), boundingBoxShader);
 		*/
-		glm::mat4 model = glm::mat4(1.0f);
+
+/////////////////////////////PISTOLET//////////////////////////////////////////////////////////////////////////////////////////////////////////
+		/*glm::mat4 model = glm::mat4(1.0f);
 		model = glm::translate(model, testowa.getCamera()->cameraPos + testowa.getCamera()->cameraFront);
 		model = glm::rotate(model,glm::radians(180.0f-testowa.getCamera()->yaw), glm::vec3(0.0f, 1.0f, 0.0f));
 		model = glm::rotate(model,glm::radians(-testowa.getCamera()->pitch), glm::vec3(0.0f, 0.0f, 1.0f));
@@ -258,10 +189,9 @@ int main(int argc, char *argv[])
 		lightShader.setVec3("viewPos", testowa.getCamera()->cameraPos);
 		glClear(GL_DEPTH_BUFFER_BIT);
 		pistolet.Draw(lightShader);
-
-		SDL_GL_SwapWindow(window);
+/////////////////////////////PISTOLET-END//////////////////////////////////////////////////////////////////////////////////////////////////////////
+		SDL_GL_SwapWindow(window); // zostanie w glownej petli aplikacji, nie ma sensu sie powtarzac
 	}
-	SDL_FreeSurface(terrainHeight);
 
 	SDL_GL_DeleteContext(context);
 	SDL_DestroyWindow(window);
