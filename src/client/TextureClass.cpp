@@ -97,6 +97,7 @@ bool CTexture::LoadTexture2D(std::string path, const std::string &directory, boo
 	//	unsigned int textureID;
 
 	int width = 1, height = 1, nrComponents = 1;
+	
 
 	SDL_Surface* ptr = IMG_Load(filename.c_str());
 
@@ -123,12 +124,19 @@ bool CTexture::LoadTexture2D(std::string path, const std::string &directory, boo
 	//	BYTE* bDataPointer = FreeImage_GetBits(dib); // Retrieve the image data
 	BYTE* bDataPointer = data;// Retrieve the image data
 	iBPP = ptr->format->BitsPerPixel;
+	nrComponents = ptr->format->BytesPerPixel;// nie w klasie !!!
 	// If somehow one of these failed (they shouldn't), return failure
 //	if (bDataPointer == NULL || FreeImage_GetWidth(dib) == 0 || FreeImage_GetHeight(dib) == 0)
 	//	return false;
 
 
-
+	GLenum format;
+	if (nrComponents == 1)
+		format = GL_RED;
+	else if (nrComponents == 3)
+		format = GL_RGB;
+	else if (nrComponents == 4)
+		format = GL_RGBA;
 
 
 	//GLenum format;
@@ -139,7 +147,7 @@ bool CTexture::LoadTexture2D(std::string path, const std::string &directory, boo
 	//else if (nrComponents == 4)
 	//	format = GL_RGBA;
 
-//	CreateFromData(bDataPointer, iWidth, iHeight,iBPP, format, bGenerateMipMaps);
+	CreateFromData(bDataPointer, iWidth, iHeight,iBPP, format, bGenerateMipMaps);
 
 
 

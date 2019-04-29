@@ -18,17 +18,6 @@ CDirectionalLight::CDirectionalLight(glm::vec3 a_vColor, glm::vec3 a_vDirection,
 	fAmbient = a_fAmbient;
 }
 
-/*-----------------------------------------------
-
-Name:	SetUniformData
-
-Params:	spProgram - shader program
-		sLightVarName - name of directional light variable
-
-Result:	Sets all directional light data.
-
-/*---------------------------------------------*/
-
 void CDirectionalLight::SetUniformData(CShaderProgram *spProgram, std::string sLightVarName)
 {
 	spProgram->SetUniform(sLightVarName + ".vColor", vColor);

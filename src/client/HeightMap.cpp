@@ -7,20 +7,10 @@ CShader CMultiLayeredHeightmap::shTerrainShaders[NUMTERRAINSHADERS];
 CMultiLayeredHeightmap::CMultiLayeredHeightmap()
 {
 	vRenderScale = glm::vec3(1.0f, 1.0f, 1.0f);
-	//GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)))
+	
 }
 
-/*-----------------------------------------------
 
-Name:	LoadHeightMapFromImage
-
-Params:	sImagePath - path to the (optimally) grayscale
-		image containing heightmap data.
-
-Result: Loads a heightmap and builds up all OpenGL
-		structures for rendering.
-
-/*---------------------------------------------*/
 
 bool CMultiLayeredHeightmap::LoadHeightMapFromImage(const char *path, const std::string &directory)
 {
@@ -33,7 +23,6 @@ bool CMultiLayeredHeightmap::LoadHeightMapFromImage(const char *path, const std:
 
 	filename = directory + '/' + filename;
 
-//	unsigned int textureID;
 
 	int width = 1, height = 1, nrComponents = 1;
 
@@ -50,7 +39,6 @@ bool CMultiLayeredHeightmap::LoadHeightMapFromImage(const char *path, const std:
 	iRows = width;
 	iCols = height;
 
-	//GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)))
 
 	GLenum format;
 	if (nrComponents == 1)
@@ -66,11 +54,11 @@ bool CMultiLayeredHeightmap::LoadHeightMapFromImage(const char *path, const std:
 	unsigned int row_step = ptr_inc * iCols;
 
 	vboHeightmapData.CreateVBO();
-	//GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)))
+
 	// All vertex data are here (there are iRows*iCols vertices in this heightmap), we will get to normals later
 	vector< vector< glm::vec3> > vVertexData(iRows, vector<glm::vec3>(iCols));
 	vector< vector< glm::vec2> > vCoordsData(iRows, vector<glm::vec2>(iCols));
-//	GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)))
+
 	float fTextureU = float(iCols)*0.1f;
 	float fTextureV = float(iRows)*0.1f;
 
@@ -150,7 +138,6 @@ bool CMultiLayeredHeightmap::LoadHeightMapFromImage(const char *path, const std:
 			vboHeightmapData.AddData(&vVertexData[i][j], sizeof(glm::vec3)); // Add vertex
 			vboHeightmapData.AddData(&vCoordsData[i][j], sizeof(glm::vec2)); // Add tex. coord
 			vboHeightmapData.AddData(&vFinalNormals[i][j], sizeof(glm::vec3)); // Add normal
-			//GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)))
 		}
 	}
 	// Now create a VBO with heightmap indices
@@ -164,85 +151,52 @@ bool CMultiLayeredHeightmap::LoadHeightMapFromImage(const char *path, const std:
 			int iRow = i + (1 - k);
 			int iIndex = iRow * iCols + j;
 			vboHeightmapIndices.AddData(&iIndex, sizeof(int));
-		//	GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)))
+		
 		}
 		// Restart triangle strips
 		vboHeightmapIndices.AddData(&iPrimitiveRestartIndex, sizeof(int));
-		//GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)))
 	}
 
 	glGenVertexArrays(1, &uiVAO);
 	glBindVertexArray(uiVAO);
-//	GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)))
 	// Attach vertex data to this VAO
 	vboHeightmapData.BindVBO();
-//	GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)))
 	vboHeightmapData.UploadDataToGPU(GL_STATIC_DRAW);
-	//GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)))
-
+	
 	// Vertex positions
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), 0);
 	// Texture coordinates
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3));
-//	GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)))
+
 	// Normal vectors
 	glEnableVertexAttribArray(2);
 	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)(sizeof(glm::vec3) + sizeof(glm::vec2)));
-//	GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)))
+
 	// And now attach index data to this VAO
 	// Here don't forget to bind another type of VBO - the element array buffer, or simplier indices to vertices
 	vboHeightmapIndices.BindVBO(GL_ELEMENT_ARRAY_BUFFER);
-//	GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)))
 	vboHeightmapIndices.UploadDataToGPU(GL_STATIC_DRAW);
-//	GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)))
-
 	bLoaded = true; // If get here, we succeeded with generating heightmap
 	return true;
 }
 
-/*-----------------------------------------------
-
-Name:	LoadTerrainShaderProgram
-
-Params:	none
-
-Result: Loads common shader program used for
-		rendering heightmaps.
-
-/*---------------------------------------------*/
 
 bool CMultiLayeredHeightmap::LoadTerrainShaderProgram()
 {
-	//GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)))
 	bool bOK = true;
 	bOK &= shShaders[0].LoadShader("res\\shaders\\terrain.vert", GL_VERTEX_SHADER);
 	bOK &= shShaders[1].LoadShader("res\\shaders\\terrain.frag", GL_FRAGMENT_SHADER);
 	bOK &= shShaders[2].LoadShader("res\\shaders\\dirLight.frag", GL_FRAGMENT_SHADER);
-	//GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)))
+
 	spTerrain.CreateProgram();
 	FOR(i, NUMTERRAINSHADERS)spTerrain.AddShaderToProgram(&shShaders[i]);
-//	GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)))
-	spTerrain.LinkProgram(); //blad
-//	GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)))
+	spTerrain.LinkProgram();
+
 	return bOK;
 }
 
-/*-----------------------------------------------
-
-Name:	SetRenderSizePolymer CLI
-Params:	fRenderX, fHeight, fRenderZ - enter all 3
-		dimensions separately
-
-		OR
-
-		fQuadSize, fHeight - how big should be one quad
-		of heightmap and height is just height :)
-
-Result: Sets rendering size (scaling) of heightmap.
-
-/*---------------------------------------------*/
 
 void CMultiLayeredHeightmap::SetRenderSize(float fRenderX, float fHeight, float fRenderZ)
 {
@@ -254,238 +208,26 @@ void CMultiLayeredHeightmap::SetRenderSize(float fQuadSize, float fHeight)
 	vRenderScale = glm::vec3(float(iCols)*fQuadSize, fHeight, float(iRows)*fQuadSize);
 }
 
-/*-----------------------------------------------
-
-Name:	RenderHeightmap
-
-Params:	none
-
-Result: Guess what it does :)
-
-/*---------------------------------------------*/
 
 void CMultiLayeredHeightmap::RenderHeightmap()
 {
-	//spTerrain.UseProgram();
+	
+	spTerrain.UseProgram();
 
 	spTerrain.SetUniform("fRenderHeight", vRenderScale.y);
 	spTerrain.SetUniform("fMaxTextureU", float(iCols)*0.1f);
 	spTerrain.SetUniform("fMaxTextureV", float(iRows)*0.1f);
 
-	spTerrain.SetUniform("HeightmapScaleMatrix", glm::scale(glm::mat4(1.0), glm::vec3(vRenderScale)));
+	spTerrain.SetUniform("HeightmapScaleMatrix",GetScaleMatrix());
 
 	// Now we're ready to render - we are drawing set of triangle strips using one call, but we g otta enable primitive restart
 	glBindVertexArray(uiVAO);
-	//GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)))
 	glEnable(GL_PRIMITIVE_RESTART);
-	//GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)))
 	glPrimitiveRestartIndex(iRows*iCols);
-	//GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)))
-//	GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)))
 	int iNumIndices = (iRows - 1)*iCols * 2 + iRows - 1;
 	glDrawElements(GL_TRIANGLE_STRIP, iNumIndices, GL_UNSIGNED_INT, 0);
-//	GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)))
-	//zmiana
+
 }
-
-/*-----------------------------------------------
-
-Name:	ReleaseHeightmap
-
-Params:	none
-
-Result: Releases all data of one heightmap instance.
-
-/*---------------------------------------------*/
-
-//bool CMultiLayeredHeightmap::LoadHeightMapFromImage2(const char * path, std::string & directory)
-//{
-//	if (bLoaded)
-//	{
-//		bLoaded = false;
-//		ReleaseHeightmap();
-//	}
-//	std::string filename = std::string(path);
-//
-//	filename = directory + '/' + filename;
-//
-//	//	unsigned int textureID;
-//
-//	int width = 1, height = 1, nrComponents = 1;
-//
-//	SDL_Surface* ptr = IMG_Load(filename.c_str());
-//
-//	width = ptr->w;
-//	height = ptr->h;
-//
-//	nrComponents = ptr->format->BytesPerPixel;
-//
-//	//FREE_IMAGE_FORMAT fif = FIF_UNKNOWN;
-//	//FIBITMAP* dib(0);
-//
-//	//fif = FreeImage_GetFileType(sImagePath.c_str(), 0); // Check the file signature and deduce its format
-//
-//	//if (fif == FIF_UNKNOWN) // If still unknown, try to guess the file format from the file extension
-//		//fif = FreeImage_GetFIFFromFilename(sImagePath.c_str());
-//
-//	//if (fif == FIF_UNKNOWN) // If still unknown, return failure
-//		//return false;
-//	width = ptr->w;
-//	height = ptr->h;
-//	nrComponents = ptr->format->BytesPerPixel;
-//	//if (FreeImage_FIFSupportsReading(fif)) // Check if the plugin has reading capabilities and load the file
-//		//dib = FreeImage_Load(fif, sImagePath.c_str());
-//	//if (!dib)
-//	//	return false;
-//	unsigned char *data = (BYTE*)ptr->pixels;
-//	//BYTE* bDataPointer = FreeImage_GetBits(dib);
-//	BYTE* bDataPointer = data;// Retrieve the image data
-//	iRows = width;
-//	iCols = height;
-//
-//	// We also require our image to be either 24-bit (classic RGB) or 8-bit (luminance)
-//	//if (bDataPointer == NULL || iRows == 0 || iCols == 0 || (FreeImage_GetBPP(dib) != 24 && FreeImage_GetBPP(dib) != 8))
-//	//	return false;
-//
-//	GLenum format;
-//	if (nrComponents == 1)
-//		format = GL_RED;
-//	else if (nrComponents == 3)
-//		format = GL_RGB;
-//	else if (nrComponents == 4)
-//		format = GL_RGBA;
-//
-//	// How much to increase data pointer to get to next pixel data
-//	unsigned int ptr_inc = nrComponents;
-//	// Length of one row in data
-//	unsigned int row_step = ptr_inc * iCols;
-//
-//	vboHeightmapData.CreateVBO();
-//	// All vertex data are here (there are iRows*iCols vertices in this heightmap), we will get to normals later
-//	vector< vector< glm::vec3> > vVertexData(iRows, vector<glm::vec3>(iCols));
-//	vector< vector< glm::vec2> > vCoordsData(iRows, vector<glm::vec2>(iCols));
-//
-//	float fTextureU = float(iCols)*0.1f;
-//	float fTextureV = float(iRows)*0.1f;
-//
-//	FOR(i, iRows)
-//	{
-//		FOR(j, iCols)
-//		{
-//			float fScaleC = float(j) / float(iCols - 1);
-//			float fScaleR = float(i) / float(iRows - 1);
-//			float fVertexHeight = float(*(bDataPointer + row_step * i + j * ptr_inc)) / 255.0f;
-//			vVertexData[i][j] = glm::vec3(-0.5f + fScaleC, fVertexHeight, -0.5f + fScaleR);
-//			vCoordsData[i][j] = glm::vec2(fTextureU*fScaleC, fTextureV*fScaleR);
-//		}
-//	}
-//
-//	// Normals are here - the heightmap contains ( (iRows-1)*(iCols-1) quads, each one containing 2 triangles, therefore array of we have 3D array)
-//	vector< vector<glm::vec3> > vNormals[2];
-//	FOR(i, 2)vNormals[i] = vector< vector<glm::vec3> >(iRows - 1, vector<glm::vec3>(iCols - 1));
-//
-//	FOR(i, iRows - 1)
-//	{
-//		FOR(j, iCols - 1)
-//		{
-//			glm::vec3 vTriangle0[] =
-//			{
-//				vVertexData[i][j],
-//				vVertexData[i + 1][j],
-//				vVertexData[i + 1][j + 1]
-//			};
-//			glm::vec3 vTriangle1[] =
-//			{
-//				vVertexData[i + 1][j + 1],
-//				vVertexData[i][j + 1],
-//				vVertexData[i][j]
-//			};
-//
-//			glm::vec3 vTriangleNorm0 = glm::cross(vTriangle0[0] - vTriangle0[1], vTriangle0[1] - vTriangle0[2]);
-//			glm::vec3 vTriangleNorm1 = glm::cross(vTriangle1[0] - vTriangle1[1], vTriangle1[1] - vTriangle1[2]);
-//
-//			vNormals[0][i][j] = glm::normalize(vTriangleNorm0);
-//			vNormals[1][i][j] = glm::normalize(vTriangleNorm1);
-//		}
-//	}
-//
-//	vector< vector<glm::vec3> > vFinalNormals = vector< vector<glm::vec3> >(iRows, vector<glm::vec3>(iCols));
-//
-//	FOR(i, iRows)
-//		FOR(j, iCols)
-//	{
-//		// Now we wanna calculate final normal for [i][j] vertex. We will have a look at all triangles this vertex is part of, and then we will make average vector
-//		// of all adjacent triangles' normals
-//
-//		glm::vec3 vFinalNormal = glm::vec3(0.0f, 0.0f, 0.0f);
-//
-//		// Look for upper-left triangles
-//		if (j != 0 && i != 0)
-//			FOR(k, 2)vFinalNormal += vNormals[k][i - 1][j - 1];
-//		// Look for upper-right triangles
-//		if (i != 0 && j != iCols - 1)vFinalNormal += vNormals[0][i - 1][j];
-//		// Look for bottom-right triangles
-//		if (i != iRows - 1 && j != iCols - 1)
-//			FOR(k, 2)vFinalNormal += vNormals[k][i][j];
-//		// Look for bottom-left triangles
-//		if (i != iRows - 1 && j != 0)
-//			vFinalNormal += vNormals[1][i][j - 1];
-//		vFinalNormal = glm::normalize(vFinalNormal);
-//
-//		vFinalNormals[i][j] = vFinalNormal; // Store final normal of j-th vertex in i-th row
-//	}
-//
-//	// First, create a VBO with only vertex data
-//	vboHeightmapData.CreateVBO(iRows*iCols*(2 * sizeof(glm::vec3) + sizeof(glm::vec2))); // Preallocate memory
-//	FOR(i, iRows)
-//	{
-//		FOR(j, iCols)
-//		{
-//			vboHeightmapData.AddData(&vVertexData[i][j], sizeof(glm::vec3)); // Add vertex
-//			vboHeightmapData.AddData(&vCoordsData[i][j], sizeof(glm::vec2)); // Add tex. coord
-//			vboHeightmapData.AddData(&vFinalNormals[i][j], sizeof(glm::vec3)); // Add normal
-//		}
-//	}
-//	// Now create a VBO with heightmap indices
-//	vboHeightmapIndices.CreateVBO();
-//	int iPrimitiveRestartIndex = iRows * iCols;
-//	FOR(i, iRows - 1)
-//	{
-//		FOR(j, iCols)
-//			FOR(k, 2)
-//		{
-//			int iRow = i + (1 - k);
-//			int iIndex = iRow * iCols + j;
-//			vboHeightmapIndices.AddData(&iIndex, sizeof(int));
-//		}
-//		// Restart triangle strips
-//		vboHeightmapIndices.AddData(&iPrimitiveRestartIndex, sizeof(int));
-//	}
-//
-//	glGenVertexArrays(1, &uiVAO);
-//	glBindVertexArray(uiVAO);
-//	// Attach vertex data to this VAO
-//	vboHeightmapData.BindVBO();
-//	vboHeightmapData.UploadDataToGPU(GL_STATIC_DRAW);
-//
-//	// Vertex positions
-//	glEnableVertexAttribArray(0);
-//	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), 0);
-//	// Texture coordinates
-//	glEnableVertexAttribArray(1);
-//	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3));
-//	// Normal vectors
-//	glEnableVertexAttribArray(2);
-//	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)(sizeof(glm::vec3) + sizeof(glm::vec2)));
-//
-//	// And now attach index data to this VAO
-//	// Here don't forget to bind another type of VBO - the element array buffer, or simplier indices to vertices
-//	vboHeightmapIndices.BindVBO(GL_ELEMENT_ARRAY_BUFFER);
-//	vboHeightmapIndices.UploadDataToGPU(GL_STATIC_DRAW);
-//
-//	bLoaded = true; // If get here, we succeeded with generating heightmap
-//	return true;
-//}
 
 
 void CMultiLayeredHeightmap::ReleaseHeightmap()
@@ -498,32 +240,10 @@ void CMultiLayeredHeightmap::ReleaseHeightmap()
 	bLoaded = false;
 }
 
-/*-----------------------------------------------
-
-Name:	GetShaderProgram
-
-Params:	none
-
-Result: Returns pointer to shader program ussed for
-		rendering heightmaps.
-
-/*---------------------------------------------*/
-
 CShaderProgram* CMultiLayeredHeightmap::GetShaderProgram()
 {
 	return &spTerrain;
 }
-
-/*-----------------------------------------------
-
-Name:	ReleaseTerrainShaderProgramx
-
-Params:	none
-
-Result: Releases a common shader program used for
-		rendering heightmaps.
-
-/*---------------------------------------------*/
 
 void CMultiLayeredHeightmap::ReleaseTerrainShaderProgram()
 {
@@ -531,15 +251,6 @@ void CMultiLayeredHeightmap::ReleaseTerrainShaderProgram()
 	FOR(i, NUMTERRAINSHADERS)shShaders[i].DeleteShader();
 }
 
-/*-----------------------------------------------
-
-Name:	Getters
-
-Params:	none
-
-Result:	They get something :)
-
-/*---------------------------------------------*/
 
 int CMultiLayeredHeightmap::GetNumHeightmapRows()
 {
@@ -549,4 +260,28 @@ int CMultiLayeredHeightmap::GetNumHeightmapRows()
 int CMultiLayeredHeightmap::GetNumHeightmapCols()
 {
 	return iCols;
+}
+
+void CMultiLayeredHeightmap::RenderHeightmapForNormals()
+
+{
+	
+		// Drawing set of triangle strips using one call, but we g otta enable primitive restart
+		
+		glBindVertexArray(uiVAO);
+	
+		glEnable(GL_PRIMITIVE_RESTART);
+	
+		glPrimitiveRestartIndex(iRows*iCols);
+
+	
+		int iNumIndices = (iRows - 1)*iCols * 2 + iRows - 1;
+	
+		glDrawElements(GL_POINTS, iNumIndices, GL_UNSIGNED_INT, 0);
+
+}
+
+glm::mat4 CMultiLayeredHeightmap::GetScaleMatrix() {
+
+	return glm::scale(glm::mat4(1.0), glm::vec3(vRenderScale));
 }

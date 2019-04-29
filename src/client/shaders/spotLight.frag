@@ -3,7 +3,7 @@
 #include_part
 
 struct SpotLight
-{ 
+{
 	vec3 vColor;
   vec3 vPosition;
 	vec3 vDirection;

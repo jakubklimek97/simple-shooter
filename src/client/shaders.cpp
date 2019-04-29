@@ -11,64 +11,33 @@ CShader::CShader()
 CShader shShaders[NUMSHADERS];
 CShaderProgram spMain, spOrtho2D, spFont2D;
 
-/*-----------------------------------------------
-
-Name:	PrepareShaderPrograms
-
-Params:	none
-
-Result:	Loads all shaders and creates shader programs.
-
-/*---------------------------------------------*/
 
 bool PrepareShaderPrograms()
 {
 	// Load shaders and create shader program
-	string sShaderFileNames[] = { "main_shader.vert", "main_shader.frag"
+	string sShaderFileNames[] = { "main_shader.vert", "main_shader.frag", "dirLight.frag","spotLight.frag"
 	};
 
-	FOR(i, 2)
+	FOR(i, NUMSHADERS)
 	{
-
 		string sExt = sShaderFileNames[i].substr(ESZ(sShaderFileNames[i]) - 4, 4);
 		int iShaderType = sExt == "vert" ? GL_VERTEX_SHADER : (sExt == "frag" ? GL_FRAGMENT_SHADER : GL_GEOMETRY_SHADER);
 		shShaders[i].LoadShader("res\\shaders\\" + sShaderFileNames[i], iShaderType);
-
 	}
 
 	// Create shader programs
-
 	spMain.CreateProgram();
 	spMain.AddShaderToProgram(&shShaders[0]);
 	spMain.AddShaderToProgram(&shShaders[1]);
-	spMain.AddShaderToProgram(&shShaders[5]);
-
-	if (!spMain.LinkProgram())return false;
-
-	/*spOrtho2D.CreateProgram();
-	spOrtho2D.AddShaderToProgram(&shShaders[3]);
-	spOrtho2D.AddShaderToProgram(&shShaders[4]);
-	spOrtho2D.LinkProgram();*/
-
-	/*spFont2D.CreateProgram();
-	spFont2D.AddShaderToProgram(&shShaders[2]);
-	spFont2D.AddShaderToProgram(&shShaders[4]);
-	spFont2D.LinkProgram();*/
+	spMain.AddShaderToProgram(&shShaders[2]);
+	spMain.AddShaderToProgram(&shShaders[3]);
+	spMain.LinkProgram();
 
 
 	return true;
 }
 
-/*-----------------------------------------------
 
-Name:    LoadShader
-
-Params:  sFile - path to a file
-		 a_iType - type of shader (fragment, vertex, geometry)
-
-Result:	Loads and compiles shader.
-
-/*---------------------------------------------*/
 
 bool CShader::LoadShader(string sFile, int a_iType)
 {
@@ -106,17 +75,6 @@ bool CShader::LoadShader(string sFile, int a_iType)
 
 }
 
-/*-----------------------------------------------
-
-Name:    GetLinesFromFile
-
-Params:  sFile - path to a file
-		 bIncludePart - whether to add include part only
-		 vResult - vector of strings to store result to
-
-Result:  Loads and adds include part.
-
-/*---------------------------------------------*/
 
 bool CShader::GetLinesFromFile(string sFile, bool bIncludePart, vector<string>* vResult)
 {
@@ -169,45 +127,19 @@ bool CShader::GetLinesFromFile(string sFile, bool bIncludePart, vector<string>* 
 	return true;
 }
 
-/*-----------------------------------------------
-
-Name:	IsLoaded
-
-Params:	none
-
-Result:	True if shader was loaded and compiled.
-
-/*---------------------------------------------*/
 
 bool CShader::IsLoaded()
 {
 	return bLoaded;
 }
 
-/*-----------------------------------------------
-
-Name:	GetShaderID
-
-Params:	none
-
-Result:	Returns ID of a generated shader.
-
-/*---------------------------------------------*/
 
 UINT CShader::GetShaderID()
 {
 	return uiShader;
 }
 
-/*-----------------------------------------------
 
-Name:	DeleteShader
-
-Params:	none
-
-Result:	Deletes shader and frees memory in GPU.
-
-/*---------------------------------------------*/
 
 void CShader::DeleteShader()
 {
@@ -221,73 +153,29 @@ CShaderProgram::CShaderProgram()
 	bLinked = false;
 }
 
-/*-----------------------------------------------
-
-Name:	CreateProgram
-
-Params:	none
-
-Result:	Creates a new program.
-
-/*---------------------------------------------*/
-
 void CShaderProgram::CreateProgram()
 {
 	uiProgram = glCreateProgram();
-	//GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)))
 }
 
-/*-----------------------------------------------
 
-Name:	AddShaderToProgram
-
-Params:	sShader - shader to add
-
-Result:	Adds a shader (like source file) to
-		a program, but only compiled one.
-
-/*---------------------------------------------*/
 
 bool CShaderProgram::AddShaderToProgram(CShader* shShader)
 {
 	if (!shShader->IsLoaded())return false;
-	//GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)))
 	glAttachShader(uiProgram, shShader->GetShaderID());
-//	GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)))
 	return true;
 }
 
-/*-----------------------------------------------
-
-Name:	LinkProgram
-
-Params:	none
-
-Result:	Performs final linkage of OpenGL program.
-
-/*---------------------------------------------*/
 
 bool CShaderProgram::LinkProgram()
 {
 	glLinkProgram(uiProgram);
-//	GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)))
 	int iLinkStatus;
 	glGetProgramiv(uiProgram, GL_LINK_STATUS, &iLinkStatus);
-//	GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)))
 	bLinked = iLinkStatus == GL_TRUE;
-//	GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)))
 	return bLinked;
 }
-
-/*-----------------------------------------------
-
-Name:	DeleteProgram
-
-Params:	none
-
-Result:	Deletes program and frees memory on GPU.
-
-/*---------------------------------------------*/
 
 void CShaderProgram::DeleteProgram()
 {
@@ -296,47 +184,18 @@ void CShaderProgram::DeleteProgram()
 	glDeleteProgram(uiProgram);
 }
 
-/*-----------------------------------------------
-
-Name:	UseProgram
-
-Params:	none
-
-Result:	Tells OpenGL to use this program.
-
-/*---------------------------------------------*/
 
 void CShaderProgram::UseProgram()
 {
 	if (bLinked)glUseProgram(uiProgram);
-//	GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)))
 }
-
-/*-----------------------------------------------
-
-Name:	GetProgramID
-
-Params:	none
-
-Result:	Returns OpenGL generated shader program ID.
-
-/*---------------------------------------------*/
 
 unsigned CShaderProgram::GetProgramID()
 {
 	return uiProgram;
 }
 
-/*-----------------------------------------------
 
-Name:	UniformSetters
-
-Params:	yes, there are :)
-
-Result:	These set of functions set most common
-		types of uniform variables.
-
-/*---------------------------------------------*/
 
 // Setting floats
 

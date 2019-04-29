@@ -8,14 +8,6 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include"shaders.h"
-/********************************
-
-Class:		CPointLight
-
-Purpose:	Support class for adding
-			directional lights to scene.
-
-********************************/
 
 class CDirectionalLight
 {
