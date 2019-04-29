@@ -4,6 +4,8 @@
 Terrain::~Terrain() {
 	if (heightMap)
 		SDL_FreeSurface(heightMap);
+	delete entity;
+	delete model;
 }
 
 void Terrain::loadTerrain(std::string modelPath, std::string heightMapPath, Shader& shader)
