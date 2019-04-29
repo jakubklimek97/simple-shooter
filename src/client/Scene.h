@@ -22,6 +22,9 @@ public:
 	void DrawObjects();
 	void movePlayer(Camera::Movement move, float deltaTime);
 	void playerJumpStart();
+	virtual void InitScene();
+	virtual void handleEvents(SDL_Event& e);
+	virtual void render();
 private:
 	std::forward_list<Entity*> objects; //docelowo lista list dla kazdego znanego typu
 	LightObject* light;

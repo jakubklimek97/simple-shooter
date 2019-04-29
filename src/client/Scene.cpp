@@ -10,6 +10,7 @@ Scene::~Scene()
 {
 	objects.clear();
 	if (light) delete light;
+	if (terrain) delete terrain;
 	delete camera;
 }
 
@@ -112,4 +113,16 @@ void Scene::playerJumpStart()
 		jumpTime = 0.3f;
 		jumpStartPos = camera->cameraPos.y;
 	}
+}
+
+void Scene::InitScene()
+{
+}
+
+void Scene::handleEvents(SDL_Event & e)
+{
+}
+
+void Scene::render()
+{
 }
