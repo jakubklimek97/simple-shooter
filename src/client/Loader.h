@@ -8,6 +8,8 @@ class Loader {
 public:
 	static bool loadModels();
 	static bool loadShaders();
+	static bool unloadShaders();
+	static bool unloadModels();
 	enum LoadedModels {
 		CUBE,
 		GUN,
