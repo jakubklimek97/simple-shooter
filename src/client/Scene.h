@@ -13,6 +13,7 @@ public:
 	Scene(glm::mat4 projectionMatrix, Camera* camera);
 	~Scene();
 	LightObject* SetLight(LightObject* light);
+	LightObject* GetLight();
 	Entity* addObject(Entity* object);
 	void removeObject(Entity* object);
 	Camera* getCamera();
@@ -23,8 +24,10 @@ public:
 	void movePlayer(Camera::Movement move, float deltaTime);
 	void playerJumpStart();
 	virtual void InitScene();
+	virtual void UnInitScene() = 0;
 	virtual void handleEvents(SDL_Event& e);
 	virtual void render();
+	bool run = true;
 private:
 	std::forward_list<Entity*> objects; //docelowo lista list dla kazdego znanego typu
 	LightObject* light;

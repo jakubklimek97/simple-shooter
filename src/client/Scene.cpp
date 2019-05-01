@@ -21,6 +21,11 @@ LightObject* Scene::SetLight(LightObject * light)
 	return light;
 }
 
+LightObject* Scene::GetLight()
+{
+	return light;
+}
+
 Entity* Scene::addObject(Entity* object)
 {
 	assert(reinterpret_cast<LightObject*>(object) != nullptr); //If you caught this assert it means you tried to add light source using this method. Use SetLight(LightObject& light) to do it instead.
