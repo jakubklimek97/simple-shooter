@@ -18,19 +18,51 @@
 #include"DirLight.h"
 #include"TextureClass.h"
 #include"Flashlight.h"
-
+#include"Skybox.h"
 
 
 CSpotLight slFlashLight;
 
 CVertexBufferObject vboSceneObjects;
 UINT uiVAOSceneObjects;
-
+CSkybox MainSkybox;
 CMultiLayeredHeightmap hmWorld;
 
 CDirectionalLight dlSun;
 
-Scene testowa(glm::perspective(glm::radians(55.0f), 800.0f / 600.0f, 0.1f, 100.0f), new Camera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.1f, 1.0f));
+Scene testowa(glm::perspective(glm::radians(55.0f), 1280.0f / 720.0f, 0.1f, 100.0f), new Camera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.1f, 1.0f));
+
+#define FOG_EQUATION_EXP		1
+#define FOG_EQUATION_EXP2		2
+
+namespace FogParameters
+{
+	float fDensity = 0.04f;
+	float fStart = 10.0f;
+	float fEnd = 75.0f;
+	glm::vec4 vFogColor = glm::vec4(0.7f, 0.7f, 0.7f, 1.0f);
+	int iFogEquation = FOG_EQUATION_EXP; // 0 = linear, 1 = exp, 2 = exp2
+};
+
+void render() {
+
+	glEnable(GL_TEXTURE_2D);
+	spFogAndLight.UseProgram();
+
+	spFogAndLight.SetUniform("sunLight.vColor", glm::vec3(1.0f, 1.0f, 1.0f));
+	spFogAndLight.SetUniform("sunLight.fAmbientIntensity", 1.0f); // Full light for skybox
+	spFogAndLight.SetUniform("sunLight.vDirection", glm::vec3(0, -1, 0));
+
+	spFogAndLight.SetUniform("matrices.projectionMatrix", testowa.GetProjectionMatrix());
+	spFogAndLight.SetUniform("gSampler", 0);
+
+	glm::mat4 mModelView = testowa.getCamera()->getViewMatrix();
+	glm::mat4 mModelToCamera;
+
+	spFogAndLight.SetUniform("fogParams.iEquation", FogParameters::iFogEquation);
+	spFogAndLight.SetUniform("fogParams.vFogColor", FogParameters::vFogColor);
+
+}
 
 
 
@@ -52,7 +84,7 @@ void initOpenGL(SDL_Window* &pWindow, SDL_GLContext &context) {
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
 	//utworzenie okna
-	pWindow = SDL_CreateWindow("Simple Shooter", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, SDL_WINDOW_OPENGL);
+	pWindow = SDL_CreateWindow("Simple Shooter", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, SDL_WINDOW_OPENGL);
 
 //	"zawartosc" okna
 	context = SDL_GL_CreateContext(pWindow);
@@ -60,7 +92,7 @@ void initOpenGL(SDL_Window* &pWindow, SDL_GLContext &context) {
 //	inicjalizacja glewa
 	glewExperimental = GL_TRUE;
 	glewInit();
-	glViewport(0, 0, 800, 600);
+	glViewport(0, 0, 1280, 720);
 	glEnable(GL_DEPTH_TEST);
 }
 
@@ -100,16 +132,16 @@ int main(int argc, char *argv[])
 
 	LoadAllTextures();
 	
-
+	MainSkybox.LoadSkybox("res\\img", "elbrus_front.jpg", "elbrus_back.jpg", "elbrus_right.jpg", "elbrus_left.jpg", "elbrus_top.jpg", "elbrus_top.jpg");
 
 	CMultiLayeredHeightmap::LoadTerrainShaderProgram();
-	hmWorld.LoadHeightMapFromImage("consider_this_question.png", "res/img");
+	hmWorld.LoadHeightMapFromImage("hm.png", "res/img");
 
 
 	dlSun = CDirectionalLight(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(sqrt(2.0f) / 2, -sqrt(2.0f) / 2, 0), 0.5f);
 	slFlashLight = CSpotLight(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), 1, 15.0f, 0.017f);
 
-	Scene testowa(glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f), new Camera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.1f, 1.0f));
+	Scene testowa(glm::perspective(glm::radians(45.0f), 1200.0f / 720.0f, 0.1f, 100.0f), new Camera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.1f, 1.0f));
 	LightObject* light = testowa.SetLight(new LightObject(kostka, glm::vec3(2.5f, 1.0f, 2.0f), 0.0f, glm::vec3(0.2f), &simpleShader, glm::vec3(1.0f, 1.0f, 1.0f)));
 	Entity* testCube = testowa.addObject(new Entity(kostka, glm::vec3(5.0f, -1.0f, 0.0f), 0.0f, glm::vec3(0.5f, 0.5f, 0.5f)));
 
@@ -270,16 +302,13 @@ int main(int argc, char *argv[])
 		//	 Now we're going to render terrain
 
 
-		hmWorld.SetRenderSize(100.0f, 10.0f, 100.0f);
+		hmWorld.SetRenderSize(10.0f, 10.0f, 10.0f);
 		CShaderProgram* spTerrain = CMultiLayeredHeightmap::GetShaderProgram();
         spTerrain->UseProgram();
 
 
 		spTerrain->SetUniform("matrices.projMatrix", testowa.GetProjectionMatrix());
 		spTerrain->SetUniform("matrices.viewMatrix", testowa.GetViewMatrix());
-		//spTerrain->SetUniform("vEyePosition", glm::vec3(1.0f, 0.0f, 0.0f));
-		// We bind all 5 textures - 3 of them are textures for layers, 1 texture is a "path" texture, and last one is
-		// the places in heightmap where path should be and how intense should it be
 		FOR(i, 3)
 		{
 			char sSamplerName[256];
@@ -290,14 +319,14 @@ int main(int argc, char *argv[])
 
 		// ... set some uniforms
 		spTerrain->SetModelAndNormalMatrix("matrices.modelMatrix", "matrices.normalMatrix", glm::mat4(1.0));
-		spTerrain->SetUniform("vColor", glm::vec4(1, 0, 0, 1));
+		spTerrain->SetUniform("vColor", glm::vec4(1, 1, 1, 1));
 
 		dlSun.SetUniformData(spTerrain, "sunLight");
 
 		//	 ... and finally render heightmap
 		hmWorld.RenderHeightmap();
 
-	
+		MainSkybox.RenderSkybox();
 	
 		SDL_GL_SwapWindow(window);
 	}

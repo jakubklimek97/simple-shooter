@@ -9,13 +9,15 @@ CShader::CShader()
 }
 
 CShader shShaders[NUMSHADERS];
-CShaderProgram spMain, spOrtho2D, spFont2D;
+CShaderProgram spMain,spFogAndLight;
 
 
 bool PrepareShaderPrograms()
 {
 	// Load shaders and create shader program
-	string sShaderFileNames[] = { "main_shader.vert", "main_shader.frag", "dirLight.frag","spotLight.frag"
+	string sShaderFileNames[] = { "main_shader.vert", "main_shader.frag", "dirLight.frag",
+		"spotLight.frag","fog.frag","shader_fog.frag","shader_fog.vert"
+
 	};
 
 	FOR(i, NUMSHADERS)
@@ -30,9 +32,14 @@ bool PrepareShaderPrograms()
 	spMain.AddShaderToProgram(&shShaders[0]);
 	spMain.AddShaderToProgram(&shShaders[1]);
 	spMain.AddShaderToProgram(&shShaders[2]);
-	spMain.AddShaderToProgram(&shShaders[3]);
+	spMain.AddShaderToProgram(&shShaders[3]); // najprawdopodobniej nie biedzie korzystane
 	spMain.LinkProgram();
 
+	spFogAndLight.CreateProgram();
+	spFogAndLight.AddShaderToProgram(&shShaders[4]);
+	spFogAndLight.AddShaderToProgram(&shShaders[5]);
+	spFogAndLight.AddShaderToProgram(&shShaders[6]);
+	spFogAndLight.LinkProgram();
 
 	return true;
 }
