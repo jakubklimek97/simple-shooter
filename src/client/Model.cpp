@@ -5,6 +5,8 @@
 unsigned int TextureFromFile(const char *path, const std::string &directory, bool gamma = false);
 Model::~Model()
 {
+	textures_loaded.clear();
+	meshes.clear();
 }
 void Model::Draw(Shader shader)
 {
@@ -18,6 +20,7 @@ Model::Model(std::string const &path, bool gamma) : gammaCorrection(gamma)
 void Model::loadModel(const std::string &path)
 {
 	Assimp::Importer importer;
+	//ReadFile zwraca wskaznik read only i jest usuwany podczas destrukcji importera 
 	const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) // if is Not Zero
 	{
