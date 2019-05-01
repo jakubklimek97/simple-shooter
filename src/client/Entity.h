@@ -11,6 +11,7 @@ class Entity
 {
 public:
 	Entity(Model& model, glm::vec3 position, float rotation, glm::vec3 scale);
+	~Entity() = default;
 	void rotateX(float radians);
 	void rotateY(float radians);
 	void rotateZ(float radians);
