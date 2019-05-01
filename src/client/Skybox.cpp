@@ -12,16 +12,15 @@ Result:	Loads skybox and creates VAO and VBO for it.
 
 /*---------------------------------------------*/
 
-void CSkybox::LoadSkybox(string a_sDirectory, string a_sFront, string a_sBack, string a_sLeft, string a_sRight, string a_sTop, string a_sBottom)
+void CSkybox::LoadSkybox(string a_sFront, string a_sBack, string a_sLeft, string a_sRight, string a_sTop, string a_sBottom)
 {
-	tTextures[0].LoadTexture2D(a_sDirectory+a_sFront, "res/img", true);
-	tTextures[1].LoadTexture2D(a_sDirectory+a_sBack, "res/img", true);
-	tTextures[2].LoadTexture2D(a_sDirectory+a_sLeft, "res/img", true);
-	tTextures[3].LoadTexture2D(a_sDirectory+a_sRight, "res/img", true);
-	tTextures[4].LoadTexture2D(a_sDirectory+a_sTop, "res/img", true);
-	tTextures[5].LoadTexture2D(a_sDirectory+a_sBottom, "res/img", true);
+	tTextures[0].LoadTexture2D(a_sFront, "res/img", true);
+	tTextures[1].LoadTexture2D(a_sBack, "res/img", true);
+	tTextures[2].LoadTexture2D(a_sLeft, "res/img", true);
+	tTextures[3].LoadTexture2D(a_sRight, "res/img", true);
+	tTextures[4].LoadTexture2D(a_sTop, "res/img", true);
+	tTextures[5].LoadTexture2D(a_sBottom, "res/img", true);
 
-	sDirectory = a_sDirectory;
 
 	sFront = a_sFront;
 	sBack = a_sBack;
@@ -46,17 +45,17 @@ void CSkybox::LoadSkybox(string a_sDirectory, string a_sFront, string a_sBack, s
 	glm::vec3 vSkyBoxVertices[24] = 
 	{
 		// Front face
-		glm::vec3(200.0f, 200.0f, 200.0f), glm::vec3(200.0f, -200.0f, 200.0f), glm::vec3(-200.0f, 200.0f, 200.0f), glm::vec3(-200.0f, -200.0f, 200.0f),
+		glm::vec3(1000.0f, 1000.0f, 1000.0f), glm::vec3(1000.0f, -1000.0f, 1000.0f), glm::vec3(-1000.0f, 1000.0f, 1000.0f), glm::vec3(-1000.0f, -1000.0f, 1000.0f),
 		// Back face
-		glm::vec3(-200.0f, 200.0f, -200.0f), glm::vec3(-200.0f, -200.0f, -200.0f), glm::vec3(200.0f, 200.0f, -200.0f), glm::vec3(200.0f, -200.0f, -200.0f),
+		glm::vec3(-1000.0f, 1000.0f, -1000.0f), glm::vec3(-1000.0f, -1000.0f, -1000.0f), glm::vec3(1000.0f, 1000.0f, -1000.0f), glm::vec3(1000.0f, -1000.0f, -1000.0f),
 		// Left face
-		glm::vec3(-200.0f, 200.0f, 200.0f), glm::vec3(-200.0f, -200.0f, 200.0f), glm::vec3(-200.0f, 200.0f, -200.0f), glm::vec3(-200.0f, -200.0f, -200.0f),
+		glm::vec3(-1000.0f, 1000.0f, 1000.0f), glm::vec3(-1000.0f, -1000.0f, 1000.0f), glm::vec3(-1000.0f, 1000.0f, -1000.0f), glm::vec3(-1000.0f, -1000.0f, -1000.0f),
 		// Right face
-		glm::vec3(200.0f, 200.0f, -200.0f), glm::vec3(200.0f, -200.0f, -200.0f), glm::vec3(200.0f, 200.0f, 200.0f), glm::vec3(200.0f, -200.0f, 200.0f),
+		glm::vec3(1000.0f, 1000.0f, -1000.0f), glm::vec3(1000.0f, -1000.0f, -1000.0f), glm::vec3(1000.0f, 1000.0f, 1000.0f), glm::vec3(1000.0f, -1000.0f, 1000.0f),
 		// Top face
-		glm::vec3(-200.0f, 200.0f, -200.0f), glm::vec3(200.0f, 200.0f, -200.0f), glm::vec3(-200.0f, 200.0f, 200.0f), glm::vec3(200.0f, 200.0f, 200.0f),
+		glm::vec3(-1000.0f, 1000.0f, -1000.0f), glm::vec3(1000.0f, 1000.0f, -1000.0f), glm::vec3(-1000.0f, 1000.0f, 1000.0f), glm::vec3(1000.0f, 1000.0f, 1000.0f),
 		// Bottom face
-		glm::vec3(200.0f, -200.0f, -200.0f), glm::vec3(-200.0f, -200.0f, -200.0f), glm::vec3(200.0f, -200.0f, 200.0f), glm::vec3(-200.0f, -200.0f, 200.0f),
+		glm::vec3(1000.0f, -1000.0f, -1000.0f), glm::vec3(-1000.0f, -1000.0f, -1000.0f), glm::vec3(1000.0f, -1000.0f, 1000.0f), glm::vec3(-1000.0f, -1000.0f, 1000.0f),
 	};
 	glm::vec2 vSkyBoxTexCoords[4] =
 	{

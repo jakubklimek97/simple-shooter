@@ -18,14 +18,63 @@
 #include"DirLight.h"
 #include"TextureClass.h"
 #include"Flashlight.h"
-#include"Skybox.h"
+//#include"Skybox.h"
+
+
+
+
+
+float skyboxVertices[] = {
+	// positions          
+	-1.0f,  1.0f, -1.0f,
+	-1.0f, -1.0f, -1.0f,
+	 1.0f, -1.0f, -1.0f,
+	 1.0f, -1.0f, -1.0f,
+	 1.0f,  1.0f, -1.0f,
+	-1.0f,  1.0f, -1.0f,
+
+	-1.0f, -1.0f,  1.0f,
+	-1.0f, -1.0f, -1.0f,
+	-1.0f,  1.0f, -1.0f,
+	-1.0f,  1.0f, -1.0f,
+	-1.0f,  1.0f,  1.0f,
+	-1.0f, -1.0f,  1.0f,
+
+	 1.0f, -1.0f, -1.0f,
+	 1.0f, -1.0f,  1.0f,
+	 1.0f,  1.0f,  1.0f,
+	 1.0f,  1.0f,  1.0f,
+	 1.0f,  1.0f, -1.0f,
+	 1.0f, -1.0f, -1.0f,
+
+	-1.0f, -1.0f,  1.0f,
+	-1.0f,  1.0f,  1.0f,
+	 1.0f,  1.0f,  1.0f,
+	 1.0f,  1.0f,  1.0f,
+	 1.0f, -1.0f,  1.0f,
+	-1.0f, -1.0f,  1.0f,
+
+	-1.0f,  1.0f, -1.0f,
+	 1.0f,  1.0f, -1.0f,
+	 1.0f,  1.0f,  1.0f,
+	 1.0f,  1.0f,  1.0f,
+	-1.0f,  1.0f,  1.0f,
+	-1.0f,  1.0f, -1.0f,
+
+	-1.0f, -1.0f, -1.0f,
+	-1.0f, -1.0f,  1.0f,
+	 1.0f, -1.0f, -1.0f,
+	 1.0f, -1.0f, -1.0f,
+	-1.0f, -1.0f,  1.0f,
+	 1.0f, -1.0f,  1.0f
+};
 
 
 CSpotLight slFlashLight;
 
 CVertexBufferObject vboSceneObjects;
 UINT uiVAOSceneObjects;
-CSkybox MainSkybox;
+//CSkybox MainSkybox;
 CMultiLayeredHeightmap hmWorld;
 
 CDirectionalLight dlSun;
@@ -57,12 +106,51 @@ void render() {
 	spFogAndLight.SetUniform("gSampler", 0);
 
 	glm::mat4 mModelView = testowa.getCamera()->getViewMatrix();
-	glm::mat4 mModelToCamera;
+//	glm::mat4 mModelToCamera;
 
 	spFogAndLight.SetUniform("fogParams.iEquation", FogParameters::iFogEquation);
 	spFogAndLight.SetUniform("fogParams.vFogColor", FogParameters::vFogColor);
 
 }
+
+
+
+unsigned int loadCubemap(vector<std::string> faces)
+{
+	unsigned int textureID;
+	glGenTextures(1, &textureID);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+
+	int width, height;
+	for (unsigned int i = 0; i < faces.size(); i++)
+	{
+		SDL_Surface*ptr = IMG_Load(faces[i].c_str());
+		width = ptr->w;
+		height = ptr->h;
+		if (ptr)
+		{
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, ptr->pixels);
+		}
+		else
+		{
+			std::cout << "Cubemap texture failed to load at path: " << faces[i] << std::endl;
+		}
+	}
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+	return textureID;
+}
+
+
+
+
+
+
+
 
 
 
@@ -112,8 +200,7 @@ int main(int argc, char *argv[])
 	Shader simpleShader("simpleColorShader.vs", "simpleColorShader.fs");
 	Model kostka("res/models/kostka/kos.obj");
 	Model pistolet("res/models/pistolet/pistolet.obj");
-
-
+	Shader skyboxShader("skybox.vs", "skybox.fs");
 
 	float deltaTime = 0.0;
 	float lastFrame = 0.0;
@@ -127,12 +214,45 @@ int main(int argc, char *argv[])
 
 
 
-	PrepareShaderPrograms();
 
 
-	LoadAllTextures();
 	
-	MainSkybox.LoadSkybox("res\\img", "elbrus_front.jpg", "elbrus_back.jpg", "elbrus_right.jpg", "elbrus_left.jpg", "elbrus_top.jpg", "elbrus_top.jpg");
+
+  
+
+	
+	vector<std::string> faces
+	{
+		("res/img/right.jpg"),
+		("res/img/left.jpg"),
+		("res/img/top.jpg"),
+		("res/img/bottom.jpg"),
+		("res/img/front.jpg"),
+		("res/img/back.jpg"),
+	};
+
+
+
+
+	PrepareShaderPrograms();
+    LoadAllTextures();
+
+	unsigned int cubemapTexture = loadCubemap(faces);
+
+
+	skyboxShader.use();
+	skyboxShader.setInt("skybox", 0);
+
+	unsigned int skyboxVAO, skyboxVBO;
+	glGenVertexArrays(1, &skyboxVAO);
+	glGenBuffers(1, &skyboxVBO);
+	glBindVertexArray(skyboxVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+
+
 
 	CMultiLayeredHeightmap::LoadTerrainShaderProgram();
 	hmWorld.LoadHeightMapFromImage("hm.png", "res/img");
@@ -229,7 +349,26 @@ int main(int argc, char *argv[])
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+
+		glDepthFunc(GL_LEQUAL);
+
+		// change depth function so depth test passes when values are equal to depth buffer's content
+		skyboxShader.use();
+		skyboxShader.setInt("skybox", 0);
+
+		glm::mat4 view = glm::mat4(glm::mat3(testowa.GetViewMatrix())); // remove translation from the view matrix
+		skyboxShader.setMat4("view", view);
+		skyboxShader.setMat4("projection", testowa.GetProjectionMatrix());
+		// skybox cube
+		glBindVertexArray(skyboxVAO);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+		glBindVertexArray(0);
+		glDepthFunc(GL_LESS);
+
 		
+
 		testowa.getCamera()->moveCamera(nextMove, deltaTime);
 
 		testCube->rotateZ(glm::radians(1.0f));
@@ -264,7 +403,8 @@ int main(int argc, char *argv[])
 		lightShader.setVec3("viewPos", testowa.getCamera()->cameraPos);
 		pistolet.Draw(lightShader);
 
-	//	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+//	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 
 		spMain.UseProgram();
 
@@ -299,8 +439,6 @@ int main(int argc, char *argv[])
 
 		
 
-		//	 Now we're going to render terrain
-
 
 		hmWorld.SetRenderSize(10.0f, 10.0f, 10.0f);
 		CShaderProgram* spTerrain = CMultiLayeredHeightmap::GetShaderProgram();
@@ -323,11 +461,19 @@ int main(int argc, char *argv[])
 
 		dlSun.SetUniformData(spTerrain, "sunLight");
 
-		//	 ... and finally render heightmap
+		////	 ... and finally render heightmap
 		hmWorld.RenderHeightmap();
 
-		MainSkybox.RenderSkybox();
+
 	
+		
+		//	 Now we're going to render terrain
+//		MainSkybox.RenderSkybox();
+	
+
+// set depth function back to default
+
+
 		SDL_GL_SwapWindow(window);
 	}
 

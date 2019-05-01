@@ -1,3 +1,5 @@
+#pragma once
+
 enum ETextureFiltering
 {
 	TEXTURE_FILTER_MAG_NEAREST = 0, // Nearest criterion for magnification
@@ -18,6 +20,8 @@ Purpose:	Wraps OpenGL texture
 			their loading.
 
 ********************************/
+
+
 #include <algorithm>
 #include <cmath>
 #include <cstring>
@@ -35,8 +39,6 @@ using namespace std;
 #include <glm/gtc/type_ptr.hpp>
 #include"SDL_image.h"
 #include"SDL.h"
-
-
 
 
 class CTexture
@@ -71,7 +73,7 @@ public:
 private:
 
 	int iWidth, iHeight, iBPP; // Texture width, height, and bytes per pixel
-	UINT uiTexture; // Texture name
+	UINT uiTexture;// Texture name
 	UINT uiSampler; // Sampler name
 	bool bMipMapsGenerated;
 

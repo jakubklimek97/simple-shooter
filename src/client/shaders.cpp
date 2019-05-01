@@ -32,7 +32,7 @@ bool PrepareShaderPrograms()
 	spMain.AddShaderToProgram(&shShaders[0]);
 	spMain.AddShaderToProgram(&shShaders[1]);
 	spMain.AddShaderToProgram(&shShaders[2]);
-	spMain.AddShaderToProgram(&shShaders[3]); // najprawdopodobniej nie biedzie korzystane
+	spMain.AddShaderToProgram(&shShaders[3]); // najprawdopodobniej nie bedzie korzystane
 	spMain.LinkProgram();
 
 	spFogAndLight.CreateProgram();
@@ -40,6 +40,8 @@ bool PrepareShaderPrograms()
 	spFogAndLight.AddShaderToProgram(&shShaders[5]);
 	spFogAndLight.AddShaderToProgram(&shShaders[6]);
 	spFogAndLight.LinkProgram();
+
+
 
 	return true;
 }

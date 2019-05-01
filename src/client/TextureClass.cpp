@@ -2,6 +2,7 @@
 
 #include "TextureClass.h"
 
+
 #define FOR(q,n) for(int q=0;q<n;q++)
 #define SFOR(q,s,e) for(int q=s;q<=e;q++)
 #define RFOR(q,n) for(int q=n;q>=0;q--)
@@ -9,7 +10,7 @@
 
 #define ESZ(elem) (int)elem.size()
 
-CTexture tTextures[NUMTEXTURES];
+
 CTexture::CTexture()
 {
 	bMipMapsGenerated = false;
@@ -105,29 +106,12 @@ bool CTexture::LoadTexture2D(std::string path, const std::string &directory, boo
 	iHeight = ptr->h;
 
 	nrComponents = ptr->format->BytesPerPixel;
-	/*FREE_IMAGE_FORMAT fif = FIF_UNKNOWN;
-	FIBITMAP* dib(0);*/
 
-	//fif = FreeImage_GetFileType(a_sPath.c_str(), 0); // Check the file signature and deduce its format
-
-	//if (fif == FIF_UNKNOWN) // If still unknown, try to guess the file format from the file extension
-	//	fif = FreeImage_GetFIFFromFilename(a_sPath.c_str());
-
-	//if (fif == FIF_UNKNOWN) // If still unknown, return failure
-	//	return false;
-
-	//if (FreeImage_FIFSupportsReading(fif)) // Check if the plugin has reading capabilities and load the file
-	//	dib = FreeImage_Load(fif, a_sPath.c_str());
-	//if (!dib)
-	//	return false;
 	BYTE *data = (BYTE*)ptr->pixels;
 	//	BYTE* bDataPointer = FreeImage_GetBits(dib); // Retrieve the image data
 	BYTE* bDataPointer = data;// Retrieve the image data
 	iBPP = ptr->format->BitsPerPixel;
-	nrComponents = ptr->format->BytesPerPixel;// nie w klasie !!!
-	// If somehow one of these failed (they shouldn't), return failure
-//	if (bDataPointer == NULL || FreeImage_GetWidth(dib) == 0 || FreeImage_GetHeight(dib) == 0)
-	//	return false;
+	nrComponents = ptr->format->BytesPerPixel;
 
 
 	GLenum format;
@@ -138,14 +122,6 @@ bool CTexture::LoadTexture2D(std::string path, const std::string &directory, boo
 	else if (nrComponents == 4)
 		format = GL_RGBA;
 
-
-	//GLenum format;
-	//if (nrComponents == 1)
-	//	format = GL_RED;
-	//else if (nrComponents == 3)
-	//	format = GL_RGB;
-	//else if (nrComponents == 4)
-	//	format = GL_RGBA;
 
 	CreateFromData(bDataPointer, iWidth, iHeight,iBPP, format, bGenerateMipMaps);
 
@@ -169,12 +145,6 @@ bool CTexture::LoadTexture2D(std::string path, const std::string &directory, boo
 	bMipMapsGenerated = bGenerateMipMaps;
 
 
-
-
-
-
-
-
 	return true; // Success
 }
 
@@ -183,19 +153,6 @@ void CTexture::SetSamplerParameter(GLenum parameter, GLenum value)
 	glSamplerParameteri(uiSampler, parameter, value);
 }
 
-/*-----------------------------------------------
-
-Name:	SetFiltering
-
-Params:	tfMagnification - mag. filter, must be from
-							ETextureFiltering enum
-		tfMinification - min. filter, must be from
-							ETextureFiltering enum
-
-Result:	Sets magnification and minification
-			texture filter.
-
-/*---------------------------------------------*/
 
 void CTexture::SetFiltering(int a_tfMagnification, int a_tfMinification)
 {
@@ -223,15 +180,7 @@ void CTexture::SetFiltering(int a_tfMagnification, int a_tfMinification)
 	tfMagnification = a_tfMagnification;
 }
 
-/*-----------------------------------------------
 
-Name:	BindTexture
-
-Params:	iTextureUnit - texture unit to bind texture to
-
-Result:	Guess what it does :)
-
-/*---------------------------------------------*/
 
 void CTexture::BindTexture(int iTextureUnit)
 {
@@ -240,15 +189,6 @@ void CTexture::BindTexture(int iTextureUnit)
 	glBindSampler(iTextureUnit, uiSampler);
 }
 
-/*-----------------------------------------------
-
-Name:	DeleteTexture
-
-Params:	none
-
-Result:	Frees all memory used by texture.
-
-/*---------------------------------------------*/
 
 void CTexture::DeleteTexture()
 {
@@ -256,15 +196,6 @@ void CTexture::DeleteTexture()
 	glDeleteTextures(1, &uiTexture);
 }
 
-/*-----------------------------------------------
-
-Name:	Getters
-
-Params:	none
-
-Result:	... They get something :D
-
-/*---------------------------------------------*/
 
 
 
@@ -303,46 +234,8 @@ string CTexture::GetPath()
 	return sPath;
 }
 
-//bool CTexture::ReloadTexture()
-//{
-//	FREE_IMAGE_FORMAT fif = FIF_UNKNOWN;
-//	FIBITMAP* dib(0);
-//
-//	fif = FreeImage_GetFileType(sPath.c_str(), 0); // Check the file signature and deduce its format
-//
-//	if (fif == FIF_UNKNOWN) // If still unknown, try to guess the file format from the file extension
-//		fif = FreeImage_GetFIFFromFilename(sPath.c_str());
-//
-//	if (fif == FIF_UNKNOWN) // If still unknown, return failure
-//		return false;
-//
-//	if (FreeImage_FIFSupportsReading(fif)) // Check if the plugin has reading capabilities and load the file
-//		dib = FreeImage_Load(fif, sPath.c_str());
-//	if (!dib)
-//		return false;
-//
-//	BYTE* bDataPointer = FreeImage_GetBits(dib); // Retrieve the image data
-//
-//	// If somehow one of these failed (they shouldn't), return failure
-//	if (bDataPointer == NULL || FreeImage_GetWidth(dib) == 0 || FreeImage_GetHeight(dib) == 0)
-//		return false;
-//
-//	GLenum format;
-//	int bada = FreeImage_GetBPP(dib);
-//	if (FreeImage_GetBPP(dib) == 32)format = GL_RGBA;
-//	if (FreeImage_GetBPP(dib) == 24)format = GL_BGR;
-//	if (FreeImage_GetBPP(dib) == 8)format = GL_LUMINANCE;
-//
-//	glBindTexture(GL_TEXTURE_2D, uiTexture);
-//	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, iWidth, iHeight, format, GL_UNSIGNED_BYTE, bDataPointer);
-//	if (bMipMapsGenerated)glGenerateMipmap(GL_TEXTURE_2D);
-//
-//	FreeImage_Unload(dib);
-//
-//	return true; // Success
-//}
 
-//CTexture tTextures[NUMTEXTURES];
+CTexture tTextures[NUMTEXTURES];
 
 void LoadAllTextures()
 {

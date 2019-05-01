@@ -110,4 +110,4 @@ bool PrepareShaderPrograms();
 #define NUMSHADERS 7
 
 extern CShader shShaders[NUMSHADERS];
-extern CShaderProgram spMain,spFogAndLight;
+extern CShaderProgram spMain, spFogAndLight;
