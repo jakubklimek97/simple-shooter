@@ -70,6 +70,8 @@ public:
 	void DeleteTexture();
 
 	CTexture();
+
+	static int LoadCubeMap(vector<string>faces);
 private:
 
 	int iWidth, iHeight, iBPP; // Texture width, height, and bytes per pixel
@@ -78,9 +80,18 @@ private:
 	bool bMipMapsGenerated;
 
 	int tfMinification, tfMagnification;
+	vector<std::string> faces
+	{
+		("res/img/right.jpg"),
+		("res/img/left.jpg"),
+		("res/img/top.jpg"),
+		("res/img/bottom.jpg"),
+		("res/img/front.jpg"),
+		("res/img/back.jpg"),
+	};
 
 	string sPath;
 };
-#define NUMTEXTURES 5
+#define NUMTEXTURES 3
 extern CTexture tTextures[NUMTEXTURES];
 void LoadAllTextures();

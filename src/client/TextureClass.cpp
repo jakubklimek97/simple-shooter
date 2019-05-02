@@ -1,7 +1,7 @@
 #pragma once
 
 #include "TextureClass.h"
-
+#include<iostream>
 
 #define FOR(q,n) for(int q=0;q<n;q++)
 
@@ -11,6 +11,36 @@
 CTexture::CTexture()
 {
 	bMipMapsGenerated = false;
+}
+
+int CTexture::LoadCubeMap(vector<string> faces)
+{
+	unsigned int textureID;
+	glGenTextures(1, &textureID);
+	glBindTexture(GL_TEXTURE_2D, textureID);
+
+	int width, height;
+	for (unsigned int i = 0; i < faces.size(); i++)
+	{
+		SDL_Surface*ptr = IMG_Load(faces[i].c_str());
+		width = ptr->w;
+		height = ptr->h;
+		if (ptr)
+		{
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, ptr->pixels);
+		}
+		else
+		{
+			cout << "Cubemap texture failed to load at path: " << faces[i] << std::endl;
+		}
+	}
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+	return textureID;
 }
 
 /*-----------------------------------------------
@@ -36,7 +66,7 @@ void CTexture::CreateEmptyTexture(int a_iWidth, int a_iHeight, GLenum format)
 	else
 		glTexImage2D(GL_TEXTURE_2D, 0, format, a_iWidth, a_iHeight, 0, format, GL_UNSIGNED_BYTE, NULL);
 
-	glGenSamplers(1, &uiSampler);
+//	glGenSamplers(1, &uiSampler);
 }
 
 /*-----------------------------------------------
@@ -54,7 +84,7 @@ Result:	Creates texture from provided data.
 void CTexture::CreateFromData(BYTE* bData, int a_iWidth, int a_iHeight, int a_iBPP, GLenum format, bool bGenerateMipMaps)
 {
 	// Generate an OpenGL texture ID for this texture
-	glGenTextures(1, &uiTexture);
+    glGenTextures(1, &uiTexture);
 	glBindTexture(GL_TEXTURE_2D, uiTexture);
 	if (format == GL_RGBA || format == GL_BGRA)
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, a_iWidth, a_iHeight, 0, format, GL_UNSIGNED_BYTE, bData);
@@ -120,11 +150,11 @@ bool CTexture::LoadTexture2D(std::string path, const std::string &directory, boo
 		format = GL_RGBA;
 
 
-	CreateFromData(bDataPointer, iWidth, iHeight,iBPP, format, bGenerateMipMaps);
+	//CreateFromData(bDataPointer, iWidth, iHeight,iBPP, format, bGenerateMipMaps);
 
 
 
-	glGenTextures(1, &uiTexture);
+  	glGenTextures(1, &uiTexture);
 	glBindTexture(GL_TEXTURE_2D, uiTexture);
 
 	int iFormat = iBPP == 24 ? GL_BGR : iBPP == 8 ? GL_LUMINANCE : 0;
@@ -133,9 +163,9 @@ bool CTexture::LoadTexture2D(std::string path, const std::string &directory, boo
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, iWidth, iHeight, 0, iFormat, GL_UNSIGNED_BYTE, bDataPointer);
 
 	if (bGenerateMipMaps)glGenerateMipmap(GL_TEXTURE_2D);
-	//GL_check(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)))
 
-	glGenSamplers(1, &uiSampler);
+//	glGenSamplers(1, &uiSampler);  // BEZ TEGO DZIALA SKYBOXA, MOZLIWE ZE Samplery na siebie na chodza
+	// Jak zarzadzic struktura, zeby tego nie robil? (dziala jak stos z tego co widze)
 
 	sPath = filename;
 
@@ -238,7 +268,7 @@ void LoadAllTextures()
 {
 	// Load textures
 
-	string sTextureNames[] = { "fungus.jpg", "sand_grass_02.jpg", "rock_2_4w.jpg", "sand.jpg", "path.png" };
+	string sTextureNames[] = { "fungus.jpg", "sand_grass_02.jpg", "rock_2_4w.jpg"};
 
 	FOR(i, NUMTEXTURES)
 	{

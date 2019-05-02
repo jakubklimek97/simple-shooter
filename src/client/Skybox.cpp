@@ -41,28 +41,27 @@ void CSkybox::LoadSkybox(string a_sFront, string a_sBack, string a_sLeft, string
 
 	vboRenderData.CreateVBO();
 	vboRenderData.BindVBO();
-
-	glm::vec3 vSkyBoxVertices[24] = 
+	glm::vec3 vSkyBoxVertices[24] =
 	{
 		// Front face
-		glm::vec3(1000.0f, 1000.0f, 1000.0f), glm::vec3(1000.0f, -1000.0f, 1000.0f), glm::vec3(-1000.0f, 1000.0f, 1000.0f), glm::vec3(-1000.0f, -1000.0f, 1000.0f),
+		glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(200.0f, -200.0f, 200.0f), glm::vec3(-200.0f, 200.0f, 200.0f), glm::vec3(-200.0f, -200.0f, 200.0f),
 		// Back face
-		glm::vec3(-1000.0f, 1000.0f, -1000.0f), glm::vec3(-1000.0f, -1000.0f, -1000.0f), glm::vec3(1000.0f, 1000.0f, -1000.0f), glm::vec3(1000.0f, -1000.0f, -1000.0f),
+		glm::vec3(-2.0f, 2.0f, -2.0f), glm::vec3(-200.0f, -200.0f, -200.0f), glm::vec3(200.0f, 200.0f, -200.0f), glm::vec3(200.0f, -200.0f, -200.0f),
 		// Left face
-		glm::vec3(-1000.0f, 1000.0f, 1000.0f), glm::vec3(-1000.0f, -1000.0f, 1000.0f), glm::vec3(-1000.0f, 1000.0f, -1000.0f), glm::vec3(-1000.0f, -1000.0f, -1000.0f),
+		glm::vec3(-200.0f, 200.0f, 200.0f), glm::vec3(-200.0f, -200.0f, 200.0f), glm::vec3(-200.0f, 200.0f, -200.0f), glm::vec3(-200.0f, -200.0f, -200.0f),
 		// Right face
-		glm::vec3(1000.0f, 1000.0f, -1000.0f), glm::vec3(1000.0f, -1000.0f, -1000.0f), glm::vec3(1000.0f, 1000.0f, 1000.0f), glm::vec3(1000.0f, -1000.0f, 1000.0f),
+		glm::vec3(200.0f, 200.0f, -200.0f), glm::vec3(200.0f, -200.0f, -200.0f), glm::vec3(200.0f, 200.0f, 200.0f), glm::vec3(200.0f, -200.0f, 200.0f),
 		// Top face
-		glm::vec3(-1000.0f, 1000.0f, -1000.0f), glm::vec3(1000.0f, 1000.0f, -1000.0f), glm::vec3(-1000.0f, 1000.0f, 1000.0f), glm::vec3(1000.0f, 1000.0f, 1000.0f),
+		glm::vec3(-200.0f, 200.0f, -200.0f), glm::vec3(200.0f, 200.0f, -200.0f), glm::vec3(-200.0f, 200.0f, 200.0f), glm::vec3(200.0f, 200.0f, 200.0f),
 		// Bottom face
-		glm::vec3(1000.0f, -1000.0f, -1000.0f), glm::vec3(-1000.0f, -1000.0f, -1000.0f), glm::vec3(1000.0f, -1000.0f, 1000.0f), glm::vec3(-1000.0f, -1000.0f, 1000.0f),
+		glm::vec3(200.0f, -200.0f, -200.0f), glm::vec3(-200.0f, -200.0f, -200.0f), glm::vec3(200.0f, -200.0f, 200.0f), glm::vec3(-200.0f, -200.0f, 200.0f),
 	};
 	glm::vec2 vSkyBoxTexCoords[4] =
 	{
 		glm::vec2(0.0f, 1.0f), glm::vec2(0.0f, 0.0f), glm::vec2(1.0f, 1.0f), glm::vec2(1.0f, 0.0f)
 	};
 
-	glm::vec3 vSkyBoxNormals[6] = 
+	glm::vec3 vSkyBoxNormals[6] =
 	{
 		glm::vec3(0.0f, 0.0f, -1.0f),
 		glm::vec3(0.0f, 0.0f, 1.0f),
