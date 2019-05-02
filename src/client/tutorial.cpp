@@ -326,7 +326,7 @@ int main(int argc, char *argv[])
 					break;
 				}
 				case SDLK_d: {
-					nextMove[Camera::STRAFE_RIGHT] = 0;;
+					nextMove[Camera::STRAFE_RIGHT] = 0;
 					break;
 				}
 				default: break;

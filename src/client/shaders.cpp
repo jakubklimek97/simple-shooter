@@ -16,8 +16,7 @@ bool PrepareShaderPrograms()
 {
 	// Load shaders and create shader program
 	string sShaderFileNames[] = { "main_shader.vert", "main_shader.frag", "dirLight.frag",
-		"spotLight.frag","fog.frag","shader_fog.frag","shader_fog.vert"
-
+		"spotLight.frag","fog.frag","shader_fog.frag","shader_fog.vert","ortho2D.vert","ortho2D.frag"
 	};
 
 	FOR(i, NUMSHADERS)

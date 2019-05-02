@@ -11,7 +11,6 @@ CMultiLayeredHeightmap::CMultiLayeredHeightmap()
 }
 
 
-
 bool CMultiLayeredHeightmap::LoadHeightMapFromImage(const char *path, const std::string &directory)
 {
 	if (bLoaded)
@@ -56,8 +55,11 @@ bool CMultiLayeredHeightmap::LoadHeightMapFromImage(const char *path, const std:
 	vboHeightmapData.CreateVBO();
 
 	// All vertex data are here (there are iRows*iCols vertices in this heightmap), we will get to normals later
-	vector< vector< glm::vec3> > vVertexData(iRows, vector<glm::vec3>(iCols));
-	vector< vector< glm::vec2> > vCoordsData(iRows, vector<glm::vec2>(iCols));
+	//vector< vector< glm::vec3> > vVertexData(iRows, vector<glm::vec3>(iCols));
+	//vector< vector< glm::vec2> > vCoordsData(iRows, vector<glm::vec2>(iCols));
+	vVertexData.assign(iRows, vector<glm::vec3>(iCols));
+	vCoordsData.assign(iRows, vector<glm::vec2>(iCols));
+	//vector< vector< glm::vec2> > vCoordsData2(int,in)
 
 	float fTextureU = float(iCols)*0.1f;
 	float fTextureV = float(iRows)*0.1f;
@@ -238,6 +240,11 @@ void CMultiLayeredHeightmap::ReleaseHeightmap()
 	vboHeightmapIndices.DeleteVBO();
 	glDeleteVertexArrays(1, &uiVAO);
 	bLoaded = false;
+}
+
+void CMultiLayeredHeightmap::CheckCollision(glm::vec3 cameraPos)
+{
+	
 }
 
 CShaderProgram* CMultiLayeredHeightmap::GetShaderProgram()

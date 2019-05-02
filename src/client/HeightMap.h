@@ -17,9 +17,6 @@
 
 
 #define FOR(q,n) for(int q=0;q<n;q++)
-#define SFOR(q,s,e) for(int q=s;q<=e;q++)
-#define RFOR(q,n) for(int q=n;q>=0;q--)
-#define RSFOR(q,s,e) for(int q=s;q>=e;q--)
 
 #define ESZ(elem) (int)elem.size()
 
@@ -32,7 +29,7 @@ public:
 	glm::mat4 GetScaleMatrix();
 	bool LoadHeightMapFromImage(const char *path, const std::string &directory);
 	void ReleaseHeightmap();
-
+	void CheckCollision(glm::vec3 cameraPos);
 	void RenderHeightmap();
 	void RenderHeightmapForNormals();
 	void SetRenderSize(float fQuadSize, float fHeight);
@@ -45,6 +42,7 @@ public:
 
 	CMultiLayeredHeightmap();
 
+
 private:
 	unsigned int uiVAO;
 
@@ -53,10 +51,11 @@ private:
 	int iRows;
 	int iCols;
 	glm::vec3 vRenderScale;
-
+	vector< vector< glm::vec3> > vVertexData;
+	vector< vector< glm::vec2> > vCoordsData;
 	CVertexBufferObject vboHeightmapData;
 	CVertexBufferObject vboHeightmapIndices;
-
+	glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
 	static CShaderProgram spTerrain;
 	static CShader shTerrainShaders[NUMTERRAINSHADERS];
 };
