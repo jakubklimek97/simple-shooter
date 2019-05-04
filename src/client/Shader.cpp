@@ -49,6 +49,12 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath)
 
 }
 
+Shader & Shader::Use()
+{
+	glUseProgram(this->ID);
+	return *this;
+}
+
 void Shader::use()
 {
 	//GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)))
@@ -103,4 +109,72 @@ void Shader::setMat3(const std::string & name, const glm::mat3 & mat) const
 void Shader::setMat4(const std::string & name,const glm::mat4 &mat) const
 {
 	glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, &mat[0][0]);
+}
+
+void Shader::SetInteger(const char *name, int value, bool useShader)
+{
+	if (useShader)
+		this->Use();
+	glUniform1i(glGetUniformLocation(this->ID, name), value);
+}
+
+void Shader::SetMatrix4(const char *name, const glm::mat4 &matrix, bool useShader)
+{
+	if (useShader)
+		this->Use();
+	glUniformMatrix4fv(glGetUniformLocation(this->ID, name), 1, GL_FALSE, glm::value_ptr(matrix));
+}
+
+void Shader::SetVector3f(const char *name, const glm::vec3 &value, bool useShader)
+{
+	if (useShader)
+		this->Use();
+	glUniform3f(glGetUniformLocation(this->ID, name), value.x, value.y, value.z);
+}
+
+
+void Shader::Compile(const char * vertexPath, const char * fragmentPath)
+{
+	std::string vertexCode;
+	std::string fragmentCode;
+	std::ifstream vShaderFile;
+	std::ifstream fShaderFile;
+	vShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+	fShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+	try
+	{
+		vShaderFile.open(vertexPath);
+		fShaderFile.open(fragmentPath);
+		std::stringstream vShaderStream, fShaderStream;
+		vShaderStream << vShaderFile.rdbuf();
+		fShaderStream << fShaderFile.rdbuf();
+		vShaderFile.close();
+		fShaderFile.close();
+		vertexCode = vShaderStream.str();
+		fragmentCode = fShaderStream.str();
+	}
+	catch (std::ifstream::failure e)
+	{
+		std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << std::endl;
+	}
+	const char* vShaderCode = vertexCode.c_str();
+	const char * fShaderCode = fragmentCode.c_str();
+	unsigned int vertex, fragment;
+	vertex = glCreateShader(GL_VERTEX_SHADER);
+	glShaderSource(vertex, 1, &vShaderCode, NULL);
+	glCompileShader(vertex);
+	checkCompileErrors(vertex, "VERTEX");
+	fragment = glCreateShader(GL_FRAGMENT_SHADER);
+	glShaderSource(fragment, 1, &fShaderCode, NULL);
+	glCompileShader(fragment);
+	checkCompileErrors(fragment, "FRAGMENT");
+	//GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)));
+    this->ID = glCreateProgram();
+	glAttachShader(this->ID, vertex);
+	glAttachShader(this->ID, fragment);
+	glLinkProgram(this->ID);
+	checkCompileErrors(this->ID, "PROGRAM");
+	glDeleteShader(vertex);
+	glDeleteShader(fragment);
+//	GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)));
 }

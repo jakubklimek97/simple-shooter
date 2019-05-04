@@ -1,6 +1,7 @@
 #pragma once
 #include <gl/glew.h>
 #include <glm/glm.hpp>
+#include<glm/gtc/type_ptr.hpp>
 
 #include <string>
 #include <fstream>
@@ -11,7 +12,9 @@ class Shader
 {
 public:
 	unsigned int ID;
+	Shader() { }
 	Shader(const char* vertexPath, const char* fragmentPath);
+	Shader &Use();
 	void use();
 	void setBool(const std::string &name, bool value) const;
 	void setInt(const std::string &name, int value) const;
@@ -25,6 +28,10 @@ public:
 	void setMat2(const std::string &name, const glm::mat2 &mat) const;
 	void setMat3(const std::string &name, const glm::mat3 &mat) const;
 	void setMat4(const std::string &name, const glm::mat4 &mat) const;
+	void Compile(const char* vertexPath, const char* fragmentPath);
+	void SetInteger(const char *name, int value, bool useShader = false);
+	void SetMatrix4(const char *name, const glm::mat4 &matrix, bool useShader = false);
+	void SetVector3f(const char *name, const glm::vec3 &value, bool useShader = false);
 
 private:
 	void checkCompileErrors(GLuint shader, std::string type)

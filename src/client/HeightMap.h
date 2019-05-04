@@ -29,12 +29,15 @@ public:
 	glm::mat4 GetScaleMatrix();
 	bool LoadHeightMapFromImage(const char *path, const std::string &directory);
 	void ReleaseHeightmap();
-	void CheckCollision(glm::vec3 cameraPos);
+	static bool CheckCollision(glm::vec3 cameraPos);
 	void RenderHeightmap();
 	void RenderHeightmapForNormals();
 	void SetRenderSize(float fQuadSize, float fHeight);
 	void SetRenderSize(float fRenderX, float fHeight, float fRenderZ);
-
+	vector< vector< glm::vec3> > GetVertexData();
+	void SetVertexData();
+	vector< vector< glm::vec2> >  GetCoordsData();
+	void SetCoordsData();
 	int GetNumHeightmapRows();
 	int GetNumHeightmapCols();
 	int counter = 0;
@@ -55,6 +58,7 @@ private:
 	vector< vector< glm::vec2> > vCoordsData;
 	CVertexBufferObject vboHeightmapData;
 	CVertexBufferObject vboHeightmapIndices;
+	CMultiLayeredHeightmap *Heightmap;
 	glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
 	static CShaderProgram spTerrain;
 	static CShader shTerrainShaders[NUMTERRAINSHADERS];

@@ -1,4 +1,5 @@
 #include <iostream>
+#include<sstream>
 #include <SDL.h>
 #include <SDL_image.h>
 #include <GL/glew.h>
@@ -21,8 +22,9 @@
 //#include"Skybox.h"
 
 
+int iTorusFaces;
 
-
+UINT uiVAOs[1]; // Only one VAO now //TEST
 
 float skyboxVertices[] = {
 	// positions          
@@ -156,7 +158,7 @@ static int zycie = 500000;
 static float i = 0.0f;
 
 float random() {
-	i += 0.06f;
+	i += 0.01f;
 	if (i == 1.1f) {
 		i = 0.0f;
 		return i;
@@ -344,6 +346,15 @@ int main(int argc, char *argv[])
 	glEnable(GL_DEPTH_TEST);
 	glClearDepth(1.0);
 
+
+	//TEST
+
+
+	// Vertex positions
+
+	//TEST
+
+
 	//DZIALA
 
 	//1 zycie
@@ -406,7 +417,7 @@ int main(int argc, char *argv[])
    // either set it manually like so:
 
 	GLfloat gamma;
-	gamma = (sin(i) / 2) + 0.5;
+	gamma = (sin(i) / 2) + 0.5f;
 
 	glUniform1f(glGetUniformLocation(Shader2d.ID, "gamma"), gamma);
 	Shader2d.setInt("texture2", 1);
@@ -449,7 +460,7 @@ int main(int argc, char *argv[])
 
 
 	CMultiLayeredHeightmap::LoadTerrainShaderProgram();
-	hmWorld.LoadHeightMapFromImage("consider_this_question.png", "res/img");
+	hmWorld.LoadHeightMapFromImage("heightmap.jpg", "res/img");
 
 
 	dlSun = CDirectionalLight(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(sqrt(2.0f) / 2, -sqrt(2.0f) / 2, 0), 0.5f);
@@ -457,13 +468,7 @@ int main(int argc, char *argv[])
 	//DZIALA
 
 
-	//TESTOWANIE
 
-
-
-
-
-	//TESTWOANIE
 	Scene testowa(glm::perspective(glm::radians(45.0f), 1200.0f / 720.0f, 0.1f, 100.0f), new Camera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.1f, 1.0f));
 	LightObject* light = testowa.SetLight(new LightObject(kostka, glm::vec3(2.5f, 1.0f, 2.0f), 0.0f, glm::vec3(0.2f), &simpleShader, glm::vec3(1.0f, 1.0f, 1.0f)));
 	Entity* testCube = testowa.addObject(new Entity(kostka, glm::vec3(5.0f, -1.0f, 0.0f), 0.0f, glm::vec3(0.5f, 0.5f, 0.5f)));
@@ -552,18 +557,6 @@ int main(int argc, char *argv[])
 		glClearColor(1.0f, 0.0f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-
-		
-
-		
-
-
-
-
-
-
-
-
 		testowa.getCamera()->moveCamera(nextMove, deltaTime);
 
 		testCube->rotateZ(glm::radians(1.0f));
@@ -632,10 +625,7 @@ int main(int argc, char *argv[])
 		dlSun.SetUniformData(&spMain, "sunLight");
 
 
-		
-
-
-		hmWorld.SetRenderSize(1.0f, 1.0f, 1.0f);
+		hmWorld.SetRenderSize(15.0f, 15.0f, 15.0f);
 		CShaderProgram* spTerrain = CMultiLayeredHeightmap::GetShaderProgram();
         spTerrain->UseProgram();
 
@@ -644,15 +634,15 @@ int main(int argc, char *argv[])
 		spTerrain->SetUniform("matrices.viewMatrix", testowa.GetViewMatrix());
 		FOR(i, 3)
 		{
-			char sSamplerName[256];
-			sprintf(sSamplerName, "gSampler[%d]", i);
+			stringstream Sampler;
+			Sampler << "gSampler[" << i << "]";
 			tTextures[i].BindTexture(i);
-			spTerrain->SetUniform(sSamplerName, i);
+			spTerrain->SetUniform(Sampler.str(), i);
 		}
 
 		// ... set some uniforms
 		spTerrain->SetModelAndNormalMatrix("matrices.modelMatrix", "matrices.normalMatrix", glm::mat4(1.0));
-		spTerrain->SetUniform("vColor", glm::vec4(1, 1, 1, 1));
+		spTerrain->SetUniform("vColor", glm::vec4(1,1 , 1, 1));
 
 		dlSun.SetUniformData(spTerrain, "sunLight");
 
@@ -670,7 +660,7 @@ int main(int argc, char *argv[])
 
 		Shader2d.use();
 
-		gamma = (sin(random()) / 2) + 0.5;
+		gamma =(GLfloat((sin(random()) / 2) + 0.5)); // uzyc static cast
 		glUniform1f(glGetUniformLocation(Shader2d.ID, "gamma"), gamma);
 		Shader2d.setInt("texture2", 1);
 		glBindVertexArray(VAO);
@@ -679,7 +669,7 @@ int main(int argc, char *argv[])
 
 		Shader2d2.use();
 
-		gamma = (sin(random()) / 2) + 0.5;
+		gamma =(GLfloat( (sin(random()) / 2) + 0.5));//uzyc static cast
 		glUniform1f(glGetUniformLocation(Shader2d2.ID, "gamma"), gamma);
 		Shader2d2.setInt("texture2", 1);
 		glBindVertexArray(VAO2);
@@ -702,13 +692,36 @@ int main(int argc, char *argv[])
 		glBindVertexArray(0);
 		glDepthFunc(GL_LESS);
 
-
-		//	 Now we're going to render terrain
-//		MainSkybox.RenderSkybox();
-	
-
 // set depth function back to default
+	//TESTOWANIE
 
+		glEnable(GL_TEXTURE_2D);
+		spFogAndLight.UseProgram();
+
+		spFogAndLight.SetUniform("sunLight.vColor", glm::vec3(1.0f, 1.0f, 1.0f));
+		spFogAndLight.SetUniform("sunLight.fAmbientIntensity", 1.0f); // Full light for skybox
+		spFogAndLight.SetUniform("sunLight.vDirection", glm::vec3(0, -1, 0));
+
+		spFogAndLight.SetUniform("matrices.projectionMatrix", testowa.GetProjectionMatrix());
+		spFogAndLight.SetUniform("gSampler", 0);
+
+		glm::mat4 mModelView = testowa.GetViewMatrix();
+//		glm::mat4 mModelToCamera;
+
+		spFogAndLight.SetUniform("fogParams.iEquation", FogParameters::iFogEquation);
+		spFogAndLight.SetUniform("fogParams.vFogColor", FogParameters::vFogColor);
+		spFogAndLight.SetUniform("fogParams.fDensity", FogParameters::fDensity);
+
+		spFogAndLight.SetUniform("matrices.modelViewMatrix", glm::translate(mModelView, testowa.getCamera()->cameraFront));//Front albo Pos
+		spFogAndLight.SetUniform("sunLight.fAmbientIntensity", 0.55f);
+		spFogAndLight.SetUniform("matrices.modelViewMatrix", &mModelView);
+
+		// Render ground
+
+	   testowa.GetViewMatrix();
+	   testowa.getCamera()->cameraPos;
+	   testowa.GetProjectionMatrix();
+	//TESTOWANIE
 
 		SDL_GL_SwapWindow(window);
 	}

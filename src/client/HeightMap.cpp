@@ -55,9 +55,10 @@ bool CMultiLayeredHeightmap::LoadHeightMapFromImage(const char *path, const std:
 	vboHeightmapData.CreateVBO();
 
 	// All vertex data are here (there are iRows*iCols vertices in this heightmap), we will get to normals later
-	vVertexData.assign(iRows, vector<glm::vec3>(iCols));
-	vCoordsData.assign(iRows, vector<glm::vec2>(iCols));
-
+	//vVertexData.assign(iRows, vector<glm::vec3>(iCols));
+	//vCoordsData.assign(iRows, vector<glm::vec2>(iCols));
+	SetVertexData();
+	SetCoordsData();
 	float fTextureU = float(iCols)*0.1f;
 	float fTextureV = float(iRows)*0.1f;
 
@@ -69,7 +70,7 @@ bool CMultiLayeredHeightmap::LoadHeightMapFromImage(const char *path, const std:
 			float fScaleR = float(i) / float(iRows - 1);
 			float fVertexHeight = float(*(bDataPointer + row_step * i + j * ptr_inc)) / 255.0f;
 			vVertexData[i][j] = glm::vec3(-0.5f + fScaleC, fVertexHeight, -0.5f + fScaleR);
-			vCoordsData[i][j] = glm::vec2(fTextureU*fScaleC, fTextureV*fScaleR);
+			vCoordsData[i][j] = glm::vec2(fTextureU*fScaleC*10, fTextureV*fScaleR*10);
 		}
 	}
 
@@ -202,6 +203,28 @@ void CMultiLayeredHeightmap::SetRenderSize(float fRenderX, float fHeight, float 
 	vRenderScale = glm::vec3(fRenderX, fHeight, fRenderZ);
 }
 
+vector< vector< glm::vec3> > CMultiLayeredHeightmap::GetVertexData()
+{
+	return vVertexData;
+}
+
+void CMultiLayeredHeightmap::SetVertexData()
+{
+  vVertexData.assign(iRows, vector<glm::vec3>(iCols));
+}
+
+vector<vector<glm::vec2>> CMultiLayeredHeightmap::GetCoordsData()
+{
+	return vCoordsData;
+}
+
+void CMultiLayeredHeightmap::SetCoordsData()
+{
+	vCoordsData.assign(iRows, vector<glm::vec2>(iCols));
+}
+
+
+
 void CMultiLayeredHeightmap::SetRenderSize(float fQuadSize, float fHeight)
 {
 	vRenderScale = glm::vec3(float(iCols)*fQuadSize, fHeight, float(iRows)*fQuadSize);
@@ -239,9 +262,17 @@ void CMultiLayeredHeightmap::ReleaseHeightmap()
 	bLoaded = false;
 }
 
-void CMultiLayeredHeightmap::CheckCollision(glm::vec3 cameraPos)
+bool CMultiLayeredHeightmap::CheckCollision(glm::vec3 cameraPos)
 {
-	
+	//FOR(i, iRows)
+	//{
+	//	FOR(j, iCols)
+	//	{
+	//		if (GetVertexData()[i][j] == cameraPos);
+	//		cameraPos.x = cameraPos.x + 1;
+	//	}
+	//}
+	return true;
 }
 
 CShaderProgram* CMultiLayeredHeightmap::GetShaderProgram()
