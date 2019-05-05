@@ -54,8 +54,8 @@ private:
 	int iRows;
 	int iCols;
 	glm::vec3 vRenderScale;
-	vector< vector< glm::vec3> > vVertexData;
-	vector< vector< glm::vec2> > vCoordsData;
+	static vector< vector< glm::vec3> > vVertexData;
+	static vector< vector< glm::vec2> > vCoordsData;
 	CVertexBufferObject vboHeightmapData;
 	CVertexBufferObject vboHeightmapIndices;
 	CMultiLayeredHeightmap *Heightmap;

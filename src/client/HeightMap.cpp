@@ -4,6 +4,8 @@
 CShaderProgram CMultiLayeredHeightmap::spTerrain;
 CShader CMultiLayeredHeightmap::shTerrainShaders[NUMTERRAINSHADERS];
 
+
+
 CMultiLayeredHeightmap::CMultiLayeredHeightmap()
 {
 	vRenderScale = glm::vec3(1.0f, 1.0f, 1.0f);
@@ -70,7 +72,7 @@ bool CMultiLayeredHeightmap::LoadHeightMapFromImage(const char *path, const std:
 			float fScaleR = float(i) / float(iRows - 1);
 			float fVertexHeight = float(*(bDataPointer + row_step * i + j * ptr_inc)) / 255.0f;
 			vVertexData[i][j] = glm::vec3(-0.5f + fScaleC, fVertexHeight, -0.5f + fScaleR);
-			vCoordsData[i][j] = glm::vec2(fTextureU*fScaleC*10, fTextureV*fScaleR*10);
+			vCoordsData[i][j] = glm::vec2(fTextureU*fScaleC, fTextureV*fScaleR);
 		}
 	}
 
@@ -264,15 +266,19 @@ void CMultiLayeredHeightmap::ReleaseHeightmap()
 
 bool CMultiLayeredHeightmap::CheckCollision(glm::vec3 cameraPos)
 {
-	//FOR(i, iRows)
-	//{
-	//	FOR(j, iCols)
-	//	{
-	//		if (GetVertexData()[i][j] == cameraPos);
-	//		cameraPos.x = cameraPos.x + 1;
-	//	}
-	//}
-	return true;
+
+	for(int i =0;i<vVertexData.size();++i)
+		for (int j = 0; j < vVertexData.size(); ++j)
+		{
+			auto tmp = vVertexData[i][j];
+			if (tmp.x == cameraPos.x && tmp.y == cameraPos.y && tmp.z == cameraPos.z)
+			{
+				cameraPos.x = cameraPos.x + 2.0f;
+				return true;
+			}
+
+		}
+	return false;
 }
 
 CShaderProgram* CMultiLayeredHeightmap::GetShaderProgram()
