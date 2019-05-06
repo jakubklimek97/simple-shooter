@@ -19,9 +19,9 @@ bool PrepareShaderPrograms()
 		"spotLight.frag","fog.frag","shader_fog.frag","shader_fog.vert","ortho2D.vert","ortho2D.frag"
 	};
 
-	FOR(i, NUMSHADERS)
+   for(int i =0;i<NUMSHADERS;++i)
 	{
-		string sExt = sShaderFileNames[i].substr(ESZ(sShaderFileNames[i]) - 4, 4);
+		string sExt = sShaderFileNames[i].substr((int) sShaderFileNames[i].size() - 4, 4);
 		int iShaderType = sExt == "vert" ? GL_VERTEX_SHADER : (sExt == "frag" ? GL_FRAGMENT_SHADER : GL_GEOMETRY_SHADER);
 		shShaders[i].LoadShader("res\\shaders\\" + sShaderFileNames[i], iShaderType);
 	}
@@ -53,12 +53,13 @@ bool CShader::LoadShader(string sFile, int a_iType)
 
 	if (!GetLinesFromFile(sFile, false, &sLines))return false;
 
-	const char** sProgram = new const char*[ESZ(sLines)];
-	FOR(i, ESZ(sLines))sProgram[i] = sLines[i].c_str();
+	const char** sProgram = new const char*[(int) sLines.size()];
+	for(int i = 0;i<(int)sLines.size();++i) 
+		sProgram[i] = sLines[i].c_str();
 
 	uiShader = glCreateShader(a_iType);
 
-	glShaderSource(uiShader, ESZ(sLines), sProgram, NULL);
+	glShaderSource(uiShader,(int)(sLines.size()), sProgram, NULL);
 	glCompileShader(uiShader);
 
 	delete[] sProgram;
@@ -69,11 +70,11 @@ bool CShader::LoadShader(string sFile, int a_iType)
 	if (iCompilationStatus == GL_FALSE)
 	{
 		char sInfoLog[1024];
-		char sFinalMessage[1536];
+//		char sFinalMessage[1536];
 		int iLogLength;
 		glGetShaderInfoLog(uiShader, 1024, &iLogLength, sInfoLog);
 		//sprintf(sFinalMessage, "Error! Shader file %s wasn't compiled! The compiler returned:\n\n%s", sFile.c_str(), sInfoLog);
-		MessageBox(NULL, sFinalMessage, "Error", MB_ICONERROR);
+//		MessageBox(NULL, sFinalMessage, "Error", MB_ICONERROR);
 		return false;
 	}
 	iType = a_iType;
@@ -91,7 +92,7 @@ bool CShader::GetLinesFromFile(string sFile, bool bIncludePart, vector<string>* 
 
 	string sDirectory;
 	int slashIndex = -1;
-	RFOR(i, ESZ(sFile) - 1)
+	for (int i = sFile.size(); i >= 0;--i)
 	{
 		if (sFile[i] == '\\' || sFile[i] == '/')
 		{
@@ -117,9 +118,9 @@ bool CShader::GetLinesFromFile(string sFile, bool bIncludePart, vector<string>* 
 		{
 			string sFileName;
 			ss >> sFileName;
-			if (ESZ(sFileName) > 0 && sFileName[0] == '\"' && sFileName[ESZ(sFileName) - 1] == '\"')
+			if ((int)(sFileName.size()) > 0 && sFileName[0] == '\"' && sFileName[(int)(sFileName.size())- 1] == '\"')
 			{
-				sFileName = sFileName.substr(1, ESZ(sFileName) - 2);
+				sFileName = sFileName.substr(1, int(sFileName.size()) - 2);
 				GetLinesFromFile(sDirectory + sFileName, true, vResult);
 			}
 		}
@@ -142,7 +143,7 @@ bool CShader::IsLoaded()
 }
 
 
-UINT CShader::GetShaderID()
+unsigned int CShader::GetShaderID()
 {
 	return uiShader;
 }
@@ -262,13 +263,13 @@ void CShaderProgram::SetUniform(string sName, const glm::vec4 vVector)
 void CShaderProgram::SetUniform(string sName, glm::mat3* mMatrices, int iCount)
 {
 	int iLoc = glGetUniformLocation(uiProgram, sName.c_str());
-	glUniformMatrix3fv(iLoc, iCount, FALSE, (GLfloat*)mMatrices);
+	glUniformMatrix3fv(iLoc, iCount, false, (GLfloat*)mMatrices);
 }
 
 void CShaderProgram::SetUniform(string sName, const glm::mat3 mMatrix)
 {
 	int iLoc = glGetUniformLocation(uiProgram, sName.c_str());
-	glUniformMatrix3fv(iLoc, 1, FALSE, (GLfloat*)&mMatrix);
+	glUniformMatrix3fv(iLoc, 1, false, (GLfloat*)&mMatrix);
 }
 
 // Setting 4x4 matrices
@@ -276,13 +277,13 @@ void CShaderProgram::SetUniform(string sName, const glm::mat3 mMatrix)
 void CShaderProgram::SetUniform(string sName, glm::mat4* mMatrices, int iCount)
 {
 	int iLoc = glGetUniformLocation(uiProgram, sName.c_str());
-	glUniformMatrix4fv(iLoc, iCount, FALSE, (GLfloat*)mMatrices);
+	glUniformMatrix4fv(iLoc, iCount, false, (GLfloat*)mMatrices);
 }
 
 void CShaderProgram::SetUniform(string sName, const glm::mat4 mMatrix)
 {
 	int iLoc = glGetUniformLocation(uiProgram, sName.c_str());
-	glUniformMatrix4fv(iLoc, 1, FALSE, (GLfloat*)&mMatrix);
+	glUniformMatrix4fv(iLoc, 1, false, (GLfloat*)&mMatrix);
 }
 
 // Setting integers

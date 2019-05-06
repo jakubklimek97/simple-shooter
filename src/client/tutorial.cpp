@@ -132,6 +132,7 @@ unsigned int loadCubemap(vector<std::string> faces)
 		if (ptr)
 		{
 			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, ptr->pixels);
+			SDL_FreeSurface(ptr);
 		}
 		else
 		{
@@ -143,7 +144,7 @@ unsigned int loadCubemap(vector<std::string> faces)
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-
+	
 	return textureID;
 }
 
@@ -460,7 +461,7 @@ int main(int argc, char *argv[])
 
 
 	CMultiLayeredHeightmap::LoadTerrainShaderProgram();
-	hmWorld.LoadHeightMapFromImage("heightmap.jpg", "res/img");
+	hmWorld.LoadHeightMapFromImage("kub.png", "res/img");
 
 
 	dlSun = CDirectionalLight(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(sqrt(2.0f) / 2, -sqrt(2.0f) / 2, 0), 0.5f);
@@ -625,14 +626,14 @@ int main(int argc, char *argv[])
 		dlSun.SetUniformData(&spMain, "sunLight");
 
 
-		hmWorld.SetRenderSize(15.0f, 15.0f, 15.0f);
+		hmWorld.SetRenderSize(10.0f, 10.0f, 10.0f);
 		CShaderProgram* spTerrain = CMultiLayeredHeightmap::GetShaderProgram();
         spTerrain->UseProgram();
 
 
 		spTerrain->SetUniform("matrices.projMatrix", testowa.GetProjectionMatrix());
 		spTerrain->SetUniform("matrices.viewMatrix", testowa.GetViewMatrix());
-		FOR(i, 3)
+		for(int i =0;i<3;++i)
 		{
 			stringstream Sampler;
 			Sampler << "gSampler[" << i << "]";
@@ -660,7 +661,7 @@ int main(int argc, char *argv[])
 
 		Shader2d.use();
 
-		gamma =(GLfloat((sin(random()) / 2) + 0.5)); // uzyc static cast
+		gamma = static_cast<GLfloat>((sin(random()) / 2) + 0.5); // uzyc static cast
 		glUniform1f(glGetUniformLocation(Shader2d.ID, "gamma"), gamma);
 		Shader2d.setInt("texture2", 1);
 		glBindVertexArray(VAO);
@@ -669,7 +670,7 @@ int main(int argc, char *argv[])
 
 		Shader2d2.use();
 
-		gamma =(GLfloat( (sin(random()) / 2) + 0.5));//uzyc static cast
+		gamma = static_cast<GLfloat>( (sin(random()) / 2) + 0.5);//uzyc static cast
 		glUniform1f(glGetUniformLocation(Shader2d2.ID, "gamma"), gamma);
 		Shader2d2.setInt("texture2", 1);
 		glBindVertexArray(VAO2);

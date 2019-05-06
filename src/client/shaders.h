@@ -9,15 +9,9 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include <windows.h> // do message boxa
 #include <sstream>
 
-#define FOR(q,n) for(int q=0;q<n;q++)
-#define SFOR(q,s,e) for(int q=s;q<=e;q++)
-#define RFOR(q,n) for(int q=n;q>=0;q--)
-#define RSFOR(q,s,e) for(int q=s;q>=e;q--)
 
-#define ESZ(elem) (int)elem.size()
 
 using namespace std;
 /********************************
@@ -38,7 +32,7 @@ public:
 	bool GetLinesFromFile(string sFile, bool bIncludePart, vector<string>* vResult);
 
 	bool IsLoaded();
-	UINT GetShaderID();
+	unsigned int GetShaderID();
 
 	CShader();
 

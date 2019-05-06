@@ -3,26 +3,13 @@
 #include "TextureClass.h"
 #include<iostream>
 
-#define FOR(q,n) for(int q=0;q<n;q++)
 
-#define ESZ(elem) (int)elem.size()
 
 
 CTexture::CTexture()
 {
 	bMipMapsGenerated = false;
 }
-
-/*-----------------------------------------------
-
-Name:	CreateEmptyTexture
-
-Params:	a_iWidth, a_iHeight - dimensions
-		format - format of data
-
-Result:	Creates texture from provided data.
-
-/*---------------------------------------------*/
 
 void CTexture::CreateEmptyTexture(int a_iWidth, int a_iHeight, GLenum format)
 {
@@ -36,20 +23,9 @@ void CTexture::CreateEmptyTexture(int a_iWidth, int a_iHeight, GLenum format)
 	else
 		glTexImage2D(GL_TEXTURE_2D, 0, format, a_iWidth, a_iHeight, 0, format, GL_UNSIGNED_BYTE, NULL);
 
-//	glGenSamplers(1, &uiSampler);
 }
 
-/*-----------------------------------------------
 
-Name:	CreateFromData
-
-Params:	a_sPath - path to the texture
-		format - format of data
-		bGenerateMipMaps - whether to create mipmaps
-
-Result:	Creates texture from provided data.
-
-/*---------------------------------------------*/
 
 void CTexture::CreateFromData(BYTE* bData, int a_iWidth, int a_iHeight, int a_iBPP, GLenum format, bool bGenerateMipMaps)
 {
@@ -73,17 +49,7 @@ void CTexture::CreateFromData(BYTE* bData, int a_iWidth, int a_iHeight, int a_iB
 	iBPP = a_iBPP;
 }
 
-/*-----------------------------------------------
 
-Name:	LoadTexture2D
-
-Params:	a_sPath - path to the texture
-		bGenerateMipMaps - whether to create mipmaps
-
-Result:	Loads texture from a file, supports most
-		graphics formats.
-
-/*---------------------------------------------*/
 
 bool CTexture::LoadTexture2D(std::string path, const std::string &directory, bool bGenerateMipMaps)
 {
@@ -92,7 +58,6 @@ bool CTexture::LoadTexture2D(std::string path, const std::string &directory, boo
 
 	filename = directory + '/' + filename;
 
-	//	unsigned int textureID;
 
 	int width = 1, height = 1, nrComponents = 1;
 	
@@ -104,9 +69,8 @@ bool CTexture::LoadTexture2D(std::string path, const std::string &directory, boo
 
 	nrComponents = ptr->format->BytesPerPixel;
 
-	BYTE *data = (BYTE*)ptr->pixels;
-	//	BYTE* bDataPointer = FreeImage_GetBits(dib); // Retrieve the image data
-	BYTE* bDataPointer = data;// Retrieve the image data
+	unsigned char *data = (unsigned char*)ptr->pixels;
+	unsigned char* bDataPointer = data;// Retrieve the image data
 	iBPP = ptr->format->BitsPerPixel;
 	nrComponents = ptr->format->BytesPerPixel;
 
@@ -118,11 +82,6 @@ bool CTexture::LoadTexture2D(std::string path, const std::string &directory, boo
 		format = GL_RGB;
 	else if (nrComponents == 4)
 		format = GL_RGBA;
-
-
-	//CreateFromData(bDataPointer, iWidth, iHeight,iBPP, format, bGenerateMipMaps);
-
-
 
   	glGenTextures(1, &uiTexture);
 	glBindTexture(GL_TEXTURE_2D, uiTexture);
@@ -142,7 +101,7 @@ bool CTexture::LoadTexture2D(std::string path, const std::string &directory, boo
 	bMipMapsGenerated = bGenerateMipMaps;
 
 
-	return true; // Success
+	return true; 
 }
 
 void CTexture::SetSamplerParameter(GLenum parameter, GLenum value)
@@ -240,7 +199,7 @@ void LoadAllTextures()
 
 	string sTextureNames[] = { "fungus.jpg", "sand_grass_02.jpg", "rock_2_4w.jpg"};
 
-	FOR(i, NUMTEXTURES)
+     for(int i =0;i<NUMTEXTURES;++i)
 	{
 		tTextures[i].LoadTexture2D(sTextureNames[i], "res/img", true);
 		tTextures[i].SetFiltering(TEXTURE_FILTER_MAG_BILINEAR, TEXTURE_FILTER_MIN_BILINEAR_MIPMAP);

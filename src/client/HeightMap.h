@@ -16,10 +16,6 @@
 #include"Camera.h"
 
 
-#define FOR(q,n) for(int q=0;q<n;q++)
-
-#define ESZ(elem) (int)elem.size()
-
 
 class CMultiLayeredHeightmap
 {
@@ -54,8 +50,8 @@ private:
 	int iRows;
 	int iCols;
 	glm::vec3 vRenderScale;
-	static vector< vector< glm::vec3> > vVertexData;
-	static vector< vector< glm::vec2> > vCoordsData;
+	 vector< vector< glm::vec3> > vVertexData;
+	 vector< vector< glm::vec2> > vCoordsData;
 	CVertexBufferObject vboHeightmapData;
 	CVertexBufferObject vboHeightmapIndices;
 	CMultiLayeredHeightmap *Heightmap;

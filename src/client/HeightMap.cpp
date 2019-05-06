@@ -35,8 +35,7 @@ bool CMultiLayeredHeightmap::LoadHeightMapFromImage(const char *path, const std:
 	nrComponents = ptr->format->BytesPerPixel;
 	unsigned int check = ptr->format->BitsPerPixel;
 	
-	BYTE *data = (BYTE*)ptr->pixels;
-	BYTE* bDataPointer = data;
+	unsigned char *bDataPointer = static_cast<unsigned char*>(ptr->pixels); // static_cast
 	iRows = width;
 	iCols = height;
 
@@ -56,17 +55,14 @@ bool CMultiLayeredHeightmap::LoadHeightMapFromImage(const char *path, const std:
 
 	vboHeightmapData.CreateVBO();
 
-	// All vertex data are here (there are iRows*iCols vertices in this heightmap), we will get to normals later
-	//vVertexData.assign(iRows, vector<glm::vec3>(iCols));
-	//vCoordsData.assign(iRows, vector<glm::vec2>(iCols));
 	SetVertexData();
 	SetCoordsData();
 	float fTextureU = float(iCols)*0.1f;
 	float fTextureV = float(iRows)*0.1f;
 
-	FOR(i, iRows)
-	{
-		FOR(j, iCols)
+	 for(int i = 0;i<iRows;++i)
+	 {
+		for(int j = 0; j<iCols;++j)
 		{
 			float fScaleC = float(j) / float(iCols - 1);
 			float fScaleR = float(i) / float(iRows - 1);
@@ -78,11 +74,13 @@ bool CMultiLayeredHeightmap::LoadHeightMapFromImage(const char *path, const std:
 
 	// Normals are here - the heightmap contains ( (iRows-1)*(iCols-1) quads, each one containing 2 triangles, therefore array of we have 3D array)
 	vector< vector<glm::vec3> > vNormals[2];
-	FOR(i, 2)vNormals[i] = vector< vector<glm::vec3> >(iRows - 1, vector<glm::vec3>(iCols - 1));
 
-	FOR(i, iRows - 1)
+	    for(int i = 0;i<2;++i)
+		vNormals[i] = vector< vector<glm::vec3> >(iRows - 1, vector<glm::vec3>(iCols - 1));
+
+	 for(int i = 0;i<iRows-1;++i)
 	{
-		FOR(j, iCols - 1)
+	 for(int j = 0;j<iCols-1;++j)
 		{
 			glm::vec3 vTriangle0[] =
 			{
@@ -107,8 +105,8 @@ bool CMultiLayeredHeightmap::LoadHeightMapFromImage(const char *path, const std:
 
 	vector< vector<glm::vec3> > vFinalNormals = vector< vector<glm::vec3> >(iRows, vector<glm::vec3>(iCols));
 
-	FOR(i, iRows)
-		FOR(j, iCols)
+	for(int i = 0;i<iRows;++i)
+	  for(int j = 0 ;j<iCols;++j)
 	{
 		// Now we wanna calculate final normal for [i][j] vertex. We will have a look at all triangles this vertex is part of, and then we will make average vector
 		// of all adjacent triangles' normals
@@ -117,12 +115,14 @@ bool CMultiLayeredHeightmap::LoadHeightMapFromImage(const char *path, const std:
 
 		// Look for upper-left triangles
 		if (j != 0 && i != 0)
-			FOR(k, 2)vFinalNormal += vNormals[k][i - 1][j - 1];
+			 for(int k =0; k<2;++k)
+			vFinalNormal += vNormals[k][i - 1][j - 1];
 		// Look for upper-right triangles
 		if (i != 0 && j != iCols - 1)vFinalNormal += vNormals[0][i - 1][j];
 		// Look for bottom-right triangles
 		if (i != iRows - 1 && j != iCols - 1)
-			FOR(k, 2)vFinalNormal += vNormals[k][i][j];
+			for(int k =0;k<2;++k)
+				vFinalNormal += vNormals[k][i][j];
 		// Look for bottom-left triangles
 		if (i != iRows - 1 && j != 0)
 			vFinalNormal += vNormals[1][i][j - 1];
@@ -133,9 +133,9 @@ bool CMultiLayeredHeightmap::LoadHeightMapFromImage(const char *path, const std:
 
 	// First, create a VBO with only vertex data
 	vboHeightmapData.CreateVBO(iRows*iCols*(2 * sizeof(glm::vec3) + sizeof(glm::vec2))); // Preallocate memory
-	FOR(i, iRows)
+	for(int i = 0;i<iRows;++i)
 	{
-		FOR(j, iCols)
+		for(int j =0;j<iCols;++j)
 		{
 			vboHeightmapData.AddData(&vVertexData[i][j], sizeof(glm::vec3)); // Add vertex
 			vboHeightmapData.AddData(&vCoordsData[i][j], sizeof(glm::vec2)); // Add tex. coord
@@ -145,12 +145,12 @@ bool CMultiLayeredHeightmap::LoadHeightMapFromImage(const char *path, const std:
 	// Now create a VBO with heightmap indices
 	vboHeightmapIndices.CreateVBO();
 	int iPrimitiveRestartIndex = iRows * iCols;
-	FOR(i, iRows - 1)
+    for(int i = 0; i<iRows-1;++i)
 	{
-		FOR(j, iCols)
-			FOR(k, 2)
+		for(int j =0;j<iCols;j++)
+			for(int z = 0;z<2;++z)
 		{
-			int iRow = i + (1 - k);
+			int iRow = i + (1 - z);
 			int iIndex = iRow * iCols + j;
 			vboHeightmapIndices.AddData(&iIndex, sizeof(int));
 		
@@ -193,7 +193,10 @@ bool CMultiLayeredHeightmap::LoadTerrainShaderProgram()
 	bOK &= shShaders[2].LoadShader("res\\shaders\\dirLight.frag", GL_FRAGMENT_SHADER);
 
 	spTerrain.CreateProgram();
-	FOR(i, NUMTERRAINSHADERS)spTerrain.AddShaderToProgram(&shShaders[i]);
+
+	   for (int i = 0; i < NUMTERRAINSHADERS; ++i)
+		spTerrain.AddShaderToProgram(&shShaders[i]);
+
 	spTerrain.LinkProgram();
 
 	return bOK;
@@ -267,17 +270,17 @@ void CMultiLayeredHeightmap::ReleaseHeightmap()
 bool CMultiLayeredHeightmap::CheckCollision(glm::vec3 cameraPos)
 {
 
-	for(int i =0;i<vVertexData.size();++i)
-		for (int j = 0; j < vVertexData.size(); ++j)
-		{
-			auto tmp = vVertexData[i][j];
-			if (tmp.x == cameraPos.x && tmp.y == cameraPos.y && tmp.z == cameraPos.z)
-			{
-				cameraPos.x = cameraPos.x + 2.0f;
-				return true;
-			}
+	//for(int i =0;i<vVertexData.size();++i)
+	//	for (int j = 0; j < vVertexData.size(); ++j)
+	//	{
+	//		auto tmp = vVertexData[i][j];
+	//		if (tmp.x == cameraPos.x && tmp.y == cameraPos.y && tmp.z == cameraPos.z)
+	//		{
+	//			cameraPos.x = cameraPos.x + 2.0f;
+	//			return true;
+	//		}
 
-		}
+	//	}
 	return false;
 }
 
@@ -289,7 +292,8 @@ CShaderProgram* CMultiLayeredHeightmap::GetShaderProgram()
 void CMultiLayeredHeightmap::ReleaseTerrainShaderProgram()
 {
 	spTerrain.DeleteProgram();
-	FOR(i, NUMTERRAINSHADERS)shShaders[i].DeleteShader();
+	 for(int i =0;i<NUMTERRAINSHADERS;++i)
+		shShaders[i].DeleteShader();
 }
 
 

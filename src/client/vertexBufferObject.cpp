@@ -1,22 +1,13 @@
 
-
 #include "vertexBufferObject.h"
 
 CVertexBufferObject::CVertexBufferObject()
 {
 	bDataUploaded = false;
-	//uiBuffer = 0;
+	uiBuffer = 0;
 }
 
-/*-----------------------------------------------
 
-Name:	CreateVBO
-
-Params:	a_iSize - initial size of buffer
-
-Result:	Creates vertex buffer object.
-
-/*---------------------------------------------*/
 
 void CVertexBufferObject::CreateVBO(int a_iSize)
 {
@@ -26,15 +17,7 @@ void CVertexBufferObject::CreateVBO(int a_iSize)
 	iCurrentSize = 0;
 }
 
-/*-----------------------------------------------
 
-Name:	DeleteVBO
-
-Params:	none
-
-Result:	Releases VBO and frees all memory.
-
-/*---------------------------------------------*/
 
 void CVertexBufferObject::DeleteVBO()
 {
@@ -43,16 +26,6 @@ void CVertexBufferObject::DeleteVBO()
 	data.clear();
 }
 
-/*-----------------------------------------------
-
-Name:	mapBufferToMemory
-
-Params:	iUsageHint - GL_READ_ONLY, GL_WRITE_ONLY...
-
-Result:	Maps whole buffer data to memory and
-		returns pointer to data.
-
-/*---------------------------------------------*/
 
 void* CVertexBufferObject::MapBufferToMemory(int iUsageHint)
 {
@@ -61,18 +34,7 @@ void* CVertexBufferObject::MapBufferToMemory(int iUsageHint)
 	return ptrRes;
 }
 
-/*-----------------------------------------------
 
-Name:	MapSubBufferToMemory
-
-Params:	iUsageHint - GL_READ_ONLY, GL_WRITE_ONLY...
-		uiOffset - data offset (from where should
-					data be mapped).
-		uiLength - length of data
-
-Result:	Maps specified part of buffer to memory.
-
-/*---------------------------------------------*/
 
 void* CVertexBufferObject::MapSubBufferToMemory(int iUsageHint, unsigned int uiOffset, unsigned int uiLength)
 {
@@ -81,30 +43,14 @@ void* CVertexBufferObject::MapSubBufferToMemory(int iUsageHint, unsigned int uiO
 	return ptrRes;
 }
 
-/*-----------------------------------------------
 
-Name:	UnmapBuffer
-
-Params:	none
-
-Result:	Unmaps previously mapped buffer.
-
-/*---------------------------------------------*/
 
 void CVertexBufferObject::UnmapBuffer()
 {
 	glUnmapBuffer(iBufferType);
 }
 
-/*-----------------------------------------------
 
-Name:	BindVBO
-
-Params:	a_iBufferType - buffer type (GL_ARRAY_BUFFER, ...)
-
-Result:	Binds this VBO.
-
-/*---------------------------------------------*/
 
 void CVertexBufferObject::BindVBO(int a_iBufferType)
 {
@@ -112,15 +58,7 @@ void CVertexBufferObject::BindVBO(int a_iBufferType)
 	glBindBuffer(iBufferType, uiBuffer);
 }
 
-/*-----------------------------------------------
 
-Name:	UploadDataToGPU
-
-Params:	iUsageHint - GL_STATIC_DRAW, GL_DYNAMIC_DRAW...
-
-Result:	Sends data to GPU.
-
-/*---------------------------------------------*/
 
 void CVertexBufferObject::UploadDataToGPU(int iDrawingHint)
 {
@@ -129,16 +67,7 @@ void CVertexBufferObject::UploadDataToGPU(int iDrawingHint)
 	data.clear();
 }
 
-/*-----------------------------------------------
 
-Name:	AddData
-
-Params:	ptrData - pointer to arbitrary data
-		uiDataSize - data size in bytes
-
-Result:	Adds arbitrary data to VBO.
-
-/*---------------------------------------------*/
 
 void CVertexBufferObject::AddData(void* ptrData, unsigned int uiDataSize)
 {
@@ -146,15 +75,7 @@ void CVertexBufferObject::AddData(void* ptrData, unsigned int uiDataSize)
 	iCurrentSize += uiDataSize;
 }
 
-/*-----------------------------------------------
 
-Name:	GetDataPointer
-
-Params:	none
-
-Result:	Returns data pointer (only before uploading).
-
-/*---------------------------------------------*/
 
 void* CVertexBufferObject::GetDataPointer()
 {
@@ -162,31 +83,14 @@ void* CVertexBufferObject::GetDataPointer()
 	return (void*)data[0];
 }
 
-/*-----------------------------------------------
 
-Name:	GetBufferID
-
-Params:	none
-
-Result:	Returns VBO ID.
-
-/*---------------------------------------------*/
 
 unsigned int CVertexBufferObject::GetBufferID()
 {
 	return uiBuffer;
 }
 
-/*-----------------------------------------------
 
-Name:	GetCurrentSize
-
-Params:	none
-
-Result: Returns size of data that has been added to
-		the buffer object.
-
-/*---------------------------------------------*/
 
 int CVertexBufferObject::GetCurrentSize()
 {

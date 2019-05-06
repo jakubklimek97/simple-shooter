@@ -11,6 +11,7 @@ Sound::Sound()
 		std::cout << "SOUND ERROR" << std::endl;
 		return;
 	}
+	SoundEng->setSoundVolume(1.0f);
 	SoundEng->drop();
 
 }
