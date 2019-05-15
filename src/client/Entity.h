@@ -15,6 +15,9 @@ public:
 	void rotateX(float radians);
 	void rotateY(float radians);
 	void rotateZ(float radians);
+	void setRotationX(float radians);
+	void setRotationY(float radians);
+	void setRotationZ(float radians);
 	void setShader(Shader& shader);
 	void setShader(Shader* shader);
 	virtual void Draw(glm::mat4 &projectionMatrix, glm::mat4& viewMatrix);

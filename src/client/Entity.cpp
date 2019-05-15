@@ -22,6 +22,21 @@ void Entity::rotateZ(float radians)
 	rotationAngle.z += radians;
 }
 
+void Entity::setRotationX(float radians)
+{
+	rotationAngle.x = radians;
+}
+
+void Entity::setRotationY(float radians)
+{
+	rotationAngle.y = radians;
+}
+
+void Entity::setRotationZ(float radians)
+{
+	rotationAngle.z = radians;
+}
+
 void Entity::setShader(Shader & shader)
 {
 	setShader(&shader);
