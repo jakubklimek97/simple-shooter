@@ -28,7 +28,11 @@ bool CMultiLayeredHeightmap::LoadHeightMapFromImage(const char *path, const std:
 	int width = 1, height = 1, nrComponents = 1;
 
 	SDL_Surface* ptr = IMG_Load(filename.c_str());
+	if (!ptr) {
+	//	std::cout << "ERROR:LOADING MAP";
+		return 0;
 
+	}
 	width = ptr->w;
 	height = ptr->h;
 
@@ -103,7 +107,7 @@ bool CMultiLayeredHeightmap::LoadHeightMapFromImage(const char *path, const std:
 		}
 	}
 
-	vector< vector<glm::vec3> > vFinalNormals = vector< vector<glm::vec3> >(iRows, vector<glm::vec3>(iCols));
+vector< vector<glm::vec3> > vFinalNormals = vector< vector<glm::vec3> >(iRows, vector<glm::vec3>(iCols));
 
 	for(int i = 0;i<iRows;++i)
 	  for(int j = 0 ;j<iCols;++j)

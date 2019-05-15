@@ -1,9 +1,6 @@
 #include "Camera.h"
 
 
-
-
-
 Camera::Camera(glm::vec3 position, glm::vec3 front, glm::vec3 up, float sensitivity, float moveSpeed): cameraPos(position), cameraFront(front), cameraUp(up), sensitivity(sensitivity), moveSpeed(moveSpeed)
 {
 	updateCameraVectors();
@@ -39,7 +36,7 @@ void Camera::moveCamera(Movement move, float deltaTime)
 		cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * deltaTime * moveSpeed;
 	}
 	if (move[Camera::MovementBits::STRAFE_RIGHT]) {
-		cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * deltaTime * moveSpeed;
+		cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp))  * deltaTime * moveSpeed;
 	}
 }
 

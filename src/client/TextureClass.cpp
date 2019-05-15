@@ -93,7 +93,7 @@ bool CTexture::LoadTexture2D(std::string path, const std::string &directory, boo
 
 	if (bGenerateMipMaps)glGenerateMipmap(GL_TEXTURE_2D);
 
-//	glGenSamplers(1, &uiSampler);  // BEZ TEGO DZIALA SKYBOXA, MOZLIWE ZE Samplery na siebie na chodza
+    //	glGenSamplers(1, &uiSampler);  // BEZ TEGO DZIALA SKYBOXA, MOZLIWE ZE Samplery na siebie na chodza
 	// Jak zarzadzic struktura, zeby tego nie robil? (dziala jak stos z tego co widze)
 
 	sPath = filename;

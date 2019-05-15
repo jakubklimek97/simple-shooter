@@ -4,7 +4,7 @@
 CVertexBufferObject::CVertexBufferObject()
 {
 	bDataUploaded = false;
-	uiBuffer = 0;
+	//uiBuffer = 0;
 }
 
 
@@ -14,7 +14,7 @@ void CVertexBufferObject::CreateVBO(int a_iSize)
 	glGenBuffers(1, &uiBuffer);
 	data.reserve(a_iSize);
 	iSize = a_iSize;
-	iCurrentSize = 0;
+	//iCurrentSize = 0;
 }
 
 
@@ -62,6 +62,7 @@ void CVertexBufferObject::BindVBO(int a_iBufferType)
 
 void CVertexBufferObject::UploadDataToGPU(int iDrawingHint)
 {
+	// try catch na blad
 	glBufferData(iBufferType, data.size(), &data[0], iDrawingHint);
 	bDataUploaded = true;
 	data.clear();

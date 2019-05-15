@@ -19,138 +19,34 @@
 #include"DirLight.h"
 #include"TextureClass.h"
 #include"Flashlight.h"
-//#include"Skybox.h"
-
-
-int iTorusFaces;
+#include"Skybox.h"
+#include"Geometry.h"
+#include"HUD.h"
 
 UINT uiVAOs[1]; // Only one VAO now //TEST
 
-float skyboxVertices[] = {
-	// positions          
-	-1.0f,  1.0f, -1.0f,
-	-1.0f, -1.0f, -1.0f,
-	 1.0f, -1.0f, -1.0f,
-	 1.0f, -1.0f, -1.0f,
-	 1.0f,  1.0f, -1.0f,
-	-1.0f,  1.0f, -1.0f,
 
-	-1.0f, -1.0f,  1.0f,
-	-1.0f, -1.0f, -1.0f,
-	-1.0f,  1.0f, -1.0f,
-	-1.0f,  1.0f, -1.0f,
-	-1.0f,  1.0f,  1.0f,
-	-1.0f, -1.0f,  1.0f,
-
-	 1.0f, -1.0f, -1.0f,
-	 1.0f, -1.0f,  1.0f,
-	 1.0f,  1.0f,  1.0f,
-	 1.0f,  1.0f,  1.0f,
-	 1.0f,  1.0f, -1.0f,
-	 1.0f, -1.0f, -1.0f,
-
-	-1.0f, -1.0f,  1.0f,
-	-1.0f,  1.0f,  1.0f,
-	 1.0f,  1.0f,  1.0f,
-	 1.0f,  1.0f,  1.0f,
-	 1.0f, -1.0f,  1.0f,
-	-1.0f, -1.0f,  1.0f,
-
-	-1.0f,  1.0f, -1.0f,
-	 1.0f,  1.0f, -1.0f,
-	 1.0f,  1.0f,  1.0f,
-	 1.0f,  1.0f,  1.0f,
-	-1.0f,  1.0f,  1.0f,
-	-1.0f,  1.0f, -1.0f,
-
-	-1.0f, -1.0f, -1.0f,
-	-1.0f, -1.0f,  1.0f,
-	 1.0f, -1.0f, -1.0f,
-	 1.0f, -1.0f, -1.0f,
-	-1.0f, -1.0f,  1.0f,
-	 1.0f, -1.0f,  1.0f
-};
-
-
-CSpotLight slFlashLight;
-
+HUD life1, life2, life3;
 CVertexBufferObject vboSceneObjects;
+CSkybox MainSkybox;
 UINT uiVAOSceneObjects;
-//CSkybox MainSkybox;
 CMultiLayeredHeightmap hmWorld;
 
 CDirectionalLight dlSun;
 
 Scene testowa(glm::perspective(glm::radians(55.0f), 1280.0f / 720.0f, 0.1f, 100.0f), new Camera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.1f, 1.0f));
 
-#define FOG_EQUATION_EXP		1
-#define FOG_EQUATION_EXP2		2
-
-namespace FogParameters
-{
-	float fDensity = 0.04f;
-	float fStart = 10.0f;
-	float fEnd = 75.0f;
-	glm::vec4 vFogColor = glm::vec4(0.7f, 0.7f, 0.7f, 1.0f);
-	int iFogEquation = FOG_EQUATION_EXP; // 0 = linear, 1 = exp, 2 = exp2
-};
-
-void render() {
-
-	glEnable(GL_TEXTURE_2D);
-	spFogAndLight.UseProgram();
-
-	spFogAndLight.SetUniform("sunLight.vColor", glm::vec3(1.0f, 1.0f, 1.0f));
-	spFogAndLight.SetUniform("sunLight.fAmbientIntensity", 1.0f); // Full light for skybox
-	spFogAndLight.SetUniform("sunLight.vDirection", glm::vec3(0, -1, 0));
-
-	spFogAndLight.SetUniform("matrices.projectionMatrix", testowa.GetProjectionMatrix());
-	spFogAndLight.SetUniform("gSampler", 0);
-
-	glm::mat4 mModelView = testowa.getCamera()->getViewMatrix();
-//	glm::mat4 mModelToCamera;
-
-	spFogAndLight.SetUniform("fogParams.iEquation", FogParameters::iFogEquation);
-	spFogAndLight.SetUniform("fogParams.vFogColor", FogParameters::vFogColor);
-
-}
-
-
-
-unsigned int loadCubemap(vector<std::string> faces)
-{
-	unsigned int textureID;
-	glGenTextures(1, &textureID);
-	glBindTexture(GL_TEXTURE_2D, textureID);
-
-	int width, height;
-	for (unsigned int i = 0; i < faces.size(); i++)
-	{
-		SDL_Surface*ptr = IMG_Load(faces[i].c_str());
-		width = ptr->w;
-		height = ptr->h;
-		if (ptr)
-		{
-			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, ptr->pixels);
-			SDL_FreeSurface(ptr);
-		}
-		else
-		{
-			std::cout << "Cubemap texture failed to load at path: " << faces[i] << std::endl;
-		}
-	}
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-	
-	return textureID;
-}
-
-
-
-
+//#define FOG_EQUATION_EXP		1
+//#define FOG_EQUATION_EXP2		2
+//
+//namespace FogParameters
+//{
+//	float fDensity = 0.10f;
+//	float fStart = 10.0f;
+//	float fEnd = 75.0f;
+//	glm::vec4 vFogColor = glm::vec4(0.7f, 0.7f, 0.7f, 1.0f);
+//	int iFogEquation = FOG_EQUATION_EXP; // 0 = linear, 1 = exp, 2 = exp2
+//};
 
 unsigned int quadVAO = 0;
 unsigned int quadVBO;
@@ -170,97 +66,29 @@ float random() {
 	return i;
 }
 
-void renderQuad()
-{
-	if (quadVAO == 0)
-	{
-		// positions
-		glm::vec3 pos1(-1.0f, 1.0f, 0.0f);
-		glm::vec3 pos2(-1.0f, -1.0f, 0.0f);
-		glm::vec3 pos3(1.0f, -1.0f, 0.0f);
-		glm::vec3 pos4(1.0f, 1.0f, 0.0f);
-		// texture coordinates
-		glm::vec2 uv1(0.0f, 1.0f);
-		glm::vec2 uv2(0.0f, 0.0f);
-		glm::vec2 uv3(1.0f, 0.0f);
-		glm::vec2 uv4(1.0f, 1.0f);
-		// normal vector
-		glm::vec3 nm(0.0f, 0.0f, 1.0f);
+vector<float> vertices = {
+	// positions          // colors           // texture coords
+	-0.7f, -1.0f, 0.0f,    1.0f, 0.0f, 0.0f,   1.0f, 1.0f, // top right
+	-0.7f, -0.7f, 0.0f,    0.0f, 1.0f, 0.0f,   1.0f, 0.0f, // bottom right
+	-1.0f,  -0.7f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f, // bottom left
+	-1.0f,  -1.0f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f  // top left 
+};
+vector<int> indices = {
+	0, 1, 3, // first triangle
+	1, 2, 3  // second triangle
+};
+vector<float> vertices2 = {
+	// positions          // colors           // texture coords
+	-0.4f, -1.0f, 0.0f,    1.0f, 0.0f, 0.0f,   1.0f, 1.0f, // top right
+	-0.4f, -0.7f, 0.0f,    0.0f, 1.0f, 0.0f,   1.0f, 0.0f, // bottom right
+	-0.7f, -0.7f, 0.0f,     0.0f, 0.0f, 1.0f,   0.0f, 0.0f, // bottom left
+	-0.7f, -1.0f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f  // top left 
+};
+vector<int>indices2 = {
+	0, 1, 3, // first triangle
+	1, 2, 3  // second triangle
+};
 
-		// calculate tangent/bitangent vectors of both triangles
-		glm::vec3 tangent1, bitangent1;
-		glm::vec3 tangent2, bitangent2;
-		// triangle 1
-		// ----------
-		glm::vec3 edge1 = pos2 - pos1;
-		glm::vec3 edge2 = pos3 - pos1;
-		glm::vec2 deltaUV1 = uv2 - uv1;
-		glm::vec2 deltaUV2 = uv3 - uv1;
-
-		float f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
-
-		tangent1.x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
-		tangent1.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
-		tangent1.z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
-		tangent1 = glm::normalize(tangent1);
-
-		bitangent1.x = f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x);
-		bitangent1.y = f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y);
-		bitangent1.z = f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z);
-		bitangent1 = glm::normalize(bitangent1);
-
-		// triangle 2
-		// ----------
-		edge1 = pos3 - pos1;
-		edge2 = pos4 - pos1;
-		deltaUV1 = uv3 - uv1;
-		deltaUV2 = uv4 - uv1;
-
-		f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
-
-		tangent2.x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
-		tangent2.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
-		tangent2.z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
-		tangent2 = glm::normalize(tangent2);
-
-
-		bitangent2.x = f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x);
-		bitangent2.y = f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y);
-		bitangent2.z = f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z);
-		bitangent2 = glm::normalize(bitangent2);
-
-
-		float quadVertices[] = {
-			// positions            // normal         // texcoords  // tangent                          // bitangent
-			pos1.x, pos1.y, pos1.z, nm.x, nm.y, nm.z, uv1.x, uv1.y, tangent1.x, tangent1.y, tangent1.z, bitangent1.x, bitangent1.y, bitangent1.z,
-			pos2.x, pos2.y, pos2.z, nm.x, nm.y, nm.z, uv2.x, uv2.y, tangent1.x, tangent1.y, tangent1.z, bitangent1.x, bitangent1.y, bitangent1.z,
-			pos3.x, pos3.y, pos3.z, nm.x, nm.y, nm.z, uv3.x, uv3.y, tangent1.x, tangent1.y, tangent1.z, bitangent1.x, bitangent1.y, bitangent1.z,
-
-			pos1.x, pos1.y, pos1.z, nm.x, nm.y, nm.z, uv1.x, uv1.y, tangent2.x, tangent2.y, tangent2.z, bitangent2.x, bitangent2.y, bitangent2.z,
-			pos3.x, pos3.y, pos3.z, nm.x, nm.y, nm.z, uv3.x, uv3.y, tangent2.x, tangent2.y, tangent2.z, bitangent2.x, bitangent2.y, bitangent2.z,
-			pos4.x, pos4.y, pos4.z, nm.x, nm.y, nm.z, uv4.x, uv4.y, tangent2.x, tangent2.y, tangent2.z, bitangent2.x, bitangent2.y, bitangent2.z
-		};
-		// configure plane VAO
-		glGenVertexArrays(1, &quadVAO);
-		glGenBuffers(1, &quadVBO);
-		glBindVertexArray(quadVAO);
-		glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 14 * sizeof(float), (void*)0);
-		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 14 * sizeof(float), (void*)(3 * sizeof(float)));
-		glEnableVertexAttribArray(2);
-		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 14 * sizeof(float), (void*)(6 * sizeof(float)));
-		glEnableVertexAttribArray(3);
-		glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 14 * sizeof(float), (void*)(8 * sizeof(float)));
-		glEnableVertexAttribArray(4);
-		glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, 14 * sizeof(float), (void*)(11 * sizeof(float)));
-	}
-	glBindVertexArray(quadVAO);
-	glDrawArrays(GL_TRIANGLES, 0, 6);
-	glBindVertexArray(0);
-}
 
 
 
@@ -299,28 +127,7 @@ void initOpenGL(SDL_Window* &pWindow, SDL_GLContext &context) {
 int main(int argc, char *argv[])
 {
 
-	float vertices[] = {
-		// positions          // colors           // texture coords
-		-0.7f, -1.0f, 0.0f,    1.0f, 0.0f, 0.0f,   1.0f, 1.0f, // top right
-		-0.7f, -0.7f, 0.0f,    0.0f, 1.0f, 0.0f,   1.0f, 0.0f, // bottom right
-		-1.0f,  -0.7f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f, // bottom left
-		-1.0f,  -1.0f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f  // top left 
-	};
-	unsigned int indices[] = {
-		0, 1, 3, // first triangle
-		1, 2, 3  // second triangle
-	};
-	float vertices2[] = {
-		// positions          // colors           // texture coords
-		-0.4f, -1.0f, 0.0f,    1.0f, 0.0f, 0.0f,   1.0f, 1.0f, // top right
-		-0.4f, -0.7f, 0.0f,    0.0f, 1.0f, 0.0f,   1.0f, 0.0f, // bottom right
-		-0.7f, -0.7f, 0.0f,     0.0f, 0.0f, 1.0f,   0.0f, 0.0f, // bottom left
-		-0.7f, -1.0f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f  // top left 
-	};
-	unsigned int indices2[] = {
-		0, 1, 3, // first triangle
-		1, 2, 3  // second triangle
-	};
+	
 
 	if (initSDL() < 0) return -1;
 	SDL_Window* window;
@@ -346,131 +153,147 @@ int main(int argc, char *argv[])
 
 	glEnable(GL_DEPTH_TEST);
 	glClearDepth(1.0);
-
-
-	//TEST
-
-
-	// Vertex positions
+	//glPolygonMode
 
 	//TEST
+	//unsigned int VBO, VAO, EBO;
+	//glGenVertexArrays(1, &VAO);
+	//glGenBuffers(1, &VBO);
+	//glGenBuffers(1, &EBO);
+
+	//glBindVertexArray(VAO);
+
+	//glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	//glBufferData(GL_ARRAY_BUFFER, vertices.size()*3*sizeof(float), &vertices.front(), GL_STATIC_DRAW);
+	////glBufferData()
+
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size()*3*sizeof(int), &indices.front(), GL_STATIC_DRAW);
+
+	//// position attribute
+	//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+	//glEnableVertexAttribArray(0);
+	//// color attribute
+	//glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+	//glEnableVertexAttribArray(1);
+	//// texture coord attribute
+	//glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+	//glEnableVertexAttribArray(2);
+
+	////2 zycie
+	//unsigned int VBO2, VAO2, EBO2;
+	//glGenVertexArrays(1, &VAO2);
+	//glGenBuffers(1, &VBO2);
+	//glGenBuffers(1, &EBO2);
+
+	//glBindVertexArray(VAO2);
+
+	//glBindBuffer(GL_ARRAY_BUFFER, VBO2);
+	//glBufferData(GL_ARRAY_BUFFER, vertices2.size() * 3 * sizeof(float), &vertices2.front(), GL_STATIC_DRAW);
+	////glBufferData()
+
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO2);
+	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices2.size()*3*sizeof(int), &indices2.front(), GL_STATIC_DRAW);
 
 
-	//DZIALA
+	//// position attribute
+	//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+	//glEnableVertexAttribArray(0);
+	//// color attribute
+	//glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+	//glEnableVertexAttribArray(1);
+	//// texture coord attribute
+	//glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+	//glEnableVertexAttribArray(2);
 
-	//1 zycie
+	////1 zycie
+	//unsigned texture1 = Model::TextureFromFile2("heart.png", "res/img", false);
+	//unsigned texture2 = Model::TextureFromFile2("container.jpg", "res/img", false);
+	////2  zycie
+	//unsigned texture3 = Model::TextureFromFile2("heart.png", "res/img", false);
+	//unsigned texture4 = Model::TextureFromFile2("container.jpg", "res/img", false);
 
-	unsigned int VBO, VAO, EBO;
-	glGenVertexArrays(1, &VAO);
-	glGenBuffers(1, &VBO);
-	glGenBuffers(1, &EBO);
+	//Shader2d.use(); // don't forget to activate/use the shader before setting uniforms!
+ //  // either set it manually like so:
 
-	glBindVertexArray(VAO);
+	//GLfloat gamma;
+	//gamma = (sin(i) / 2) + 0.5f;
 
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	//glUniform1f(glGetUniformLocation(Shader2d.ID, "gamma"), gamma);
+	//Shader2d.setInt("texture2", 1);
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+	//Shader2d2.use();
+	////2 zycie
+	//glUniform1f(glGetUniformLocation(Shader2d2.ID, "gamma"), gamma);
+	//Shader2d2.setInt("texture2", 1);
 
-	// position attribute
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
-	// color attribute
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(1);
-	// texture coord attribute
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-	glEnableVertexAttribArray(2);
+	//vboSceneObjects.CreateVBO();
+	//glGenVertexArrays(1, uiVAOs); // Create one VAO
+	//glBindVertexArray(uiVAOs[0]);
 
-	//2 zycie
-	unsigned int VBO2, VAO2, EBO2;
-	glGenVertexArrays(1, &VAO2);
-	glGenBuffers(1, &VBO2);
-	glGenBuffers(1, &EBO2);
-
-	glBindVertexArray(VAO2);
-
-	glBindBuffer(GL_ARRAY_BUFFER, VBO2);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices2), vertices2, GL_STATIC_DRAW);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO2);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices2), indices2, GL_STATIC_DRAW);
-
-	// position attribute
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
-	// color attribute
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(1);
-	// texture coord attribute
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-	glEnableVertexAttribArray(2);
-
-	//1 zycie
-	unsigned texture1 = Model::TextureFromFile2("heart.png", "res/img", false);
-	unsigned texture2 = Model::TextureFromFile2("container.jpg", "res/img", false);
-	//2  zycie
-	unsigned texture3 = Model::TextureFromFile2("heart.png", "res/img", false);
-	unsigned texture4 = Model::TextureFromFile2("container.jpg", "res/img", false);
-
-	Shader2d.use(); // don't forget to activate/use the shader before setting uniforms!
-   // either set it manually like so:
-
-	GLfloat gamma;
-	gamma = (sin(i) / 2) + 0.5f;
-
-	glUniform1f(glGetUniformLocation(Shader2d.ID, "gamma"), gamma);
-	Shader2d.setInt("texture2", 1);
-
-	Shader2d2.use();
-	//2 zycie
-	glUniform1f(glGetUniformLocation(Shader2d2.ID, "gamma"), gamma);
-	Shader2d2.setInt("texture2", 1);
-
-	
-	vector<std::string> faces
-	{
-		("res/img/right.jpg"),
-		("res/img/left.jpg"),
-		("res/img/top.jpg"),
-		("res/img/bottom.jpg"),
-		("res/img/front.jpg"),
-		("res/img/back.jpg"),
-	};
+	//vboSceneObjects.BindVBO();
+	//// Vertex positions
 
 
+	//for(int i =0;i< 36;++i)
+	//{
+	//	vboSceneObjects.AddData(&vCubeVertices[i], sizeof(glm::vec3));
+	//	vboSceneObjects.AddData(&vCubeTexCoords[i % 6], sizeof(glm::vec2));
+	//	vboSceneObjects.AddData(&vCubeNormals[i / 6], sizeof(glm::vec3));
+	//}
+
+
+	//// Add ground to VBO
+
+	//for(int i =0;i<6;++i)
+	//{
+	//	vboSceneObjects.AddData(&vGround[i], sizeof(glm::vec3));
+	//    vCubeTexCoords[i] *= 100.0f;
+	//	vboSceneObjects.AddData(&vCubeTexCoords[i % 6], sizeof(glm::vec2));
+	//	glm::vec3 vGroundNormal(0.0f, 1.0f, 0.0f);
+	//	vboSceneObjects.AddData(&vGroundNormal, sizeof(glm::vec3));
+	//}
+
+	//vboSceneObjects.UploadDataToGPU(GL_STATIC_DRAW);
+	//// Vertex positions
+	//glEnableVertexAttribArray(0);
+	//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), 0);
+	//// Texture coordinates
+	//glEnableVertexAttribArray(1);
+	//glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3));
+	//// Normal vectors
+	//glEnableVertexAttribArray(2);
+	//glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)(sizeof(glm::vec3) + sizeof(glm::vec2)));
+
+std::vector<reference_wrapper<const Shader>>SH = { Shader2d, Shader2d2 };
 	PrepareShaderPrograms();
+
+	tTextures[0].LoadTexture2D("sand.jpg", "res/img", true);
+	tTextures[0].SetFiltering(TEXTURE_FILTER_MAG_BILINEAR, TEXTURE_FILTER_MIN_BILINEAR_MIPMAP);
+	tTextures[1].LoadTexture2D("snow.jpg", "res/img", true);
+	tTextures[1].SetFiltering(TEXTURE_FILTER_MAG_BILINEAR, TEXTURE_FILTER_MIN_BILINEAR_MIPMAP);
+	
+	
+	life1 = HUD(SH, "heart.png", "container.jpg", 0.01f, 1);
+	life2 = HUD(SH, "heart.png", "container.jpg", 0.01f, 1);
+	life3 = HUD(SH, "heart.png", "container.jpg", 0.01f, 1);
+
+	MainSkybox = CSkybox(skyboxShader,"res/img/right.jpg", "res/img/left.jpg", "res/img/top.jpg", "res/img/bottom.jpg", "res/img/front.jpg", "res/img/back.jpg");
+
     LoadAllTextures();
-
-	unsigned int cubemapTexture = loadCubemap(faces);
-
-
-	skyboxShader.use();
-	skyboxShader.setInt("skybox", 0);
-
-	unsigned int skyboxVAO, skyboxVBO;
-	glGenVertexArrays(1, &skyboxVAO);
-	glGenBuffers(1, &skyboxVBO);
-	glBindVertexArray(skyboxVAO);
-	glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 
 
 
 	CMultiLayeredHeightmap::LoadTerrainShaderProgram();
-	hmWorld.LoadHeightMapFromImage("kub.png", "res/img");
+	hmWorld.LoadHeightMapFromImage("hm.png", "res/img");
 
 
 	dlSun = CDirectionalLight(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(sqrt(2.0f) / 2, -sqrt(2.0f) / 2, 0), 0.5f);
-	slFlashLight = CSpotLight(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), 1, 15.0f, 0.017f);
+//	slFlashLight = CSpotLight(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), 1, 15.0f, 0.017f);
 	//DZIALA
 
 
 
-	Scene testowa(glm::perspective(glm::radians(45.0f), 1200.0f / 720.0f, 0.1f, 100.0f), new Camera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.1f, 1.0f));
 	LightObject* light = testowa.SetLight(new LightObject(kostka, glm::vec3(2.5f, 1.0f, 2.0f), 0.0f, glm::vec3(0.2f), &simpleShader, glm::vec3(1.0f, 1.0f, 1.0f)));
 	Entity* testCube = testowa.addObject(new Entity(kostka, glm::vec3(5.0f, -1.0f, 0.0f), 0.0f, glm::vec3(0.5f, 0.5f, 0.5f)));
 
@@ -560,6 +383,65 @@ int main(int argc, char *argv[])
 
 		testowa.getCamera()->moveCamera(nextMove, deltaTime);
 
+		glEnable(GL_TEXTURE_2D);
+		spFogAndLight.UseProgram();
+
+		
+
+		//spFogAndLight.SetUniform("sunLight.vColor", glm::vec3(1.0f, 1.0f, 1.0f));
+		//spFogAndLight.SetUniform("sunLight.fAmbientIntensity", 1.0f); // Full light for skybox
+		//spFogAndLight.SetUniform("sunLight.vDirection", glm::vec3(0, -1, 0));
+
+		//spFogAndLight.SetUniform("matrices.projectionMatrix", testowa.GetProjectionMatrix());
+		//spFogAndLight.SetUniform("gSampler", 0);
+
+		//glm::mat4 mModelView = testowa.GetViewMatrix();
+		//glm::mat4 mModelToCamera;
+
+		//spFogAndLight.SetUniform("fogParams.iEquation", FogParameters::iFogEquation);
+		//spFogAndLight.SetUniform("fogParams.vFogColor", FogParameters::vFogColor);
+
+		//spFogAndLight.SetUniform("fogParams.fDensity", FogParameters::fDensity);
+		//spFogAndLight.SetUniform("matrices.modelViewMatrix", glm::translate(mModelView, testowa.getCamera()->cameraFront));
+
+		//glBindVertexArray(uiVAOs[0]);
+		//spFogAndLight.SetUniform("sunLight.fAmbientIntensity", 0.55f);
+		//spFogAndLight.SetUniform("matrices.modelViewMatrix", &mModelView);
+		//	mModelToCamera = glm::translate(glm::mat4(1.0), glm::vec3(1.0f,1.0f,1.0f));
+		//	mModelToCamera = glm::scale(mModelToCamera, glm::vec3(15.0f, 15.0f, 15.0f));
+		//	spFogAndLight.SetUniform("matrices.normalMatrix", glm::transpose(glm::inverse(mModelToCamera)));
+		//	spFogAndLight.SetUniform("matrices.modelViewMatrix", mModelView*mModelToCamera);
+
+		//tTextures[0].BindTexture();
+		//glDrawArrays(GL_TRIANGLES, 36, 6);
+
+
+		//tTextures[1].BindTexture();
+
+		//float dx[] = { 1.0f, 0.0f, -1.0f, 0.0f };
+		//float dz[] = { 0.0f, -1.0f, 0.0f, 1.0f };
+		//int iCurDir = 0;
+		//glm::vec3 vBoxPos(0.0f, 7.48f, 0.0f);
+		//const int iSpiralLevels = 12;
+		//for (int i = 1; i <= iSpiralLevels; ++i)
+		//{
+		//	for (int j = 0; j < i; ++j)
+		//	{
+		//		mModelToCamera = glm::translate(glm::mat4(1.0), vBoxPos);
+		//		mModelToCamera = glm::scale(mModelToCamera, glm::vec3(15.0f, 15.0f, 15.0f));
+		//		// We need to transform normals properly, it's done by transpose of inverse matrix of rotations and scales
+		//		spFogAndLight.SetUniform("matrices.normalMatrix", glm::transpose(glm::inverse(mModelToCamera)));
+		//		spFogAndLight.SetUniform("matrices.modelViewMatrix", mModelView*mModelToCamera);
+		//		glDrawArrays(GL_TRIANGLES, 0, 36);
+
+		//		vBoxPos += glm::vec3(15.02f*dx[iCurDir], 0.0f, 15.02f*dz[iCurDir]);
+		//	}
+		//	iCurDir = (iCurDir + 1) % 4;
+		//}
+
+
+
+
 		testCube->rotateZ(glm::radians(1.0f));
 		testCube->rotateY(glm::radians(1.0f));
 		testBoundingBox->rotateY(glm::radians(2.0f));
@@ -592,24 +474,11 @@ int main(int argc, char *argv[])
 		lightShader.setVec3("viewPos", testowa.getCamera()->cameraPos);
 		pistolet.Draw(lightShader);
 
-//	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
 		spMain.UseProgram();
 
-		glm::vec3 PointLightPos = testowa.getCamera()->cameraPos;
-		glm::vec3 CameraDirection = glm::normalize(testowa.getCamera()->cameraFront - testowa.getCamera()->cameraPos);
-		PointLightPos.y -= 3.2f;
 
-		glm::vec3 PointLightDirection = (PointLightPos + CameraDirection * 75.0f) - PointLightPos;
-		PointLightDirection = glm::normalize(PointLightDirection);
-		glm::vec3 HorizontalVector = glm::cross(testowa.getCamera()->cameraFront - testowa.getCamera()->cameraPos, testowa.getCamera()->cameraUp);
-		PointLightPos += HorizontalVector * 3.3f;
-
-		slFlashLight.vPosition = PointLightPos;
-		slFlashLight.vDirection = PointLightDirection;
-
-		slFlashLight.SetUniformData(&spMain, "spotLight");
 
 		spMain.SetUniform("matrices.projMatrix", testowa.GetProjectionMatrix());
 		spMain.SetUniform("matrices.viewMatrix", testowa.GetViewMatrix());
@@ -650,80 +519,14 @@ int main(int argc, char *argv[])
 		////	 ... and finally render heightmap
 		hmWorld.RenderHeightmap();
 
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, texture1);
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, texture2);
-		glActiveTexture(GL_TEXTURE2);
-		glBindTexture(GL_TEXTURE_2D, texture3);
-		glActiveTexture(GL_TEXTURE3);
-		glBindTexture(GL_TEXTURE_2D, texture4);
-
-		Shader2d.use();
-
-		gamma = static_cast<GLfloat>((sin(random()) / 2) + 0.5); // uzyc static cast
-		glUniform1f(glGetUniformLocation(Shader2d.ID, "gamma"), gamma);
-		Shader2d.setInt("texture2", 1);
-		glBindVertexArray(VAO);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-		//tutaj
-
-		Shader2d2.use();
-
-		gamma = static_cast<GLfloat>( (sin(random()) / 2) + 0.5);//uzyc static cast
-		glUniform1f(glGetUniformLocation(Shader2d2.ID, "gamma"), gamma);
-		Shader2d2.setInt("texture2", 1);
-		glBindVertexArray(VAO2);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		life1.Incrementvalue();
+		life1.RotationIntensity();
+		life1.RenderHUD(SH);
+		life2.RenderHUD(SH);
+		life3.RenderHUD(SH);
 		
-
-		glDepthFunc(GL_LEQUAL);
-		// change depth function so depth test passes when values are equal to depth buffer's content
-		skyboxShader.use();
-		//skyboxShader.setInt("skybox", 0);
-
-		glm::mat4 view = glm::mat4(glm::mat3(testowa.GetViewMatrix())); // remove translation from the view matrix
-		skyboxShader.setMat4("view", view);
-		skyboxShader.setMat4("projection", testowa.GetProjectionMatrix());
-		// skybox cube
-		glBindVertexArray(skyboxVAO);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
-		glActiveTexture(GL_TEXTURE0);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
-		glBindVertexArray(0);
-		glDepthFunc(GL_LESS);
-
-// set depth function back to default
-	//TESTOWANIE
-
-		glEnable(GL_TEXTURE_2D);
-		spFogAndLight.UseProgram();
-
-		spFogAndLight.SetUniform("sunLight.vColor", glm::vec3(1.0f, 1.0f, 1.0f));
-		spFogAndLight.SetUniform("sunLight.fAmbientIntensity", 1.0f); // Full light for skybox
-		spFogAndLight.SetUniform("sunLight.vDirection", glm::vec3(0, -1, 0));
-
-		spFogAndLight.SetUniform("matrices.projectionMatrix", testowa.GetProjectionMatrix());
-		spFogAndLight.SetUniform("gSampler", 0);
-
-		glm::mat4 mModelView = testowa.GetViewMatrix();
-//		glm::mat4 mModelToCamera;
-
-		spFogAndLight.SetUniform("fogParams.iEquation", FogParameters::iFogEquation);
-		spFogAndLight.SetUniform("fogParams.vFogColor", FogParameters::vFogColor);
-		spFogAndLight.SetUniform("fogParams.fDensity", FogParameters::fDensity);
-
-		spFogAndLight.SetUniform("matrices.modelViewMatrix", glm::translate(mModelView, testowa.getCamera()->cameraFront));//Front albo Pos
-		spFogAndLight.SetUniform("sunLight.fAmbientIntensity", 0.55f);
-		spFogAndLight.SetUniform("matrices.modelViewMatrix", &mModelView);
-
-		// Render ground
-
-	   testowa.GetViewMatrix();
-	   testowa.getCamera()->cameraPos;
-	   testowa.GetProjectionMatrix();
-	//TESTOWANIE
-
+			
+		MainSkybox.RenderSkybox(skyboxShader, testowa.GetViewMatrix(), testowa.GetProjectionMatrix());
 		SDL_GL_SwapWindow(window);
 	}
 
