@@ -107,5 +107,8 @@ bool Networking::recvData(void* data)
 bool Networking::acceptConnection()
 {
 	connectionSock = SDLNet_TCP_Accept(serverSock);
+	if (connectionSock) {
+		isConnected = true;
+	}
 	return connectionSock;
 }
