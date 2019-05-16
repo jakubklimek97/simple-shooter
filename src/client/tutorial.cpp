@@ -155,77 +155,6 @@ int main(int argc, char *argv[])
 	glClearDepth(1.0);
 	//glPolygonMode
 
-	//TEST
-	//unsigned int VBO, VAO, EBO;
-	//glGenVertexArrays(1, &VAO);
-	//glGenBuffers(1, &VBO);
-	//glGenBuffers(1, &EBO);
-
-	//glBindVertexArray(VAO);
-
-	//glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	//glBufferData(GL_ARRAY_BUFFER, vertices.size()*3*sizeof(float), &vertices.front(), GL_STATIC_DRAW);
-	////glBufferData()
-
-	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size()*3*sizeof(int), &indices.front(), GL_STATIC_DRAW);
-
-	//// position attribute
-	//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-	//glEnableVertexAttribArray(0);
-	//// color attribute
-	//glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-	//glEnableVertexAttribArray(1);
-	//// texture coord attribute
-	//glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-	//glEnableVertexAttribArray(2);
-
-	////2 zycie
-	//unsigned int VBO2, VAO2, EBO2;
-	//glGenVertexArrays(1, &VAO2);
-	//glGenBuffers(1, &VBO2);
-	//glGenBuffers(1, &EBO2);
-
-	//glBindVertexArray(VAO2);
-
-	//glBindBuffer(GL_ARRAY_BUFFER, VBO2);
-	//glBufferData(GL_ARRAY_BUFFER, vertices2.size() * 3 * sizeof(float), &vertices2.front(), GL_STATIC_DRAW);
-	////glBufferData()
-
-	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO2);
-	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices2.size()*3*sizeof(int), &indices2.front(), GL_STATIC_DRAW);
-
-
-	//// position attribute
-	//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-	//glEnableVertexAttribArray(0);
-	//// color attribute
-	//glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-	//glEnableVertexAttribArray(1);
-	//// texture coord attribute
-	//glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-	//glEnableVertexAttribArray(2);
-
-	////1 zycie
-	//unsigned texture1 = Model::TextureFromFile2("heart.png", "res/img", false);
-	//unsigned texture2 = Model::TextureFromFile2("container.jpg", "res/img", false);
-	////2  zycie
-	//unsigned texture3 = Model::TextureFromFile2("heart.png", "res/img", false);
-	//unsigned texture4 = Model::TextureFromFile2("container.jpg", "res/img", false);
-
-	//Shader2d.use(); // don't forget to activate/use the shader before setting uniforms!
- //  // either set it manually like so:
-
-	//GLfloat gamma;
-	//gamma = (sin(i) / 2) + 0.5f;
-
-	//glUniform1f(glGetUniformLocation(Shader2d.ID, "gamma"), gamma);
-	//Shader2d.setInt("texture2", 1);
-
-	//Shader2d2.use();
-	////2 zycie
-	//glUniform1f(glGetUniformLocation(Shader2d2.ID, "gamma"), gamma);
-	//Shader2d2.setInt("texture2", 1);
 
 	//vboSceneObjects.CreateVBO();
 	//glGenVertexArrays(1, uiVAOs); // Create one VAO
@@ -381,13 +310,13 @@ std::vector<reference_wrapper<const Shader>>SH = { Shader2d, Shader2d2 };
 		glClearColor(1.0f, 0.0f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		testowa.getCamera()->moveCamera(nextMove, deltaTime);
+		
 
 		glEnable(GL_TEXTURE_2D);
 		spFogAndLight.UseProgram();
 
 		
-
+	
 		//spFogAndLight.SetUniform("sunLight.vColor", glm::vec3(1.0f, 1.0f, 1.0f));
 		//spFogAndLight.SetUniform("sunLight.fAmbientIntensity", 1.0f); // Full light for skybox
 		//spFogAndLight.SetUniform("sunLight.vDirection", glm::vec3(0, -1, 0));
@@ -440,8 +369,9 @@ std::vector<reference_wrapper<const Shader>>SH = { Shader2d, Shader2d2 };
 		//}
 
 
-
-
+		cout << "POZYCJA GRACZA X (WZDLUZ):" << testowa.getCamera()->cameraPos.x;
+		cout << "POZYCJA GRACZA Z (WSZERZ):" << testowa.getCamera()->cameraPos.z;
+		cout << "POZYCJA GRACZA Y (WYSOKOSC):" << testowa.getCamera()->cameraPos.y;
 		testCube->rotateZ(glm::radians(1.0f));
 		testCube->rotateY(glm::radians(1.0f));
 		testBoundingBox->rotateY(glm::radians(2.0f));
@@ -495,7 +425,7 @@ std::vector<reference_wrapper<const Shader>>SH = { Shader2d, Shader2d2 };
 		dlSun.SetUniformData(&spMain, "sunLight");
 
 
-		hmWorld.SetRenderSize(10.0f, 10.0f, 10.0f);
+		hmWorld.SetRenderSize(1.0f, 1.0f, 1.0f);
 		CShaderProgram* spTerrain = CMultiLayeredHeightmap::GetShaderProgram();
         spTerrain->UseProgram();
 
@@ -519,12 +449,21 @@ std::vector<reference_wrapper<const Shader>>SH = { Shader2d, Shader2d2 };
 		////	 ... and finally render heightmap
 		hmWorld.RenderHeightmap();
 
-		life1.Incrementvalue();
+		
+		float terrainheight = hmWorld.CheckCollision(testowa.getCamera()->cameraPos.x, testowa.getCamera()->cameraPos.z);
+		float camera = testowa.getCamera()->cameraPos.y;
+		if (camera <= terrainheight||camera <= terrainheight+0.11f||camera <= terrainheight-0.13f) { //200 ->Terrain height
+			testowa.getCamera()->cameraPos.y = terrainheight-0.09f;
+		}
+		else if(terrainheight - testowa.getCamera()->cameraPos.y<0.1f || terrainheight - testowa.getCamera()->cameraPos.y<0.2f)
+			float terrainheight = hmWorld.CheckCollision(testowa.getCamera()->cameraPos.x - 0.1f, testowa.getCamera()->cameraPos.z-0.1f);
+			life1.Incrementvalue();
 		life1.RotationIntensity();
 		life1.RenderHUD(SH);
 		life2.RenderHUD(SH);
 		life3.RenderHUD(SH);
-		
+
+		testowa.getCamera()->moveCamera(nextMove, deltaTime);
 			
 		MainSkybox.RenderSkybox(skyboxShader, testowa.GetViewMatrix(), testowa.GetProjectionMatrix());
 		SDL_GL_SwapWindow(window);

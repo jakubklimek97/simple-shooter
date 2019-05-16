@@ -197,7 +197,7 @@ void LoadAllTextures()
 {
 	// Load textures
 
-	string sTextureNames[] = { "fungus.jpg", "sand_grass_02.jpg", "rock_2_4w.jpg"};
+	string sTextureNames[] = { "sand.jpg", "fungus.jpg", "sand.jpg","water.jpg" };
 
      for(int i =0;i<NUMTEXTURES;++i)
 	{

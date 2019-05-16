@@ -25,7 +25,7 @@ bool CMultiLayeredHeightmap::LoadHeightMapFromImage(const char *path, const std:
 	filename = directory + '/' + filename;
 
 
-	int width = 1, height = 1, nrComponents = 1;
+	int nrComponents = 1;
 
 	SDL_Surface* ptr = IMG_Load(filename.c_str());
 	if (!ptr) {
@@ -61,6 +61,7 @@ bool CMultiLayeredHeightmap::LoadHeightMapFromImage(const char *path, const std:
 
 	SetVertexData();
 	SetCoordsData();
+	SetHeightsData();
 	float fTextureU = float(iCols)*0.1f;
 	float fTextureV = float(iRows)*0.1f;
 
@@ -68,10 +69,11 @@ bool CMultiLayeredHeightmap::LoadHeightMapFromImage(const char *path, const std:
 	 {
 		for(int j = 0; j<iCols;++j)
 		{
-			float fScaleC = float(j) / float(iCols - 1);
-			float fScaleR = float(i) / float(iRows - 1);
-			float fVertexHeight = float(*(bDataPointer + row_step * i + j * ptr_inc)) / 255.0f;
-			vVertexData[i][j] = glm::vec3(-0.5f + fScaleC, fVertexHeight, -0.5f + fScaleR);
+			float fScaleC = float(j) / float(iCols - 1)*300;
+			float fScaleR = float(i) / float(iRows - 1) * 300;
+			float fVertexHeight = (float(*(bDataPointer + row_step * i + j * ptr_inc)) / 255.0f)*10;
+			Heihgts[j][i] = fVertexHeight;
+			vVertexData[i][j] = glm::vec3( fScaleC, fVertexHeight,  fScaleR);
 			vCoordsData[i][j] = glm::vec2(fTextureU*fScaleC, fTextureV*fScaleR);
 		}
 	}
@@ -212,6 +214,11 @@ void CMultiLayeredHeightmap::SetRenderSize(float fRenderX, float fHeight, float 
 	vRenderScale = glm::vec3(fRenderX, fHeight, fRenderZ);
 }
 
+void CMultiLayeredHeightmap::SetHeightsData()
+{
+	Heihgts.assign(iRows, vector<float>(iCols));
+}
+
 vector< vector< glm::vec3> > CMultiLayeredHeightmap::GetVertexData()
 {
 	return vVertexData;
@@ -225,6 +232,10 @@ void CMultiLayeredHeightmap::SetVertexData()
 vector<vector<glm::vec2>> CMultiLayeredHeightmap::GetCoordsData()
 {
 	return vCoordsData;
+}
+
+void CMultiLayeredHeightmap::getHeightOfTerrain(float CameraX, float CameraY, float CameraZ)
+{
 }
 
 void CMultiLayeredHeightmap::SetCoordsData()
@@ -271,21 +282,49 @@ void CMultiLayeredHeightmap::ReleaseHeightmap()
 	bLoaded = false;
 }
 
-bool CMultiLayeredHeightmap::CheckCollision(glm::vec3 cameraPos)
+float CMultiLayeredHeightmap::CheckCollision(float WorldX,float WorldZ)
 {
+	float TerrainX = WorldX ;
+	float TerrainZ = WorldZ;
+	float gridsize =  SIZES/( static_cast<float>(Heihgts.size()-1));
+	int gridX = (static_cast<int>(floor(TerrainX / gridsize)));
+	int gridZ = (static_cast<int>(floor(TerrainZ / gridsize)));
+	if (gridX >= Heihgts.size() - 1 || gridZ >= Heihgts.size() - 1 || gridX < 0 || gridZ < 0) {
+		return 0;
+	}
 
-	//for(int i =0;i<vVertexData.size();++i)
-	//	for (int j = 0; j < vVertexData.size(); ++j)
-	//	{
-	//		auto tmp = vVertexData[i][j];
-	//		if (tmp.x == cameraPos.x && tmp.y == cameraPos.y && tmp.z == cameraPos.z)
-	//		{
-	//			cameraPos.x = cameraPos.x + 2.0f;
-	//			return true;
-	//		}
+	float xCoord = 0.1f*(((int)TerrainX% (int)gridsize) / gridsize);
+	float zCoord = 0.1f*(((int)TerrainZ % (int)gridsize) / gridsize);
+	float collide;
+	if (xCoord <= (1 - zCoord)) {
+		collide = BarryCentric(glm::vec3(0, Heihgts[gridX][gridZ], 0),
+		    	glm::vec3(1, Heihgts[gridX + 1][gridZ], 0), 
+			   glm::vec3(0, Heihgts[gridX][gridZ + 1], 1),
+			   glm::vec2(xCoord, zCoord));
+			
 
-	//	}
-	return false;
+	}
+	else {
+		collide = BarryCentric(glm::vec3(1, Heihgts[gridX+1][gridZ], 0),
+			glm::vec3(1, Heihgts[gridX + 1][gridZ+1], 1),
+			glm::vec3(0, Heihgts[gridX][gridZ + 1], 1),
+			glm::vec2(xCoord, zCoord));
+
+	}
+
+
+
+	return collide;
+}
+
+float CMultiLayeredHeightmap::BarryCentric(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3, glm::vec2 pos)
+{
+	float det = (p2.z - p3.z) * (p1.x - p3.x) + (p3.x - p2.x)*(p1.z - p3.z);
+	float l1 = ((p2.z - p3.z) * (pos.x - p3.x) + (p3.x - p2.x)*(pos.y - p3.z)) / det;
+	float l2 = ((p3.z - p1.z)*(pos.x - p3.x) + (p1.x - p3.x)*(pos.y - p3.z)) / det;
+	float l3 = 1.0f - l1 - l2;
+
+	return (l1 * p1.y + l2 * p2.y + l3 * p3.y);
 }
 
 CShaderProgram* CMultiLayeredHeightmap::GetShaderProgram()
