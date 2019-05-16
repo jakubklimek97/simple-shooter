@@ -25,85 +25,10 @@
 #include "utils.h"
 #include "Loader.h"
 #include "SceneGame.h"
+#include "SceneMultiplayerGame.h"
 
-std::mutex loopLock;
-std::mutex posLock;
-std::mutex playerPosLock;
-float pos[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-float playerPos[4] = { 0.0f };
-std::thread* connectionThread;
 
-void connectionHandlerThread() {
-	bool connection = true;
-	Networking::MessageType ctrl;
-	float posTemp[4];
-	while (connection) {
-		Networking::recvControlMsg(&ctrl);
-		if (ctrl == Networking::MessageType::POSITION_FOLLOWS) {
-			connection = Networking::recvData(posTemp);
-			if (connection) {
-				posLock.lock();
-				pos[0] = posTemp[0];
-				pos[1] = posTemp[1];
-				pos[2] = posTemp[2];
-				pos[3] = posTemp[3];
-				posLock.unlock();
-			}
-			else break;
-		}
-		else if (ctrl == Networking::MessageType::QUIT) {
-			std::cout << "Zakonczenie przez serwer" << std::endl;
-			Networking::closeConnection();
-			connection = false;
-			return; //zakonczenie polaczenia
-		}
-		Networking::sendControlMsg(Networking::MessageType::POSITION_FOLLOWS);
-		playerPosLock.lock();
-		posTemp[0] = playerPos[0];
-		posTemp[1] = playerPos[1];
-		posTemp[2] = playerPos[2];
-		posTemp[3] = playerPos[3];
-		playerPosLock.unlock();
-		Networking::sendData(posTemp);
-		std::this_thread::sleep_for(std::chrono::milliseconds(16)); //16ms opoznienia miedzy wiadomosciami
-	}
-}
-void serverConnectionHandlerThread() {
-	bool connection = true;
-	Networking::MessageType ctrl;
-	float posTemp[4];
-	while (connection) {
-		Networking::sendControlMsg(Networking::MessageType::POSITION_FOLLOWS);
-		playerPosLock.lock();
-		posTemp[0] = playerPos[0];
-		posTemp[1] = playerPos[1];
-		posTemp[2] = playerPos[2];
-		posTemp[3] = playerPos[3];
-		playerPosLock.unlock();
-		Networking::sendData(posTemp);
-		Networking::recvControlMsg(&ctrl);
-		if (ctrl == Networking::MessageType::POSITION_FOLLOWS) {
-			connection = Networking::recvData(posTemp);
-			if (connection) {
-				posLock.lock();
-				pos[0] = posTemp[0];
-				pos[1] = posTemp[1];
-				pos[2] = posTemp[2];
-				pos[3] = posTemp[3];
-				posLock.unlock();
-			}
-			else break;
-		}
-		else if (ctrl == Networking::MessageType::QUIT) {
-			std::cout << "Zakonczenie przez serwer" << std::endl;
-			Networking::closeConnection();
-			connection = false;
-			break; //zakonczenie polaczenia
-		}	
-	}
-	connection = false;
-	Networking::closeConnection();
-}
+
 void serverThread() {
 	Networking::startServer(60100);
 	bool connection;
@@ -160,6 +85,7 @@ int main(int argc, char *argv[])
 
 	Loader::loadModels();
 	Loader::loadShaders();
+	Loader::loadTextures2D();
 
 	/*Entity* testBoundingBox = testowa.addObject(new Entity(kostka, glm::vec3(4.0f, 0.0f, 0.0f), 0.0f, glm::vec3(0.5f, 0.5f, 0.5f)));
 	testBoundingBox->setShader(lightShader);
@@ -175,50 +101,37 @@ int main(int argc, char *argv[])
 		box.calculateBoundingBox();
 		box.Draw(testowa.GetProjectionMatrix(), testowa.GetViewMatrix(), boundingBoxShader);
 		*/
-
-	SceneGame* scenaGra = new SceneGame(glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.01f, 100.0f), new Camera(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.1f, 8.0f));
-	scenaGra->InitScene();
-	SDL_Event e;
-	Networking::setDataSize(sizeof(pos));
-	//prosta obsluga serwera(na razie w mainie)
+	SceneMultiplayerGame* multiplayerScene = new SceneMultiplayerGame(glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.01f, 100.0f), new Camera(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.1f, 8.0f));
+	
 	if (czySerwer) {
+		multiplayerScene->setServer(true);
 		serverThread();
-		connectionThread = new std::thread(serverConnectionHandlerThread);
+
 	}
 	else {
 		bool connection = Networking::connect("localhost", 60100);
-		if (connection) {
-			connectionThread = new std::thread(connectionHandlerThread);
-		}
+		multiplayerScene->setServer(false);
+		if (!connection)
+			return 0; //brzydkie wyjscie, powinno byc w scenie z nawiazywaniem polaczenia
 	}
-	/////////////////////////////////////////////////
-	while (scenaGra->run)
+	multiplayerScene->InitScene();
+	
+	SDL_Event e;
+	while (multiplayerScene->run)
 	{
-		scenaGra->handleEvents(e);
-		glm::vec3 playerPosV = scenaGra->getCamera()->cameraPos;
-		playerPosLock.lock();
-		playerPos[0] = playerPosV.x;
-		playerPos[1] = playerPosV.y-1.0f;
-		playerPos[2] = playerPosV.z;
-		playerPos[3] = scenaGra->getCamera()->yaw;
-		playerPosLock.unlock();
-		posLock.lock();
-		glm::vec3 player2pos(pos[0], pos[1], pos[2]);
-		scenaGra->player2->setRotationY(-glm::radians(pos[3]));
-		posLock.unlock();
-		scenaGra->player2->setPosition(player2pos);
-		//scenaGra->player2->setRotationY(-glm::radians(scenaGra->getCamera()->yaw));
-		scenaGra->render();
-		std::cout << pos[3] << std::endl;
+		multiplayerScene->handleEvents(e);
+
+		multiplayerScene->render();
 		
 		SDL_GL_SwapWindow(window); // zostanie w glownej petli aplikacji, nie ma sensu sie powtarzac
 	}
 	//na razie takie zakonczenie serwera
 	Networking::stopServer();
-	////////////////////////////
-	scenaGra->UnInitScene();
-	delete scenaGra;
+	multiplayerScene->UnInitScene();
+	delete multiplayerScene;
 	Loader::unloadShaders();
+	Loader::unloadModels();
+	Loader::unloadTextures2D();
 	SDL_GL_DeleteContext(context);
 	SDL_DestroyWindow(window);
 	SDLNet_Quit();
