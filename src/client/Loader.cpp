@@ -19,8 +19,16 @@ std::string Loader::fragmentShaderPath[SHADERS_COUNT] = {
 	"boundingBox.fs",
 	"simpleColorShader.fs"
 };
+std::string Loader::textures2DName[TEXTURES2D_COUNT] = {
+	"buttonSingle.png"
+};
+std::string Loader::textures2DPath[TEXTURES2D_COUNT] = {
+	"res/textures"
+};
+
 std::vector<Model> Loader::models;
 std::vector<Shader> Loader::shaders;
+std::vector<unsigned int> Loader::textures2D;
 bool Loader::loadModels() {
 	for (int i = 0; i < Loader::LoadedModels::MODELS_COUNT; ++i) {
 		models.push_back(Model(Loader::modelPath[i]));
@@ -48,6 +56,23 @@ bool Loader::unloadShaders()
 bool Loader::unloadModels()
 {
 	models.clear();
+	return true;
+}
+
+bool Loader::loadTextures2D()
+{
+	for (int i = 0; i < Loader::LoadedTextures2D::TEXTURES2D_COUNT; ++i) {
+		textures2D.push_back(TextureFromFile(textures2DName[i].c_str(),textures2DPath[i]));
+	}
+	return true;
+}
+
+bool Loader::unloadTextures2D()
+{
+	for (int i = 0; i < Loader::LoadedTextures2D::TEXTURES2D_COUNT; ++i) {
+		glDeleteTextures(TEXTURES2D_COUNT, textures2D.data());
+	}
+	textures2D.clear();
 	return true;
 }
 
