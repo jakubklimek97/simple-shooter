@@ -2,7 +2,7 @@
 #include <SDL.h>
 #include <SDL_image.h>
 
-unsigned int TextureFromFile(const char *path, const std::string &directory, bool gamma = false);
+
 Model::~Model()
 {
 	textures_loaded.clear();

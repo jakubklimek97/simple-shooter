@@ -16,11 +16,10 @@
 #include <iostream>
 #include <map>
 #include <vector>
-
+unsigned int TextureFromFile(const char *path, const std::string &directory, bool gamma = false);
 class Model
 {
 public:
-
 	std::vector<Texture> textures_loaded;
 	std::vector<Mesh> meshes;
 	std::string directory;
