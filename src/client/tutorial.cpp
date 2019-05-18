@@ -102,32 +102,34 @@ int main(int argc, char *argv[])
 		box.Draw(testowa.GetProjectionMatrix(), testowa.GetViewMatrix(), boundingBoxShader);
 		*/
 	SceneMultiplayerGame* multiplayerScene = new SceneMultiplayerGame(glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.01f, 100.0f), new Camera(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.1f, 8.0f));
-	
+	SceneGame* gameScene = new SceneGame(glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.01f, 100.0f), new Camera(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.1f, 8.0f));
 	if (czySerwer) {
 		multiplayerScene->setServer(true);
 		serverThread();
 
 	}
 	else {
-		bool connection = Networking::connect("localhost", 60100);
+		bool connection = Networking::connect("127.0.0.1", 60100);
 		multiplayerScene->setServer(false);
 		if (!connection)
 			return 0; //brzydkie wyjscie, powinno byc w scenie z nawiazywaniem polaczenia
 	}
-	multiplayerScene->InitScene();
+	Scene *ptr = multiplayerScene;
+	ptr->InitScene();
 	
 	SDL_Event e;
-	while (multiplayerScene->run)
+	while (ptr->run)
 	{
-		multiplayerScene->handleEvents(e);
+		ptr->handleEvents(e);
 
-		multiplayerScene->render();
+		ptr->render();
 		
 		SDL_GL_SwapWindow(window); // zostanie w glownej petli aplikacji, nie ma sensu sie powtarzac
 	}
 	//na razie takie zakonczenie serwera
 	Networking::stopServer();
-	multiplayerScene->UnInitScene();
+	ptr->UnInitScene();
+	delete gameScene;
 	delete multiplayerScene;
 	Loader::unloadShaders();
 	Loader::unloadModels();
