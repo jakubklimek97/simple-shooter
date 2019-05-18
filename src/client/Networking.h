@@ -8,7 +8,8 @@ public:
 		POSITION_FOLLOWS,
 		QUIT,
 		REQ_DATA_SIZE_CHANGE,
-		HIT
+		HIT,
+		SHOOT
 	};
 	static bool startServer(Uint16 port);
 	static bool stopServer();

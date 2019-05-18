@@ -23,6 +23,7 @@ public:
 		LIGHT,
 		BOUNDING_BOX,
 		SIMPLE,
+		BULLET,
 		SHADERS_COUNT
 	};
 	enum LoadedTextures2D {

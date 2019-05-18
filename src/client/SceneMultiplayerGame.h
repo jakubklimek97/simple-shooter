@@ -2,6 +2,8 @@
 #include "Scene.h"
 #include <thread>
 #include <mutex>
+#include <deque>
+#include "Bullet.h"
 class SceneMultiplayerGame :
 	public Scene
 {
@@ -32,5 +34,11 @@ private:
 	float pos[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 	float playerPos[4] = { 0.0f };
 	std::thread* connectionThread;
+	std::thread* tmpThreadObject;
+	std::mutex bulletLock;
+	std::deque<Bullet*> bulletContainer;
+	void deleteBullet();
+	bool sendBullet = false;
+	Bullet* tmpBulletPtr;
 };
 

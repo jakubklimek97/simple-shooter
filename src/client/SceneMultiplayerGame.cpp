@@ -17,6 +17,7 @@ SceneMultiplayerGame::~SceneMultiplayerGame()
 
 void SceneMultiplayerGame::InitScene()
 {
+	ostatniWystrzal = 0.0f;
 	lastFrame = SDL_GetTicks() / 1000.0f;
 	Terrain* terrain = new Terrain();
 	terrain->loadTerrain("res/models/teren_org/teren.obj", "res/models/teren_org/height.png", Loader::getShader(Loader::LoadedShaders::LIGHT));
@@ -26,6 +27,7 @@ void SceneMultiplayerGame::InitScene()
 	player2->setShader(Loader::getShader(Loader::LoadedShaders::LIGHT));
 	Networking::setDataSize(sizeof(pos));
 	SDL_SetRelativeMouseMode(SDL_TRUE);
+	Bullet::setShader(&Loader::getShader(Loader::LoadedShaders::SIMPLE));
 	if (isServer) {
 		connectionThread = new std::thread([=] {serverConnectionHandlerThread(); });
 	}
@@ -40,6 +42,7 @@ void SceneMultiplayerGame::UnInitScene()
 	connectionThread->join();
 	delete connectionThread;
 	delete player2;
+	//zakladam, ze pociski zostana usuniete
 }
 
 void SceneMultiplayerGame::handleEvents(SDL_Event & e)
@@ -51,7 +54,7 @@ void SceneMultiplayerGame::handleEvents(SDL_Event & e)
 	{
 		if (e.type == SDL_QUIT) {
 			quitLock.lock();
-			run = false; //jakis hack na wyjscie, eventy musi pobierac w whilu zeby kamera byla plynna...
+			run = false;
 			quitLock.unlock();
 		}
 		switch (e.type) {
@@ -109,8 +112,12 @@ void SceneMultiplayerGame::handleEvents(SDL_Event & e)
 			getCamera()->turnCamera(e.motion);
 		}
 		case SDL_MOUSEBUTTONDOWN: {
-			if (e.button.button == SDL_BUTTON_LEFT) {
+			if (e.button.button == SDL_BUTTON_LEFT && currentFrame > ostatniWystrzal) {
 				ostatniWystrzal = currentFrame + 0.5f;
+			bulletContainer.push_back(new Bullet(getCamera()->cameraPos, getCamera()->cameraFront));
+				tmpThreadObject = new std::thread([=] {deleteBullet(); });
+				tmpThreadObject->detach();
+				sendBullet = true;
 			}
 		}
 		default: break;
@@ -138,18 +145,23 @@ void SceneMultiplayerGame::render()
 	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	DrawObjects();
+	//rysowanie pociskow
+	bulletLock.lock();
+	for (Bullet* bullet : bulletContainer) {
+		bullet->draw(GetProjectionMatrix(), getCamera()->getViewMatrix(), glm::vec3(1.0f, 0.0f, 0.0f));
+	}
+	bulletLock.unlock();
+	//rysowanie broni
 	glm::mat4 model = glm::mat4(1.0f);
 	model = glm::translate(model, getCamera()->cameraPos + getCamera()->cameraFront);
 	model = glm::rotate(model, glm::radians(180.0f - getCamera()->yaw), glm::vec3(0.0f, 1.0f, 0.0f));
 	model = glm::rotate(model, glm::radians(-getCamera()->pitch), glm::vec3(0.0f, 0.0f, 1.0f));
 	model = glm::translate(model, glm::vec3(0.35f, -0.15f, 0.0f));
-	//std::cout << terrain.getHeight(testowa.getCamera()->cameraPos) << std::endl;
 	if (ostatniWystrzal != 0.0) {
 		if (currentFrame >= ostatniWystrzal) {
 			ostatniWystrzal = 0.0;
 		}
 		else {
-			//std::cout << glm::cos((ostatniWystrzal - currentFrame) / 2.0f) << std::endl;
 			model = glm::rotate(model, -glm::sin((ostatniWystrzal - currentFrame) / 0.5f) / 3.0f, glm::vec3(0.0f, 0.0f, 1.0f));
 		}
 	}
@@ -175,7 +187,9 @@ void SceneMultiplayerGame::serverConnectionHandlerThread() {
 	bool connection = true;
 	Networking::MessageType ctrl;
 	float posTemp[4];
-	while (connection && run) {
+	float bulletTmp[6];
+	std::thread* tmpPtr;
+	if (connection) {
 		connection = Networking::sendControlMsg(Networking::MessageType::POSITION_FOLLOWS);
 		playerPosLock.lock();
 		posTemp[0] = playerPos[0];
@@ -184,8 +198,42 @@ void SceneMultiplayerGame::serverConnectionHandlerThread() {
 		posTemp[3] = playerPos[3];
 		playerPosLock.unlock();
 		connection = Networking::sendData(posTemp);
+	}
+	while (connection && run) {
+		bulletLock.lock();
+		if (sendBullet) {
+			sendBullet = false;
+			connection = Networking::sendControlMsg(Networking::MessageType::SHOOT);
+			memcpy(bulletTmp, bulletContainer.back()->vertices, sizeof(float) * 6);
+			posTemp[0] = bulletTmp[0];
+			posTemp[1] = bulletTmp[1];
+			posTemp[2] = bulletTmp[2];
+			connection = Networking::sendData(posTemp);
+			posTemp[0] = bulletTmp[3];
+			posTemp[1] = bulletTmp[4];
+			posTemp[2] = bulletTmp[5];
+			connection = Networking::sendData(posTemp);
+		}
+		bulletLock.unlock();
 		connection = Networking::recvControlMsg(&ctrl);
-		if (connection && ctrl == Networking::MessageType::POSITION_FOLLOWS) {
+		if (connection && ctrl == Networking::MessageType::SHOOT) {
+			connection = Networking::recvData(posTemp);
+			bulletTmp[0] = posTemp[0];
+			bulletTmp[1] = posTemp[1];
+			bulletTmp[2] = posTemp[2];
+			connection = Networking::recvData(posTemp);
+			if (!connection)
+				break;
+			bulletTmp[3] = posTemp[0];
+			bulletTmp[4] = posTemp[1];
+			bulletTmp[5] = posTemp[2];
+			bulletLock.lock();
+			bulletContainer.push_back(new Bullet(bulletTmp));
+			bulletLock.unlock();
+			tmpPtr = new std::thread([=] {deleteBullet(); });
+			tmpPtr->detach();
+		}
+		else if (connection && ctrl == Networking::MessageType::POSITION_FOLLOWS) {
 			connection = Networking::recvData(posTemp);
 			if (connection) {
 				posLock.lock();
@@ -194,6 +242,14 @@ void SceneMultiplayerGame::serverConnectionHandlerThread() {
 				pos[2] = posTemp[2];
 				pos[3] = posTemp[3];
 				posLock.unlock();
+				connection = Networking::sendControlMsg(Networking::MessageType::POSITION_FOLLOWS);
+				playerPosLock.lock();
+				posTemp[0] = playerPos[0];
+				posTemp[1] = playerPos[1];
+				posTemp[2] = playerPos[2];
+				posTemp[3] = playerPos[3];
+				playerPosLock.unlock();
+				connection = Networking::sendData(posTemp);
 			}
 			else break;
 		}
@@ -212,9 +268,43 @@ void SceneMultiplayerGame::connectionHandlerThread() {
 	bool connection = true;
 	Networking::MessageType ctrl;
 	float posTemp[4];
+	float bulletTmp[6];
+	std::thread* tmpPtr;
 	while (connection && run) {
+		bulletLock.lock();
+		if (sendBullet) {
+			sendBullet = false;
+			connection = Networking::sendControlMsg(Networking::MessageType::SHOOT);
+			memcpy(bulletTmp, bulletContainer.back()->vertices, sizeof(float) * 6);
+			posTemp[0] = bulletTmp[0];
+			posTemp[1] = bulletTmp[1];
+			posTemp[2] = bulletTmp[2];
+			connection = Networking::sendData(posTemp);
+			posTemp[0] = bulletTmp[3];
+			posTemp[1] = bulletTmp[4];
+			posTemp[2] = bulletTmp[5];
+			connection = Networking::sendData(posTemp);
+		}
+		bulletLock.unlock();
 		connection = Networking::recvControlMsg(&ctrl);
-		if (ctrl == Networking::MessageType::POSITION_FOLLOWS) {
+		if (connection && ctrl == Networking::MessageType::SHOOT) {
+			connection = Networking::recvData(posTemp);
+			bulletTmp[0] = posTemp[0];
+			bulletTmp[1] = posTemp[1];
+			bulletTmp[2] = posTemp[2];
+			connection = Networking::recvData(posTemp);
+			if (!connection)
+				break;
+			bulletTmp[3] = posTemp[0];
+			bulletTmp[4] = posTemp[1];
+			bulletTmp[5] = posTemp[2];
+			bulletLock.lock();
+			bulletContainer.push_back(new Bullet(bulletTmp));
+			bulletLock.unlock();
+			tmpPtr = new std::thread([=] {deleteBullet(); });
+			tmpPtr->detach();
+		}
+		else if (connection && ctrl == Networking::MessageType::POSITION_FOLLOWS) {
 			connection = Networking::recvData(posTemp);
 			if (connection) {
 				posLock.lock();
@@ -223,6 +313,14 @@ void SceneMultiplayerGame::connectionHandlerThread() {
 				pos[2] = posTemp[2];
 				pos[3] = posTemp[3];
 				posLock.unlock();
+				connection = Networking::sendControlMsg(Networking::MessageType::POSITION_FOLLOWS);
+				playerPosLock.lock();
+				posTemp[0] = playerPos[0];
+				posTemp[1] = playerPos[1];
+				posTemp[2] = playerPos[2];
+				posTemp[3] = playerPos[3];
+				playerPosLock.unlock();
+				connection = Networking::sendData(posTemp);
 			}
 			else break;
 		}
@@ -232,18 +330,20 @@ void SceneMultiplayerGame::connectionHandlerThread() {
 			connection = false;
 			return; //zakonczenie polaczenia
 		}
-		connection = Networking::sendControlMsg(Networking::MessageType::POSITION_FOLLOWS);
-		playerPosLock.lock();
-		posTemp[0] = playerPos[0];
-		posTemp[1] = playerPos[1];
-		posTemp[2] = playerPos[2];
-		posTemp[3] = playerPos[3];
-		playerPosLock.unlock();
-		connection = Networking::sendData(posTemp);
+		
 		std::this_thread::sleep_for(std::chrono::milliseconds(16)); //16ms opoznienia miedzy wiadomosciami
 	}
 	Networking::closeConnection();
 	quitLock.lock();
 	run = false;
 	quitLock.unlock();
+}
+
+void SceneMultiplayerGame::deleteBullet()
+{
+	SDL_Delay(500);
+	bulletLock.lock();
+	delete bulletContainer.front();
+	bulletContainer.pop_front();
+	bulletLock.unlock();
 }

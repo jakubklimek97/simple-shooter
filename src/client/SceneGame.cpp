@@ -11,7 +11,6 @@ SceneGame::SceneGame(glm::mat4 projectionMatrix, Camera * camera): Scene(project
 SceneGame::~SceneGame()
 {
 }
-
 void SceneGame::InitScene()
 {
 	lastFrame = SDL_GetTicks() / 1000.0f;
@@ -22,6 +21,8 @@ void SceneGame::InitScene()
 	player2 = addObject(new Entity(Loader::getModel(Loader::LoadedModels::PLAYER), glm::vec3(20.0f, 0.0f, 7.0f), 0.0f, glm::vec3(1.0f)));
 	player2->setShader(Loader::getShader(Loader::LoadedShaders::LIGHT));
 	SDL_SetRelativeMouseMode(SDL_TRUE);
+
+	Bullet::setShader(&Loader::getShader(Loader::LoadedShaders::SIMPLE));
 }
 
 void SceneGame::UnInitScene()
@@ -94,8 +95,11 @@ void SceneGame::handleEvents(SDL_Event & e)
 			getCamera()->turnCamera(e.motion);
 		}
 		case SDL_MOUSEBUTTONDOWN: {
-			if (e.button.button == SDL_BUTTON_LEFT) {
+			if (e.button.button == SDL_BUTTON_LEFT && currentFrame > ostatniWystrzal) {
 				ostatniWystrzal = currentFrame + 0.5f;
+				bulletContainer.push_back(new Bullet(getCamera()->cameraPos, getCamera()->cameraFront));
+				tmpThreadObject = new std::thread([=] {deleteBullet(); });
+				tmpThreadObject->detach();
 			}
 		}
 		default: break;
@@ -109,25 +113,28 @@ void SceneGame::render()
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 	DrawObjects();
 	glm::mat4 model = glm::mat4(1.0f);
 	model = glm::translate(model, getCamera()->cameraPos + getCamera()->cameraFront);
 	model = glm::rotate(model, glm::radians(180.0f - getCamera()->yaw), glm::vec3(0.0f, 1.0f, 0.0f));
 	model = glm::rotate(model, glm::radians(-getCamera()->pitch), glm::vec3(0.0f, 0.0f, 1.0f));
 	model = glm::translate(model, glm::vec3(0.35f, -0.15f, 0.0f));
-	//std::cout << terrain.getHeight(testowa.getCamera()->cameraPos) << std::endl;
 	if (ostatniWystrzal != 0.0) {
 		if (currentFrame >= ostatniWystrzal) {
 			ostatniWystrzal = 0.0;
 		}
 		else {
-			//std::cout << glm::cos((ostatniWystrzal - currentFrame) / 2.0f) << std::endl;
 			model = glm::rotate(model, -glm::sin((ostatniWystrzal - currentFrame) / 0.5f) / 3.0f, glm::vec3(0.0f, 0.0f, 1.0f));
 		}
 	}
+	bulletLock.lock();
+	for (Bullet* bullet : bulletContainer) {
+		bullet->draw(GetProjectionMatrix(), getCamera()->getViewMatrix(), glm::vec3(1.0f, 0.0f, 0.0f));
+	}
+	bulletLock.unlock();
 	model = glm::scale(model, glm::vec3(0.03f, 0.03f, 0.03f));
 	Shader& lightShader = Loader::getShader(Loader::LoadedShaders::LIGHT);
-	lightShader.use();
 	lightShader.use();
 	lightShader.setMat4("model", model);
 	lightShader.setMat4("projection", GetProjectionMatrix());
@@ -137,4 +144,13 @@ void SceneGame::render()
 	lightShader.setVec3("viewPos", getCamera()->cameraPos);
 	glClear(GL_DEPTH_BUFFER_BIT);
 	Loader::getModel(Loader::LoadedModels::GUN).Draw(lightShader);
+}
+
+void SceneGame::deleteBullet()
+{
+	SDL_Delay(500);
+	bulletLock.lock();
+	delete bulletContainer.front();
+	bulletContainer.pop_front();
+	bulletLock.unlock();
 }
