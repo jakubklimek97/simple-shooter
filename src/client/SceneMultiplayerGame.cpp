@@ -4,6 +4,7 @@
 #include "Networking.h"
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
+#include "SceneManager.h"
 
 
 
@@ -50,12 +51,15 @@ void SceneMultiplayerGame::handleEvents(SDL_Event & e)
 	currentFrame = SDL_GetTicks() / 1000.0f;
 	deltaTime = currentFrame - lastFrame;
 	lastFrame = currentFrame;
+	if (!run)
+		SceneManager::GetInstance().SelectScene(SceneManager::Scenes::SCENE_QUIT);
 	while (SDL_PollEvent(&e))
 	{
 		if (e.type == SDL_QUIT) {
 			quitLock.lock();
 			run = false;
 			quitLock.unlock();
+			SceneManager::GetInstance().SelectScene(SceneManager::Scenes::SCENE_QUIT);
 		}
 		switch (e.type) {
 		case SDL_KEYDOWN: {

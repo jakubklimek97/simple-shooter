@@ -26,6 +26,7 @@
 #include "Loader.h"
 #include "SceneGame.h"
 #include "SceneMultiplayerGame.h"
+#include "SceneManager.h"
 
 
 
@@ -101,7 +102,8 @@ int main(int argc, char *argv[])
 		box.calculateBoundingBox();
 		box.Draw(testowa.GetProjectionMatrix(), testowa.GetViewMatrix(), boundingBoxShader);
 		*/
-	SceneMultiplayerGame* multiplayerScene = new SceneMultiplayerGame(glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.01f, 100.0f), new Camera(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.1f, 8.0f));
+	//SceneMultiplayerGame* multiplayerScene = new SceneMultiplayerGame(glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.01f, 100.0f), new Camera(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.1f, 8.0f));
+	SceneMultiplayerGame* multiplayerScene = (SceneMultiplayerGame*)SceneManager::GetInstance().getScene(SceneManager::Scenes::SCENE_MULTIPLAYER);
 	SceneGame* gameScene = new SceneGame(glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.01f, 100.0f), new Camera(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.1f, 8.0f));
 	if (czySerwer) {
 		multiplayerScene->setServer(true);
@@ -114,23 +116,27 @@ int main(int argc, char *argv[])
 		if (!connection)
 			return 0; //brzydkie wyjscie, powinno byc w scenie z nawiazywaniem polaczenia
 	}
-	Scene *ptr = multiplayerScene;
-	ptr->InitScene();
+	//Scene *ptr = multiplayerScene;
+	//ptr->InitScene();
 	
+	SceneManager::GetInstance().SelectScene(SceneManager::Scenes::SCENE_MULTIPLAYER);
 	SDL_Event e;
-	while (ptr->run)
+	//while (SceneManager::GetInstance().getScene()->run)
+	while(SceneManager::GetInstance().currentScene != SceneManager::SCENE_QUIT)
 	{
-		ptr->handleEvents(e);
-
-		ptr->render();
+		SceneManager::GetInstance().getScene()->handleEvents(e);
+		//ptr->handleEvents(e);
+		if(SceneManager::GetInstance().getScene())
+		SceneManager::GetInstance().getScene()->render();
+		//ptr->render();
 		
 		SDL_GL_SwapWindow(window); // zostanie w glownej petli aplikacji, nie ma sensu sie powtarzac
 	}
 	//na razie takie zakonczenie serwera
 	Networking::stopServer();
-	ptr->UnInitScene();
+	//ptr->UnInitScene();
 	delete gameScene;
-	delete multiplayerScene;
+	//delete multiplayerScene;
 	Loader::unloadShaders();
 	Loader::unloadModels();
 	Loader::unloadTextures2D();
