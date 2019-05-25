@@ -24,18 +24,9 @@ CSpotLight::CSpotLight(glm::vec3 a_vColor, glm::vec3 a_vPosition, glm::vec3 a_vD
 	fLinearAtt = a_fLinearAtt;
 }
 
-/*-----------------------------------------------
 
-Name:	SetUniformData
 
-Params:	spProgram - shader program
-		sLightVarName - name of spot light variable
-
-Result:	Sets all spot light data.
-
-/*---------------------------------------------*/
-
-void CSpotLight::SetUniformData(CShaderProgram* spProgram, string sLightVarName)
+void CSpotLight::SetUniformData(ShaderProgram* spProgram, string sLightVarName)
 {
 	spProgram->SetUniform(sLightVarName + ".vColor", vColor);
 	spProgram->SetUniform(sLightVarName + ".vPosition", vPosition);

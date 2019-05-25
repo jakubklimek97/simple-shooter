@@ -4,6 +4,11 @@
 #include<algorithm>
 #include<iterator>
 #include<list>
+
+#define _USE_MATH_DEFINES
+
+float CSkybox::roatationspeed = 1.0f;
+
 CSkybox::CSkybox()
 {
 	ReserveVector(6);
@@ -124,7 +129,7 @@ void CSkybox::LoadCubeMap(vector<string> faces)
 
 void CSkybox::BindBuffer(Shader&Program)
 {
-	Program.use();
+	
 
 	glGenVertexArrays(1, &skyboxVAO);
 	glGenBuffers(1, &skyboxVBO);
@@ -133,17 +138,31 @@ void CSkybox::BindBuffer(Shader&Program)
 	glBufferData(GL_ARRAY_BUFFER, sizeof(SkyBoxVertices), &SkyBoxVertices, GL_STATIC_DRAW);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	
+	Program.use();
+	Program.setInt("skybox", 0);
 }
 
 void CSkybox::RenderSkybox(Shader&Program, glm::mat4 ViewMatrix, glm::mat4 ProjectionMatrix)
 {
 	glDepthFunc(GL_LEQUAL);
-
+	
 		// change depth function so depth test passes when values are equal to depth buffer's content
 	Program.use();
-	glm::mat4 view = glm::mat4(glm::mat3(ViewMatrix)); // remove translation from the view matrix
-	Program.setMat4("view", view);
-	Program.setMat4("projection",ProjectionMatrix);
+	
+	float rotation =+ 10.0f*roatationspeed * _deltatime;
+	glm::mat4 view = ViewMatrix;
+	view[3][0] = 0;
+	view[3][1] = 0;
+	view[3][2] = 0;
+	float Radian = static_cast<float>(DegreetoRadians(rotation));
+	 glm::mat4 view2 = glm::rotate(ViewMatrix, glm::radians(rotation), glm::vec3( 0,1,0 ));
+	 glm::mat4 view3 = glm::mat4(glm::mat3(view2));
+	//glm::rotate(DegreetoRadians(rotation), glm::vec3(0, 1, 0), ViewMatrix, ViewMatrix);
+	glm::vec3 fogColour = { r = 0.7f,g = 0.7f,b = 0.7f };// remove translation from the view matrix
+	Program.setMat4("view", view3);
+	Program.setMat4("projection", ProjectionMatrix);
+	Program.setVec3("fogColour", fogColour);
 	// skybox cube
 	glBindVertexArray(skyboxVAO);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxID);
@@ -151,6 +170,17 @@ void CSkybox::RenderSkybox(Shader&Program, glm::mat4 ViewMatrix, glm::mat4 Proje
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 	glBindVertexArray(0);
 	glDepthFunc(GL_LESS);
+}
+
+void CSkybox::SetDeltatime(float deltatime)
+{
+	_deltatime = deltatime;
+}
+
+double CSkybox::DegreetoRadians(double degree)
+{
+	double radian = degree * M_PI / 180;
+	return radian;
 }
 
 vector<string> CSkybox::ReserveVector(int size)

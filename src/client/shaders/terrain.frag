@@ -57,11 +57,11 @@ void main()
 	}
 	else vTexColor = texture2D(gSampler[2], vTexCoord);
 
-	//vec2 vPathCoord = vec2(vTexCoord.x/fMaxTextureU, vTexCoord.y/fMaxTextureV);
-	//vec4 vPathIntensity = texture2D(gSampler[4], vPathCoord);
-	//fScale = vPathIntensity.x;
+	vec2 vPathCoord = vec2(vTexCoord.x/fMaxTextureU, vTexCoord.y/fMaxTextureV);
+	vec4 vPathIntensity = texture2D(gSampler[4], vPathCoord);
+	fScale = vPathIntensity.x;
   
-	//vec4 vPathColor = texture2D(gSampler[3], vTexCoord); // Black color means there is a path *vPathColor
+	vec4 vPathColor = texture2D(gSampler[3], vTexCoord); // Black color means there is a path *vPathColor
 	vec4 vFinalTexColor = fScale*vTexColor+(1-fScale);
 
 	vec4 vMixedColor = vFinalTexColor*vColor;

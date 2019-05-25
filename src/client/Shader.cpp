@@ -133,48 +133,26 @@ void Shader::SetVector3f(const char *name, const glm::vec3 &value, bool useShade
 }
 
 
-void Shader::Compile(const char * vertexPath, const char * fragmentPath)
+void Shader::Compile(const char * vertexSource, const char * fragmentSource)
 {
-	std::string vertexCode;
-	std::string fragmentCode;
-	std::ifstream vShaderFile;
-	std::ifstream fShaderFile;
-	vShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-	fShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-	try
-	{
-		vShaderFile.open(vertexPath);
-		fShaderFile.open(fragmentPath);
-		std::stringstream vShaderStream, fShaderStream;
-		vShaderStream << vShaderFile.rdbuf();
-		fShaderStream << fShaderFile.rdbuf();
-		vShaderFile.close();
-		fShaderFile.close();
-		vertexCode = vShaderStream.str();
-		fragmentCode = fShaderStream.str();
-	}
-	catch (std::ifstream::failure e)
-	{
-		std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << std::endl;
-	}
-	const char* vShaderCode = vertexCode.c_str();
-	const char * fShaderCode = fragmentCode.c_str();
-	unsigned int vertex, fragment;
-	vertex = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vertex, 1, &vShaderCode, NULL);
-	glCompileShader(vertex);
-	checkCompileErrors(vertex, "VERTEX");
-	fragment = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragment, 1, &fShaderCode, NULL);
-	glCompileShader(fragment);
-	checkCompileErrors(fragment, "FRAGMENT");
-	//GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)));
-    this->ID = glCreateProgram();
-	glAttachShader(this->ID, vertex);
-	glAttachShader(this->ID, fragment);
+	GLuint sVertex, sFragment;
+	// Vertex Shader
+	sVertex = glCreateShader(GL_VERTEX_SHADER);
+	glShaderSource(sVertex, 1, &vertexSource, NULL);
+	glCompileShader(sVertex);
+	checkCompileErrors(sVertex, "VERTEX");
+	// Fragment Shader
+	sFragment = glCreateShader(GL_FRAGMENT_SHADER);
+	glShaderSource(sFragment, 1, &fragmentSource, NULL);
+	glCompileShader(sFragment);
+	checkCompileErrors(sFragment, "FRAGMENT");
+	// Shader Program
+	this->ID = glCreateProgram();
+	glAttachShader(this->ID, sVertex);
+	glAttachShader(this->ID, sFragment);
 	glLinkProgram(this->ID);
 	checkCompileErrors(this->ID, "PROGRAM");
-	glDeleteShader(vertex);
-	glDeleteShader(fragment);
-//	GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)sizeof(glm::vec3)));
-}
+	// Delete the shaders as they're linked into our program now and no longer necessery
+	glDeleteShader(sVertex);
+	glDeleteShader(sFragment);
+	}

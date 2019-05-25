@@ -2,14 +2,6 @@
 
 #include "shaders.h"
 
-/********************************
-
-Class:		CSpotLight
-
-Purpose:	Support class for adding
-			spotlights to scene.
-
-********************************/
 
 class CSpotLight
 {
@@ -22,7 +14,7 @@ public:
 	float fConeAngle;
 	float fLinearAtt;
 
-	void SetUniformData(CShaderProgram* spProgram, string sLightVarName);
+	void SetUniformData(ShaderProgram* spProgram, string sLightVarName);
 
 	CSpotLight();
 	CSpotLight(glm::vec3 a_vColor, glm::vec3 a_vPosition, glm::vec3 a_vDirection, int a_bOn, float a_fConeAngle, float a_fLinearAtt);

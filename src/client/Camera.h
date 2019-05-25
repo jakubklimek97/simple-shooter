@@ -16,6 +16,8 @@ public:
 	};
 	Camera(glm::vec3 position, glm::vec3 front, glm::vec3 up, float sensitivity, float moveSpeed);
 	~Camera();
+	void SetPitch1(float value);
+	void SetPitch2(float value);
 	glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
 	glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 	glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
@@ -28,5 +30,7 @@ public:
 	void moveCamera(Movement move, float deltaTime);
 	glm::mat4 getViewMatrix() const;
 	void updateCameraVectors();
+	float pitch1 = 89.0f;
+	float pitch2 = -89.0f;
 };
 

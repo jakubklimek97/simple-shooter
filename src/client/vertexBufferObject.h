@@ -1,15 +1,11 @@
 #pragma once
 #include <ctime>
-//#include <windows.h>
-
 #include <algorithm>
 #include <cmath>
-#include <cstring>
 #include <vector>
 #include <sstream>
 #include <queue>
-#include <map>
-#include <set>
+
 
 using namespace std;
 
@@ -17,16 +13,9 @@ using namespace std;
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-/********************************
 
-Class:		CVertexBufferObject
 
-Purpose:	Wraps OpenGL vertex buffer
-			object.
-
-********************************/
-
-class CVertexBufferObject
+class HeightMapBuffer
 {
 public:
 	void CreateVBO(int a_iSize = 0);
@@ -44,9 +33,8 @@ public:
 	void* GetDataPointer();
 	unsigned GetBufferID();
 
-	int GetCurrentSize();
 
-	CVertexBufferObject();
+	HeightMapBuffer();
 
 private:
 	unsigned uiBuffer;

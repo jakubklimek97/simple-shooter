@@ -1,7 +1,7 @@
 
 #include "vertexBufferObject.h"
 
-CVertexBufferObject::CVertexBufferObject()
+HeightMapBuffer::HeightMapBuffer()
 {
 	bDataUploaded = false;
 	//uiBuffer = 0;
@@ -9,7 +9,7 @@ CVertexBufferObject::CVertexBufferObject()
 
 
 
-void CVertexBufferObject::CreateVBO(int a_iSize)
+void HeightMapBuffer::CreateVBO(int a_iSize)
 {
 	glGenBuffers(1, &uiBuffer);
 	data.reserve(a_iSize);
@@ -19,7 +19,7 @@ void CVertexBufferObject::CreateVBO(int a_iSize)
 
 
 
-void CVertexBufferObject::DeleteVBO()
+void HeightMapBuffer::DeleteVBO()
 {
 	glDeleteBuffers(1, &uiBuffer);
 	bDataUploaded = false;
@@ -27,7 +27,7 @@ void CVertexBufferObject::DeleteVBO()
 }
 
 
-void* CVertexBufferObject::MapBufferToMemory(int iUsageHint)
+void* HeightMapBuffer::MapBufferToMemory(int iUsageHint)
 {
 	if (!bDataUploaded)return NULL;
 	void* ptrRes = glMapBuffer(iBufferType, iUsageHint);
@@ -36,7 +36,7 @@ void* CVertexBufferObject::MapBufferToMemory(int iUsageHint)
 
 
 
-void* CVertexBufferObject::MapSubBufferToMemory(int iUsageHint, unsigned int uiOffset, unsigned int uiLength)
+void* HeightMapBuffer::MapSubBufferToMemory(int iUsageHint, unsigned int uiOffset, unsigned int uiLength)
 {
 	if (!bDataUploaded)return NULL;
 	void* ptrRes = glMapBufferRange(iBufferType, uiOffset, uiLength, iUsageHint);
@@ -45,14 +45,14 @@ void* CVertexBufferObject::MapSubBufferToMemory(int iUsageHint, unsigned int uiO
 
 
 
-void CVertexBufferObject::UnmapBuffer()
+void HeightMapBuffer::UnmapBuffer()
 {
 	glUnmapBuffer(iBufferType);
 }
 
 
 
-void CVertexBufferObject::BindVBO(int a_iBufferType)
+void HeightMapBuffer::BindVBO(int a_iBufferType)
 {
 	iBufferType = a_iBufferType;
 	glBindBuffer(iBufferType, uiBuffer);
@@ -60,7 +60,7 @@ void CVertexBufferObject::BindVBO(int a_iBufferType)
 
 
 
-void CVertexBufferObject::UploadDataToGPU(int iDrawingHint)
+void HeightMapBuffer::UploadDataToGPU(int iDrawingHint)
 {
 	// try catch na blad
 	glBufferData(iBufferType, data.size(), &data[0], iDrawingHint);
@@ -70,7 +70,7 @@ void CVertexBufferObject::UploadDataToGPU(int iDrawingHint)
 
 
 
-void CVertexBufferObject::AddData(void* ptrData, unsigned int uiDataSize)
+void HeightMapBuffer::AddData(void* ptrData, unsigned int uiDataSize)
 {
 	data.insert(data.end(), (unsigned char*)ptrData, (unsigned char*)ptrData + uiDataSize);
 	iCurrentSize += uiDataSize;
@@ -78,7 +78,7 @@ void CVertexBufferObject::AddData(void* ptrData, unsigned int uiDataSize)
 
 
 
-void* CVertexBufferObject::GetDataPointer()
+void* HeightMapBuffer::GetDataPointer()
 {
 	if (bDataUploaded)return NULL;
 	return (void*)data[0];
@@ -86,14 +86,10 @@ void* CVertexBufferObject::GetDataPointer()
 
 
 
-unsigned int CVertexBufferObject::GetBufferID()
+unsigned int HeightMapBuffer::GetBufferID()
 {
 	return uiBuffer;
 }
 
 
 
-int CVertexBufferObject::GetCurrentSize()
-{
-	return iCurrentSize;
-}

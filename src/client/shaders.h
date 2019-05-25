@@ -14,14 +14,7 @@
 
 
 using namespace std;
-/********************************
 
-Class:		CShader
-
-Purpose:	Wraps OpenGL shader loading
-			and compiling.
-
-********************************/
 
 class CShader
 {
@@ -42,16 +35,9 @@ private:
 	bool bLoaded; // Whether shader was loaded and compiled
 };
 
-/********************************
 
-Class:		CShaderProgram
 
-Purpose:	Wraps OpenGL shader program
-			and make its usage easy.
-
-********************************/
-
-class CShaderProgram
+class ShaderProgram
 {
 public:
 	void CreateProgram();
@@ -92,7 +78,7 @@ public:
 	void SetModelAndNormalMatrix(string sModelMatrixName, string sNormalMatrixName, glm::mat4 mModelMatrix);
 	void SetModelAndNormalMatrix(string sModelMatrixName, string sNormalMatrixName, glm::mat4* mModelMatrix);
 
-	CShaderProgram();
+	ShaderProgram();
 
 private:
 	unsigned uiProgram; // ID of program
@@ -104,4 +90,4 @@ bool PrepareShaderPrograms();
 #define NUMSHADERS 7
 
 extern CShader shShaders[NUMSHADERS];
-extern CShaderProgram spMain, spFogAndLight;
+extern ShaderProgram spMain, spFogAndLight, test;

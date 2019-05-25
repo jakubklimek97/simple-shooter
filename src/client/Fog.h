@@ -16,7 +16,7 @@ public:
 	Fog();
 	Fog(glm::vec4 FogColor, float FogDensity, int Equation);
 	~Fog() = default;
-	 void SetUniformData(CShaderProgram* Program, string FogName);
+	 void SetUniformData(ShaderProgram* Program, string FogName);
 
 private:
 	glm::vec4 _FogColor;

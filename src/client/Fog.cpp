@@ -16,7 +16,7 @@ Fog::Fog(glm::vec4 FogColor, float FogDensity, int Equation)
 	_Equation = Equation;
 }
 
-void Fog::SetUniformData(CShaderProgram * Program, string FogName)
+void Fog::SetUniformData(ShaderProgram * Program, string FogName)
 {
 	Program->SetUniform(FogName + ".vFogColor", _FogColor);
 	Program->SetUniform(FogName + ".fDensity", _FogDensity);

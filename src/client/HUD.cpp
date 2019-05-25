@@ -2,7 +2,7 @@
 
 
 int HUD::lifenumber = 0;
-int HUD::life = 500000;
+int HUD::HP = 500000;
 float HUD::_incrementvalue = 0.0f;
 HUD::HUD()
 {
@@ -87,9 +87,9 @@ void HUD::Incrementvalue()
 	if (_incrementvalue == 1.1f) {
 		_incrementvalue = 0.0f;
 	}
-	life -= 1;
-	if (life < -2300)
-		life = -1;
+	HP -= 1;
+	if (HP < -2300)
+		HP = -1;
 }
 
 

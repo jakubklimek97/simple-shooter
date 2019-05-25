@@ -11,16 +11,6 @@ enum ETextureFiltering
 	TEXTURE_FILTER_MIN_TRILINEAR, // Bilinear criterion for minification on two closest mipmaps, then averaged
 };
 
-/********************************
-
-Class:		CTexture
-
-Purpose:	Wraps OpenGL texture
-			object and performs
-			their loading.
-
-********************************/
-
 
 #include <algorithm>
 #include <cmath>
@@ -46,8 +36,6 @@ class CTexture
 public:
 	void CreateEmptyTexture(int a_iWidth, int a_iHeight, GLenum format);
 	void CreateFromData(BYTE* bData, int a_iWidth, int a_iHeight, int a_iBPP, GLenum format, bool bGenerateMipMaps = false);
-
-	//bool ReloadTexture();
 
 	bool LoadTexture2D(string path, const string &directory, bool  bGenerateMipMaps);
 	void BindTexture(int iTextureUnit = 0);

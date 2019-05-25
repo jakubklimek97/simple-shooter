@@ -17,7 +17,7 @@ public:
 
 	float fAmbient;
 
-	void SetUniformData(CShaderProgram* spProgram, std::string sLightVarName);
+	void SetUniformData(ShaderProgram* spProgram, std::string sLightVarName);
 
 	CDirectionalLight();
 	CDirectionalLight(glm::vec3 a_vColor, glm::vec3 a_vDirection, float a_fAmbient);

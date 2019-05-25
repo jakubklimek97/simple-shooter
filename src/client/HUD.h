@@ -43,7 +43,7 @@ private:
 	static float _incrementvalue;
 	unsigned int texture1, texture2, texture3, texture4;
 	unsigned int VBO, VAO, EBO;
-	static int life; // time before image disappear
+	static int HP; // time before image disappear
 	float _gamma;
 	bool loaded;
 };
