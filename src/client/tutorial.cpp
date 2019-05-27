@@ -7,6 +7,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+
 #include "Shader.h"
 #include "Camera.h"
 #include "Model.h"
@@ -18,14 +19,12 @@
 #include"vertexBufferObject.h"
 #include"DirLight.h"
 #include"TextureClass.h"
-#include"Flashlight.h"
 #include"Skybox.h"
 #include"Geometry.h"
 #include"HUD.h"
-#include"Fog.h"
-#include"TextManager.h"
-#include"SpriteRenderer.h"
-#include"ResourceManager.h"
+
+
+
 
 UINT uiVAOs[1]; // Only one VAO now //TEST
 
@@ -89,8 +88,8 @@ void initOpenGL(SDL_Window* &pWindow, SDL_GLContext &context) {
 
 int main(int argc, char *argv[])
 {
-	TextManager* Text;
-	SpriteRenderer *Renderer;
+	//TextManager* Text;
+	//SpriteRenderer *Renderer;
 
 	HUD life1, life2, life3;
 	HeightMapBuffer vboSceneObjects;
@@ -98,7 +97,7 @@ int main(int argc, char *argv[])
 	HeightMap hmWorld;
 
 	CDirectionalLight dlSun;
-	Fog FOG;
+//	Fog FOG;
 
 	if (initSDL() < 0) return -1;
 	SDL_Window* window;
@@ -163,28 +162,21 @@ std::vector<reference_wrapper<const Shader>>SH = { Shader2d, Shader2d2 };
 	life2 = HUD(SH, "heart.png", "sand.jpg", 0.01f, 1);
 	life3 = HUD(SH, "heart.png", "sand.jpg", 0.01f, 1);
 
-	MainSkybox = CSkybox(skyboxShader,"res/img/right.jpg", "res/img/left.jpg", "res/img/top.jpg", "res/img/bottom.jpg", "res/img/front.jpg", "res/img/back.jpg");
-    LoadAllTextures();
+	MainSkybox = CSkybox(skyboxShader, "res/img/right.jpg", "res/img/left.jpg", "res/img/top.jpg", "res/img/bottom.jpg", "res/img/front.jpg", "res/img/back.jpg");
+	LoadAllTextures();
 
 
-	ResourceManager::LoadShader("res/shaders/sprite.vs", "res/shaders/sprite.fs", "sprite");
-	ResourceManager::LoadTexture("res/img/black_img.png", GL_FALSE, "background");
-	glm::mat4 projection = glm::ortho(0.0f, static_cast<GLfloat>(1280), static_cast<GLfloat>(720), 0.0f, -1.0f, 1.0f);
-	ResourceManager::GetShader("sprite").Use().SetInteger("sprite", 0);
-	ResourceManager::GetShader("sprite").SetMatrix4("projection", projection);
+	//ResourceManager::LoadShader("res/shaders/sprite.vs", "res/shaders/sprite.fs", "sprite");
+	//ResourceManager::LoadTexture("res/img/black_img.png", GL_FALSE, "background");
+	//glm::mat4 projection = glm::ortho(0.0f, static_cast<GLfloat>(1280), static_cast<GLfloat>(720), 0.0f, -1.0f, 1.0f);
+	//ResourceManager::GetShader("sprite").Use().SetInteger("sprite", 0);
+	//ResourceManager::GetShader("sprite").SetMatrix4("projection", projection);
 
-	Renderer = new SpriteRenderer(ResourceManager::GetShader("sprite"));
+	//Renderer = new SpriteRenderer(ResourceManager::GetShader("sprite"));
 
-
-
-
-
-
-
-
-    Text = new TextManager(1280, 720);
-	Text->Load("abel.ttf",32);
-	  
+ //   Text = new TextManager(1280, 720);
+	//Text->Load("abel.ttf",32);
+	//  
 
 	HeightMap::LoadTerrainShaderProgram();
 	hmWorld.LoadMapFromImage("hm.png", "res/img");
@@ -194,7 +186,7 @@ std::vector<reference_wrapper<const Shader>>SH = { Shader2d, Shader2d2 };
 	//DZIALA
 
 //	FOG = Fog(glm::vec4(0.5f, 0.5f, 0.5f, 1.0f), 0.10f, 1);
-	Scene testowa(glm::perspective(glm::radians(55.0f), 1280.0f / 720.0f, 0.1f, 50000.0f), new Camera(glm::vec3(200.0f, 30.0f, 200.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.1f, 1.0f));
+	Scene testowa(glm::perspective(glm::radians(55.0f), 1280.0f / 720.0f, 0.1f, 5000.0f), new Camera(glm::vec3(200.0f, 30.0f, 200.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.1f, 1.0f));
 
 	LightObject* light = testowa.SetLight(new LightObject(kostka, glm::vec3(2.5f, 1.0f, 2.0f), 0.0f, glm::vec3(0.2f), &simpleShader, glm::vec3(1.0f, 1.0f, 1.0f)));
 	Entity* testCube = testowa.addObject(new Entity(kostka, glm::vec3(5.0f, -1.0f, 0.0f), 0.0f, glm::vec3(0.5f, 0.5f, 0.5f)));
@@ -203,7 +195,7 @@ std::vector<reference_wrapper<const Shader>>SH = { Shader2d, Shader2d2 };
 	testBoundingBox->rotateY(45.0f);
 	BoundingBox box(*testBoundingBox);
 	testowa.removeObject(testCube);
-	//DZIALA
+
 	Camera::Movement nextMove;
 	float ostatniWystrzal = 0.0;
 	while (true)
@@ -287,11 +279,11 @@ std::vector<reference_wrapper<const Shader>>SH = { Shader2d, Shader2d2 };
 
 		testowa.getCamera()->moveCamera(nextMove, deltaTime);
 
-		Text->RenderText("Player1", 5.0f, 5.0f, 1.0f);
+		/*Text->RenderText("Player1", 590.0f, 185.0f, 1.0f);
 		Text->RenderText("Player2", 250.0f,800.0f/2,1.0f);
 		Text->RenderText("Player3", 320.0f,1000.0f/2-20.0f,1.0f,glm::vec3(0.0,1.0f,0.0f));
-		Renderer->DrawSprite(ResourceManager::GetTexture("background"), glm::vec2(1, 0), glm::vec2(1200, 800), 1.0f);
-
+		Renderer->DrawSprite(ResourceManager::GetTexture("background"), glm::vec2(470, 150), glm::vec2(350, 100), 0.0f,glm::vec3(1.0,0.5,0.0));
+*/
 
 
 		MainSkybox.SetDeltatime(currentFrame);
@@ -348,7 +340,7 @@ std::vector<reference_wrapper<const Shader>>SH = { Shader2d, Shader2d2 };
 		spMain.SetUniform("matrices.normalMatrix", glm::mat4(1.0));
 		spMain.SetUniform("vColor", glm::vec4(1,1, 1, 1));
 
-		static float fAngleOfDarkness = 100.0f;
+		static float fAngleOfDarkness = 10000.0f;
 
 		dlSun.vDirection = glm::vec3(-sin(fAngleOfDarkness*3.1415f / 180.0f), -cos(fAngleOfDarkness*3.1415f / 180.0f), 0.0f);
 		dlSun.SetUniformData(&spMain, "sunLight");
@@ -377,7 +369,7 @@ std::vector<reference_wrapper<const Shader>>SH = { Shader2d, Shader2d2 };
 	
 		////	 ... and finally render heightmap
 		hmWorld.RenderHeightmap(testowa.GetProjectionMatrix());
-		
+		//
 		
 		float terrainheight = hmWorld.CheckCollision(testowa.getCamera()->cameraPos.x, testowa.getCamera()->cameraPos.z);
 		float camera = testowa.getCamera()->cameraPos.y;

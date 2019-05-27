@@ -150,7 +150,7 @@ void CSkybox::RenderSkybox(Shader&Program, glm::mat4 ViewMatrix, glm::mat4 Proje
 		// change depth function so depth test passes when values are equal to depth buffer's content
 	Program.use();
 	
-	float rotation =+ 10.0f*roatationspeed * _deltatime;
+	float rotation =+ 5.0f*roatationspeed * _deltatime;
 	glm::mat4 view = ViewMatrix;
 	view[3][0] = 0;
 	view[3][1] = 0;

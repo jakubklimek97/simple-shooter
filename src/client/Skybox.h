@@ -10,7 +10,7 @@ class CSkybox
 {
 public:
 	CSkybox();
-	CSkybox(Shader&Program,string a_sFront, string a_sBack, string a_sLeft, string a_sRight, string a_sTop, string a_sBottom);
+	CSkybox(Shader&Program,string Right, string Left, string Top, string Bottom, string Front, string Back);
 	void LoadSkyBoxVector(vector<string> vec);
 //	void DeleteSkybox();
 	void LoadCubeMap(vector<string> faces);
