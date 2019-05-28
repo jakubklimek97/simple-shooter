@@ -24,6 +24,9 @@ public:
 		BOUNDING_BOX,
 		SIMPLE,
 		BULLET,
+		SKYBOX,
+		SHADER2D,
+		SHADER2D2,
 		SHADERS_COUNT
 	};
 	enum LoadedTextures2D {

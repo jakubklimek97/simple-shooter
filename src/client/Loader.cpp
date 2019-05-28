@@ -12,14 +12,20 @@ std::string Loader::vertexShaderPath[SHADERS_COUNT] = {
 	"LightShader.vs",
 	"boundingBox.vs",
 	"simpleColorShader.vs",
-	"bullet.vs"
+	"bullet.vs",
+	"skybox.vs",
+	"texture.vs",
+	"texture.vs"
 };
 std::string Loader::fragmentShaderPath[SHADERS_COUNT] = {
 	"fragment.fs",
 	"LightShader.fs",
 	"boundingBox.fs",
 	"simpleColorShader.fs",
-	"bullet.fs"
+	"bullet.fs",
+	"skybox.fs",
+	"texture.fs",
+	"texture.fs"
 };
 std::string Loader::textures2DName[TEXTURES2D_COUNT] = {
 	"buttonSingle.png"
