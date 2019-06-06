@@ -18,7 +18,15 @@ Fog::Fog(glm::vec4 FogColor, float FogDensity, int Equation)
 
 void Fog::SetUniformData(ShaderProgram * Program, string FogName)
 {
-	Program->SetUniform(FogName + ".vFogColor", _FogColor);
+	Program->SetUniform(FogName + ".vColor", _FogColor);
+	Program->SetUniform(FogName + ".fAmbientIntensity", _AmbientIntensity);
 	Program->SetUniform(FogName + ".fDensity", _FogDensity);
 	Program->SetUniform(FogName + ".iEquation", _Equation);
+	Program->SetUniform(FogName + "gSampler", 0);
+}
+
+void Fog::SetUniformData(ShaderProgram * Program, glm::mat4 ModelMatrix, glm::mat4 ProjectionMatrix,glm::vec3 CameraPosition)
+{
+	Program->SetUniform("matrices.modelViewMatrix", &ModelMatrix);
+	Program->SetUniform("matrices.modelViewMatrix", glm::translate(ModelMatrix, CameraPosition));
 }

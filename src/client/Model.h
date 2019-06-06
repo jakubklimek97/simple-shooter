@@ -17,6 +17,8 @@
 #include <map>
 #include <vector>
 
+unsigned int TextureFromFile(const char *path, const std::string &directory, bool gamma = false);
+
 class Model
 {
 public:
@@ -32,7 +34,6 @@ public:
 	void Draw(Shader shader);
 	Model() = default;
 	static int TextureFromFile2(const char *path, const std::string &directory, bool gamma);
-
 private:
 	void loadModel(std::string const &path);
 	void processNode(aiNode *node, const aiScene *scene);

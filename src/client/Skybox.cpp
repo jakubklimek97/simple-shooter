@@ -7,7 +7,7 @@
 
 #define _USE_MATH_DEFINES
 
-float CSkybox::roatationspeed = 1.0f;
+float CSkybox::roatationspeed = 2.0f;
 
 CSkybox::CSkybox()
 {

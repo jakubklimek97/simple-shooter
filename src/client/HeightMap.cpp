@@ -9,7 +9,7 @@ CShader HeightMap::shTerrainShaders[NUMTERRAINSHADERS];
 HeightMap::HeightMap()
 {
 	vRenderScale = glm::vec3(1.0f, 1.0f, 1.0f);
-	
+
 }
 
 
@@ -29,7 +29,7 @@ bool HeightMap::LoadMapFromImage(const char *path, const std::string &directory)
 
 	SDL_Surface* ptr = IMG_Load(filename.c_str());
 	if (!ptr) {
-	//	std::cout << "ERROR:LOADING MAP";
+		//	std::cout << "ERROR:LOADING MAP";
 		return 0;
 
 	}
@@ -38,7 +38,7 @@ bool HeightMap::LoadMapFromImage(const char *path, const std::string &directory)
 
 	nrComponents = ptr->format->BytesPerPixel;
 	unsigned int check = ptr->format->BitsPerPixel;
-	
+
 	unsigned char *PointerData = static_cast<unsigned char*>(ptr->pixels); // static_cast
 	Rows = width;
 	Columns = height;
@@ -65,27 +65,27 @@ bool HeightMap::LoadMapFromImage(const char *path, const std::string &directory)
 	float TextureCol = static_cast<float>(Columns)*0.1f;
 	float TextureRow = static_cast<float>(Rows)*0.1f;
 
-	 for(int i = 0;i<Rows;++i)
-	 {
-		for(int j = 0; j<Columns;++j)
+	for (int i = 0; i < Rows; ++i)
+	{
+		for (int j = 0; j < Columns; ++j)
 		{
 			float ScaleColumns = static_cast<float>(j) / static_cast<float>(Columns - 1)*500.0f;
 			float ScaleRows = static_cast<float>(i) / static_cast<float>(Rows - 1) * 500.0f;
 			float HeightValue = (static_cast<float>(*(PointerData + step_row * i + j * pointer_incrementation)) / 255.0f)*50.0f;
 			Heihgts[j][i] = HeightValue;
-			DataVer[i][j] = glm::vec3( ScaleColumns, HeightValue,  ScaleRows);
-			DataCoordinate[i][j] = glm::vec2((TextureCol*ScaleColumns)/100.0f, (TextureRow*ScaleRows)/100.0f);
+			DataVer[i][j] = glm::vec3(ScaleColumns, HeightValue, ScaleRows);
+			DataCoordinate[i][j] = glm::vec2((TextureCol*ScaleColumns) / 100.0f, (TextureRow*ScaleRows) / 100.0f);
 		}
 	}
-	 //Calculating normals 1 etap
+	//Calculating normals 1 etap
 	vector< vector<glm::vec3> > HeightNormal[2];
 
-	    for(int i = 0;i<2;++i)
+	for (int i = 0; i < 2; ++i)
 		HeightNormal[i] = vector< vector<glm::vec3> >(Rows - 1, vector<glm::vec3>(Columns - 1));
 
-	 for(int i = 0;i<Rows-1;++i)
+	for (int i = 0; i < Rows - 1; ++i)
 	{
-	 for(int j = 0;j<Columns-1;++j)
+		for (int j = 0; j < Columns - 1; ++j)
 		{
 			glm::vec3 ZeroTriangle[] =
 			{
@@ -107,39 +107,39 @@ bool HeightMap::LoadMapFromImage(const char *path, const std::string &directory)
 			HeightNormal[1][i][j] = glm::normalize(FirstNormalTriangle);
 		}
 	}
-	 //FInal Normals
-vector< vector<glm::vec3> > NomalsFinal = vector< vector<glm::vec3> >(Rows, vector<glm::vec3>(Columns));
+	//FInal Normals
+	vector< vector<glm::vec3> > NomalsFinal = vector< vector<glm::vec3> >(Rows, vector<glm::vec3>(Columns));
 
-	for(int i = 0;i<Rows;++i)
-	  for(int j = 0 ;j<Columns;++j)
-	{
-	
+	for (int i = 0; i < Rows; ++i)
+		for (int j = 0; j < Columns; ++j)
+		{
 
-		glm::vec3 BufforFinalNormal = glm::vec3(0.0f, 0.0f, 0.0f);
 
-		// upper-left triangle
-		if (j != 0 && i != 0)
-			 for(int k =0; k<2;++k)
-			BufforFinalNormal += HeightNormal[k][i - 1][j - 1];
-		// upper-right triangle
-		if (i != 0 && j != Columns - 1)BufforFinalNormal += HeightNormal[0][i - 1][j];
-		// bottom-right triangle
-		if (i != Rows - 1 && j != Columns - 1)
-			for(int k =0;k<2;++k)
-				BufforFinalNormal += HeightNormal[k][i][j];
-		// bottom-left triangle
-		if (i != Rows - 1 && j != 0)
-			BufforFinalNormal += HeightNormal[1][i][j - 1];
-		BufforFinalNormal = glm::normalize(BufforFinalNormal);
+			glm::vec3 BufforFinalNormal = glm::vec3(0.0f, 0.0f, 0.0f);
 
-		NomalsFinal[i][j] = BufforFinalNormal; // Store final normal of j-th vertex in i-th row
-	}
+			// upper-left triangle
+			if (j != 0 && i != 0)
+				for (int k = 0; k < 2; ++k)
+					BufforFinalNormal += HeightNormal[k][i - 1][j - 1];
+			// upper-right triangle
+			if (i != 0 && j != Columns - 1)BufforFinalNormal += HeightNormal[0][i - 1][j];
+			// bottom-right triangle
+			if (i != Rows - 1 && j != Columns - 1)
+				for (int k = 0; k < 2; ++k)
+					BufforFinalNormal += HeightNormal[k][i][j];
+			// bottom-left triangle
+			if (i != Rows - 1 && j != 0)
+				BufforFinalNormal += HeightNormal[1][i][j - 1];
+			BufforFinalNormal = glm::normalize(BufforFinalNormal);
+
+			NomalsFinal[i][j] = BufforFinalNormal; // Store final normal of j-th vertex in i-th row
+		}
 
 
 	vboHeightmapData.CreateVBO(Rows*Columns*(2 * sizeof(glm::vec3) + sizeof(glm::vec2))); // Preallocate memory
-	for(int i = 0;i<Rows;++i)
+	for (int i = 0; i < Rows; ++i)
 	{
-		for(int j =0;j<Columns;++j)
+		for (int j = 0; j < Columns; ++j)
 		{
 			vboHeightmapData.AddData(&DataVer[i][j], sizeof(glm::vec3)); // Add vertex
 			vboHeightmapData.AddData(&DataCoordinate[i][j], sizeof(glm::vec2)); // Add tex. coord
@@ -149,16 +149,16 @@ vector< vector<glm::vec3> > NomalsFinal = vector< vector<glm::vec3> >(Rows, vect
 	// Now create a VBO with heightmap indices
 	vboHeightmapIndices.CreateVBO();
 	int iPrimitiveRestartIndex = Rows * Columns;
-    for(int i = 0; i<Rows-1;++i)
+	for (int i = 0; i < Rows - 1; ++i)
 	{
-		for(int j =0;j<Columns;j++)
-			for(int z = 0;z<2;++z)
-		{
-			int iRow = i + (1 - z);
-			int iIndex = iRow * Columns + j;
-			vboHeightmapIndices.AddData(&iIndex, sizeof(int));
-		
-		}
+		for (int j = 0; j < Columns; j++)
+			for (int z = 0; z < 2; ++z)
+			{
+				int iRow = i + (1 - z);
+				int iIndex = iRow * Columns + j;
+				vboHeightmapIndices.AddData(&iIndex, sizeof(int));
+
+			}
 		// Restart triangle strips
 		vboHeightmapIndices.AddData(&iPrimitiveRestartIndex, sizeof(int));
 	}
@@ -168,7 +168,7 @@ vector< vector<glm::vec3> > NomalsFinal = vector< vector<glm::vec3> >(Rows, vect
 	// Attach vertex data to this VAO
 	vboHeightmapData.BindVBO();
 	vboHeightmapData.UploadDataToGPU(GL_STATIC_DRAW);
-	
+
 	// Vertex positions
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), 0);
@@ -198,7 +198,7 @@ bool HeightMap::LoadTerrainShaderProgram()
 	//bOK &= shShaders[3].LoadShader("res\\shaders\\fog1.frag", GL_FRAGMENT_SHADER);
 	spTerrain.CreateProgram();
 
-	   for (int i = 0; i < NUMTERRAINSHADERS; ++i)
+	for (int i = 0; i < NUMTERRAINSHADERS; ++i)
 		spTerrain.AddShaderToProgram(&shShaders[i]);
 
 	spTerrain.LinkProgram();
@@ -224,7 +224,7 @@ vector< vector< glm::vec3> > HeightMap::GetVertexData()
 
 void HeightMap::SetVertexData()
 {
-  DataVer.assign(Rows, vector<glm::vec3>(Columns));
+	DataVer.assign(Rows, vector<glm::vec3>(Columns));
 }
 
 vector<vector<glm::vec2>> HeightMap::GetCoordsData()
@@ -251,15 +251,15 @@ void HeightMap::SetRenderSize(float fQuadSize, float fHeight)
 
 void HeightMap::RenderHeightmap(glm::mat4 projection)
 {
-	
+
 	spTerrain.UseProgram();
 
 	spTerrain.SetUniform("fRenderHeight", vRenderScale.y);
 	spTerrain.SetUniform("fMaxTextureU", float(Columns)*0.1f);
 	spTerrain.SetUniform("fMaxTextureV", float(Rows)*0.1f);
 
-	spTerrain.SetUniform("HeightmapScaleMatrix",GetScaleMatrix());
-	
+	spTerrain.SetUniform("HeightmapScaleMatrix", GetScaleMatrix());
+
 	// Now we're ready to render - we are drawing set of triangle strips using one call, but we g otta enable primitive restart
 	glBindVertexArray(uiVAO);
 	glEnable(GL_PRIMITIVE_RESTART);
@@ -281,31 +281,33 @@ void HeightMap::ReleaseHeightmap()
 	bLoaded = false;
 }
 
-float HeightMap::CheckCollision(float WorldX,float WorldZ)
+float HeightMap::CheckCollision(float WorldX, float WorldZ)
 {
-	float TerrainX = WorldX;
-	float TerrainZ = WorldZ;
-	float gridsize =  SIZES/( static_cast<float>(Heihgts.size()-1));
-	int gridX = (static_cast<int>(floor(TerrainX / gridsize)));
-	int gridZ = (static_cast<int>(floor(TerrainZ / gridsize)));
+	//float TerrainX = WorldX;
+	//float TerrainZ = WorldZ;
+	float gridsize = SIZES / (static_cast<float>(Heihgts.size() - 1));
+	int gridX = (static_cast<int>(floor(WorldX / gridsize)));
+	int gridZ = (static_cast<int>(floor(WorldX / gridsize)));
 	if (gridX >= Heihgts.size() - 1 || gridZ >= Heihgts.size() - 1 || gridX < 0 || gridZ < 0) {
 		return 0;
 	}
 
-	float xCoord = std::fmod(TerrainX, gridsize) / gridsize;
-	float zCoord = std::fmod(TerrainZ, gridsize) / gridsize;
+	float xCoord = std::fmod(WorldX, gridsize) / gridsize;
+	float zCoord = std::fmod(WorldZ , gridsize) / gridsize;
 	float collide;
 	if (xCoord <= (1 - zCoord)) {
-		collide = BarryCentric(glm::vec3(0, Heihgts[gridX][gridZ], 0),
-		    	glm::vec3(1, Heihgts[gridX + 1][gridZ], 0), 
-			   glm::vec3(0, Heihgts[gridX][gridZ + 1], 1),
-			   glm::vec2(xCoord, zCoord));
-			
+		collide = BarryCentric(
+				glm::vec3(0, Heihgts[gridX][gridZ], 0),
+				glm::vec3(1, Heihgts[gridX + 1][gridZ], 0),
+				glm::vec3(0, Heihgts[gridX][gridZ + 1], 1),
+				glm::vec2(xCoord, zCoord));
+
 
 	}
 	else {
-		collide = BarryCentric(glm::vec3(1, Heihgts[gridX+1][gridZ], 0),
-			glm::vec3(1, Heihgts[gridX + 1][gridZ+1], 1),
+		collide = BarryCentric(
+			glm::vec3(1, Heihgts[gridX + 1][gridZ], 0),
+			glm::vec3(1, Heihgts[gridX + 1][gridZ + 1], 1),
 			glm::vec3(0, Heihgts[gridX][gridZ + 1], 1),
 			glm::vec2(xCoord, zCoord));
 
@@ -333,7 +335,7 @@ ShaderProgram* HeightMap::GetShaderProgram()
 void HeightMap::ReleaseTerrainShaderProgram()
 {
 	spTerrain.DeleteProgram();
-	 for(int i =0;i<NUMTERRAINSHADERS;++i)
+	for (int i = 0; i < NUMTERRAINSHADERS; ++i)
 		shShaders[i].DeleteShader();
 }
 

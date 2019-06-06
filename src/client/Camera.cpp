@@ -37,10 +37,10 @@ void Camera::moveCamera(Movement move, float deltaTime)
 {
 	if (move.none()) return;
 	if (move[Camera::MovementBits::MOVE_FORWARD]) {
-		cameraPos += 50*deltaTime * moveSpeed * cameraFront;
+		cameraPos += 10*deltaTime * moveSpeed * cameraFront;
 	}
 	if (move[Camera::MovementBits::MOVE_BACKWARD]) {
-		cameraPos -= 50 * deltaTime * moveSpeed * cameraFront;
+		cameraPos -= 10 * deltaTime * moveSpeed * cameraFront;
 	}
 	if (move[Camera::MovementBits::STRAFE_LEFT]) {
 		cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * deltaTime * moveSpeed;
