@@ -191,10 +191,10 @@ bool HeightMap::LoadMapFromImage(const char *path, const std::string &directory)
 
 bool HeightMap::LoadTerrainShaderProgram()
 {
-	bool bOK = true;
-	bOK &= shShaders[0].LoadShader("res\\shaders\\terrain.vert", GL_VERTEX_SHADER);
-	bOK &= shShaders[1].LoadShader("res\\shaders\\terrain.frag", GL_FRAGMENT_SHADER);
-	bOK &= shShaders[2].LoadShader("res\\shaders\\dirLight.frag", GL_FRAGMENT_SHADER);
+	bool Loaded = true;
+	Loaded &= shShaders[0].LoadShader("res\\shaders\\terrain.vert", GL_VERTEX_SHADER);
+	Loaded &= shShaders[1].LoadShader("res\\shaders\\terrain.frag", GL_FRAGMENT_SHADER);
+	Loaded &= shShaders[2].LoadShader("res\\shaders\\dirLight.frag", GL_FRAGMENT_SHADER);
 	//bOK &= shShaders[3].LoadShader("res\\shaders\\fog1.frag", GL_FRAGMENT_SHADER);
 	spTerrain.CreateProgram();
 
@@ -203,7 +203,7 @@ bool HeightMap::LoadTerrainShaderProgram()
 
 	spTerrain.LinkProgram();
 
-	return bOK;
+	return Loaded;
 }
 
 
@@ -260,7 +260,6 @@ void HeightMap::RenderHeightmap(glm::mat4 projection)
 
 	spTerrain.SetUniform("HeightmapScaleMatrix", GetScaleMatrix());
 
-	// Now we're ready to render - we are drawing set of triangle strips using one call, but we g otta enable primitive restart
 	glBindVertexArray(uiVAO);
 	glEnable(GL_PRIMITIVE_RESTART);
 	glPrimitiveRestartIndex(Rows*Columns);
@@ -281,31 +280,28 @@ void HeightMap::ReleaseHeightmap()
 	bLoaded = false;
 }
 
-float HeightMap::CheckCollision(float WorldX, float WorldZ)
+float HeightMap::TerrainCollide(float WorldX, float WorldZ)
 {
-	//float TerrainX = WorldX;
-	//float TerrainZ = WorldZ;
 	float gridsize = SIZES / (static_cast<float>(Heihgts.size() - 1));
 	int gridX = (static_cast<int>(floor(WorldX / gridsize)));
-	int gridZ = (static_cast<int>(floor(WorldX / gridsize)));
+	int gridZ = (static_cast<int>(floor(WorldZ / gridsize)));
 	if (gridX >= Heihgts.size() - 1 || gridZ >= Heihgts.size() - 1 || gridX < 0 || gridZ < 0) {
 		return 0;
 	}
 
 	float xCoord = std::fmod(WorldX, gridsize) / gridsize;
-	float zCoord = std::fmod(WorldZ , gridsize) / gridsize;
-	float collide;
+	float zCoord = std::fmod(WorldZ, gridsize) / gridsize;
 	if (xCoord <= (1 - zCoord)) {
-		collide = BarryCentric(
-				glm::vec3(0, Heihgts[gridX][gridZ], 0),
-				glm::vec3(1, Heihgts[gridX + 1][gridZ], 0),
-				glm::vec3(0, Heihgts[gridX][gridZ + 1], 1),
-				glm::vec2(xCoord, zCoord));
+		Collide = BarryCentric(
+			glm::vec3(0, Heihgts[gridX][gridZ], 0),
+			glm::vec3(1, Heihgts[gridX + 1][gridZ], 0),
+			glm::vec3(0, Heihgts[gridX][gridZ + 1], 1),
+			glm::vec2(xCoord, zCoord));
 
 
 	}
 	else {
-		collide = BarryCentric(
+		Collide = BarryCentric(
 			glm::vec3(1, Heihgts[gridX + 1][gridZ], 0),
 			glm::vec3(1, Heihgts[gridX + 1][gridZ + 1], 1),
 			glm::vec3(0, Heihgts[gridX][gridZ + 1], 1),
@@ -315,7 +311,7 @@ float HeightMap::CheckCollision(float WorldX, float WorldZ)
 
 
 
-	return collide;
+	return Collide;
 }
 
 float HeightMap::BarryCentric(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3, glm::vec2 pos)

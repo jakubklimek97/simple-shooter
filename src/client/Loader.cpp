@@ -15,7 +15,8 @@ std::string Loader::vertexShaderPath[SHADERS_COUNT] = {
 	"bullet.vs",
 	"skybox.vs",
 	"texture.vs",
-	"texture.vs"
+	"texture.vs",
+	"menubox.vs"
 };
 std::string Loader::fragmentShaderPath[SHADERS_COUNT] = {
 	"fragment.fs",
@@ -25,7 +26,8 @@ std::string Loader::fragmentShaderPath[SHADERS_COUNT] = {
 	"bullet.fs",
 	"skybox.fs",
 	"texture.fs",
-	"texture.fs"
+	"texture.fs",
+	"menubox.fs"
 };
 std::string Loader::textures2DName[TEXTURES2D_COUNT] = {
 	"buttonSingle.jpg"

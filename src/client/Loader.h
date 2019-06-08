@@ -27,6 +27,7 @@ public:
 		SKYBOX,
 		SHADER2D,
 		SHADER2D2,
+		MENUBOX,
 		SHADERS_COUNT
 	};
 	enum LoadedTextures2D {

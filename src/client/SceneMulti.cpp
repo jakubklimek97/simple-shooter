@@ -5,6 +5,10 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "SceneManager.h"
 
+static int currentSelection = 0;
+static glm::vec3 color = glm::vec3(1, 0, 1);
+// testowanie menu
+
 SceneMulti::SceneMulti(glm::mat4 projectionMatrix, Camera * camera): Scene(projectionMatrix, camera)
 {
 }
@@ -16,8 +20,6 @@ void SceneMulti::InitScene()
 {
 	lastFrame = SDL_GetTicks() / 1000.0f;
 
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glEnable(GL_BLEND);
 
 	VBOSceneObject.CreateVBO();
 	glGenVertexArrays(1, uVAO); // Create one VAO
@@ -49,11 +51,6 @@ void SceneMulti::InitScene()
 	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), (void*)(sizeof(glm::vec3) + sizeof(glm::vec2)));
 
 
-
-
-	/*Terrain* terrain = new Terrain();
-	terrain->loadTerrain("res/models/teren_org/teren.obj", "res/models/teren_org/height.png", Loader::getShader(Loader::LoadedShaders::LIGHT));
-	addTerrain(terrain);*/
 	SetLight(new LightObject(Loader::getModel(Loader::LoadedModels::CUBE), glm::vec3(0.0f, 10.0f, 0.0f), 0.0f, glm::vec3(0.2f), &Loader::getShader(Loader::LoadedShaders::SIMPLE), glm::vec3(1.0f, 1.0f, 1.0f)));
 	player2 = addObject(new Entity(Loader::getModel(Loader::LoadedModels::PLAYER), glm::vec3(20.0f, 0.0f, 7.0f), 0.0f, glm::vec3(1.0f)));
 	player2->setShader(Loader::getShader(Loader::LoadedShaders::LIGHT));
@@ -76,14 +73,25 @@ void SceneMulti::InitScene()
 	PrepareShaderPrograms();
 	LoadAllTextures();
 
-		HeightMap::LoadTerrainShaderProgram();
-	    World.LoadMapFromImage("hm.png", "res/img");
+	HeightMap::LoadTerrainShaderProgram();
+    World.LoadMapFromImage("hm.png", "res/img");
+
+
+	SoundMgr = Sound::Instance();
+	SoundM = SoundManager::Instance();
+
+	SoundM->PlayMusic("Battle_in_the_Stars.ogg", -1);
+
 
 }
 
 void SceneMulti::UnInitScene()
 {
 	delete player2;
+	Sound::Release();
+	SoundMgr = NULL;
+	SoundManager::Release();
+	SoundM = NULL;
 }
 
 void SceneMulti::handleEvents(SDL_Event & e)
@@ -103,22 +111,32 @@ void SceneMulti::handleEvents(SDL_Event & e)
 			switch (e.key.keysym.sym) {
 			case SDLK_w: {
 				nextMove[Camera::MOVE_FORWARD] = 1;
+				SoundM->PlaySFX("CartoonWalking.ogg");
+
 				break;
 			}
 			case SDLK_s: {
 				nextMove[Camera::MOVE_BACKWARD] = 1;
+				SoundM->PlaySFX("CartoonWalking.ogg");
 				break;
 			}
 			case SDLK_a: {
 				nextMove[Camera::STRAFE_LEFT] = 1;
+				SoundM->PlaySFX("CartoonWalking.ogg");
 				break;
 			}
 			case SDLK_d: {
 				nextMove[Camera::STRAFE_RIGHT] = 1;;
+				SoundM->PlaySFX("CartoonWalking.ogg");
 				break;
 			}
+			case SDLK_DOWN:
+				nextMove[Camera::MOVE_BACKWARD] = 0;
+				break;
+
 			case SDLK_SPACE: {
 				playerJumpStart();
+				SoundM->PlaySFX("Jump.ogg",0,3);
 				break;
 			}
 			default: break;
@@ -130,20 +148,28 @@ void SceneMulti::handleEvents(SDL_Event & e)
 			switch (e.key.keysym.sym) {
 			case SDLK_w: {
 				nextMove[Camera::MOVE_FORWARD] = 0;
+				SoundM->PlaySFX("CartoonWalking.ogg");
 				break;
 			}
 			case SDLK_s: {
 				nextMove[Camera::MOVE_BACKWARD] = 0;
+				SoundM->PlaySFX("CartoonWalking.ogg");
 				break;
 			}
 			case SDLK_a: {
 				nextMove[Camera::STRAFE_LEFT] = 0;
+				SoundM->PlaySFX("CartoonWalking.ogg");
 				break;
 			}
 			case SDLK_d: {
-				nextMove[Camera::STRAFE_RIGHT] = 0;;
+				nextMove[Camera::STRAFE_RIGHT] = 0;
+				SoundM->PlaySFX("CartoonWalking.ogg");
 				break;
 			}
+			
+			case SDLK_UP:
+				break;
+
 			default: break;
 			}
 			break;
@@ -152,11 +178,14 @@ void SceneMulti::handleEvents(SDL_Event & e)
 			getCamera()->turnCamera(e.motion);
 		}
 		case SDL_MOUSEBUTTONDOWN: {
+			
 			if (e.button.button == SDL_BUTTON_LEFT && currentFrame > ostatniWystrzal) {
 				ostatniWystrzal = currentFrame + 0.5f;
 				bulletContainer.push_back(new Bullet(getCamera()->cameraPos, getCamera()->cameraFront));
 				tmpThreadObject = new std::thread([=] {deleteBullet(); });
 				tmpThreadObject->detach();
+				SoundM->PlaySFX("laser.wav", 0, 1);
+
 			}
 		}
 		default: break;
@@ -168,8 +197,10 @@ void SceneMulti::handleEvents(SDL_Event & e)
 void SceneMulti::render()
 {
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+
 
 	MainSkybox.SetDeltatime(currentFrame);
 	MainSkybox.RenderSkybox(Loader::getShader(Loader::LoadedShaders::SKYBOX), this->GetViewMatrix(), this->GetProjectionMatrix());
@@ -250,7 +281,7 @@ void SceneMulti::render()
 			World.RenderHeightmap(GetProjectionMatrix());
 			
 			
-			float terrainheight = World.CheckCollision(getCamera()->cameraPos.x,getCamera()->cameraPos.z);
+			float terrainheight = World.TerrainCollide(getCamera()->cameraPos.x,getCamera()->cameraPos.z);
 			float camera = getCamera()->cameraPos.y;
 			if (camera <= terrainheight||camera <= terrainheight+0.31f||camera <= terrainheight-0.33f) { //200 ->Terrain height
 			   getCamera()->cameraPos.y = terrainheight+1.95f;
@@ -289,7 +320,6 @@ void SceneMulti::render()
 		spFogAndLight.SetUniform("sunLight.fAmbientIntensity", 0.55f);
 		spFogAndLight.SetUniform("matrices.modelViewMatrix", &mModelView);
 
-	//	tTextures[1].BindTexture(0);
 		float dx[] = { 4.0f, 0.0f, -4.0f, 0.0f };
 		float dz[] = { 0.0f, -4.0f, 0.0f, 4.0f };
 		int iCurDir = 0;
@@ -321,19 +351,17 @@ void SceneMulti::render()
 				continue;
 		}
 		//KOLIZJA MGLY
-	// tTextures[1].BindTexture();
 	
-	//	spFogAndLight.SetUniform("vColor", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 		float posx = getCamera()->cameraPos.x;
 		float posz = getCamera()->cameraPos.z;
 		if (posx > 450.0f || posx < 100.0f) {
 
 
-			cout << "KOLIZJA";
+			//cout << "KOLIZJA";
 			getCamera()->cameraPos.x = 200;
 		}
 		else if (posz > 400.0f || posz < 65.0f) {
-			cout << "KOLZIJA";
+		//	cout << "KOLZIJA";
 		   getCamera()->cameraPos.z = 200;
 
 		}
@@ -342,7 +370,9 @@ void SceneMulti::render()
 		life1.RotationIntensity();
 		life1.RenderHUD(SH);
 		life2.RenderHUD(SH);
+		life3.RenderHUD(SH);
 
+		
 
 }
 

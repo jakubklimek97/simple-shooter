@@ -34,8 +34,3 @@ glm::vec3 vPyramidVertices[] =
 };
 
 glm::vec2 vPyramidTexCoords[] = { glm::vec2(0.5f, 1.0f), glm::vec2(0.0f, 0.0f), glm::vec2(1.0f, 0.0f) };
-
-glm::vec3 vGround[] =
-{
-	glm::vec3(-50, -10, -50), glm::vec3(50, -10, -50), glm::vec3(50, -10, 50), glm::vec3(50, -10, 50), glm::vec3(-50, -10, 50), glm::vec3(-50, -10, -50)
-};

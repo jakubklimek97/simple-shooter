@@ -14,10 +14,11 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <string>
+#include"Collision.h"
 
 
 
-class HeightMap
+class HeightMap:protected Collision
 {
 public:
 	static bool LoadTerrainShaderProgram();
@@ -25,7 +26,8 @@ public:
 	glm::mat4 GetScaleMatrix();
 	bool LoadMapFromImage(const char *path, const std::string &directory);
 	void ReleaseHeightmap();
-	float CheckCollision(float CameraX, float CameraZ);
+	virtual float TerrainCollide(float WorldX, float WorldZ);
+	virtual 
 	float BarryCentric(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3, glm::vec2 pos);
 	void RenderHeightmap(glm::mat4 projection);
 	
@@ -41,6 +43,8 @@ public:
 	int GetNumHeightmapCols();
 	int counter = 0;
 	static ShaderProgram* GetShaderProgram();
+
+
 
 	HeightMap();
 

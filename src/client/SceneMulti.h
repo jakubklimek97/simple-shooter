@@ -8,6 +8,11 @@
 #include"TextureClass.h"
 #include"DirLight.h"
 #include"Geometry.h"
+#include"TextManager.h"
+#include"ResourceManager.h"
+#include"SpriteRenderer.h"
+#include"SoundManager.h"
+#include"Sound.h"
 #include <thread>
 #include <mutex>
 #include <deque>
@@ -39,5 +44,10 @@ private: //zmienne uzywane przez scene (indywidualne)
 	HeightMap World;
 	HeightMapBuffer VBOSceneObject;
 	CDirectionalLight Sun;
+	//TextManager *Text;
+	//SpriteRenderer *Renderer;
 	unsigned int uVAO[1];
+	SoundManager* SoundM;
+	Sound* SoundMgr;
+
 };

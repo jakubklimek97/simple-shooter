@@ -1,6 +1,5 @@
-
+#pragma warning (disable:4996)
 #include "shaders.h"
-
 #include <glm/gtc/type_ptr.hpp>
 
 CShader::CShader()
@@ -87,51 +86,52 @@ bool CShader::LoadShader(string sFile, int a_iType)
 }
 
 
-bool CShader::GetLinesFromFile(string sFile, bool bIncludePart, vector<string>* vResult)
+bool CShader::GetLinesFromFile(string File, bool IncludePart, vector<string>* Result)
 {
-	FILE* fp = fopen(sFile.c_str(), "rt");
-	if (!fp)return false;
 
-	string sDirectory;
+	FILE* fp = fopen(File.c_str(), "rt");
+	if (!fp)return false; // File not loaded
+
+	string Directory;
 	int slashIndex = -1;
-	for (int i = sFile.size(); i >= 0;--i)
+	for (int i = File.size(); i >= 0;--i)
 	{
-		if (sFile[i] == '\\' || sFile[i] == '/')
+		if (File[i] == '\\' || File[i] == '/')
 		{
 			slashIndex = i;
 			break;
 		}
 	}
 
-	sDirectory = sFile.substr(0, slashIndex + 1);
+	Directory = File.substr(0, slashIndex + 1);
 
 	// Get all lines from a file
 
-	char sLine[255];
+	char Line[255];
 
-	bool bInIncludePart = false;
+	bool IncludePartCheck = false;
 
-	while (fgets(sLine, 255, fp))
+	while (fgets(Line, 255, fp))
 	{
-		stringstream ss(sLine);
-		string sFirst;
-		ss >> sFirst;
-		if (sFirst == "#include")
+		stringstream ss(Line);
+		string FirstLine;
+		ss >> FirstLine;
+		if (FirstLine == "#include")
 		{
-			string sFileName;
-			ss >> sFileName;
-			if ((int)(sFileName.size()) > 0 && sFileName[0] == '\"' && sFileName[(int)(sFileName.size())- 1] == '\"')
+			string NameFile;
+			ss >> NameFile;
+			if ((int)(NameFile.size()) > 0 && NameFile[0] == '\"' && NameFile[(int)(NameFile.size())- 1] == '\"')
 			{
-				sFileName = sFileName.substr(1, int(sFileName.size()) - 2);
-				GetLinesFromFile(sDirectory + sFileName, true, vResult);
+				NameFile = NameFile.substr(1, int(NameFile.size()) - 2);
+				GetLinesFromFile(Directory + NameFile, true, Result);
 			}
 		}
-		else if (sFirst == "#include_part")
-			bInIncludePart = true;
-		else if (sFirst == "#definition_part")
-			bInIncludePart = false;
-		else if (!bIncludePart || (bIncludePart && bInIncludePart))
-			vResult->push_back(sLine);
+		else if (FirstLine == "#include_part")
+			IncludePartCheck = true;
+		else if (FirstLine == "#definition_part")
+			IncludePartCheck = false;
+		else if (!IncludePart || (IncludePart && IncludePartCheck))
+			Result->push_back(Line);
 	}
 	fclose(fp);
 

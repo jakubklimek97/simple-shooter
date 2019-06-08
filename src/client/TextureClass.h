@@ -69,6 +69,6 @@ private:
 
 	string sPath;
 };
-#define NUMTEXTURES 4
+#define NUMTEXTURES 2
 extern CTexture tTextures[NUMTEXTURES];
 void LoadAllTextures();

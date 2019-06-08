@@ -28,7 +28,7 @@
 
 
 int initSDL() {
-	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+	if (SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO) < 0) {
 		std::cout << "Nie mozna zainicjowac SDLA: " << SDL_GetError() << std::endl;
 		return -1;
 	}
@@ -44,15 +44,15 @@ void initOpenGL(SDL_Window* &pWindow, SDL_GLContext &context) {
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
 	//utworzenie okna
-	pWindow = SDL_CreateWindow("Simple Shooter", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1920, 1080, SDL_WINDOW_OPENGL);
-
+	pWindow = SDL_CreateWindow("Simple Shooter", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, SDL_WINDOW_OPENGL);
+	
 	//"zawartosc" okna
 	context = SDL_GL_CreateContext(pWindow);
 
 	//inicjalizacja glewa
 	glewExperimental = GL_TRUE;
 	glewInit();
-	glViewport(0, 0, 1920, 1080);
+	glViewport(0, 0, 1280, 720);
 	glEnable(GL_DEPTH_TEST);
 }
 
@@ -71,7 +71,9 @@ int main(int argc, char *argv[])
 
 	SceneMulti* multiplayerScene = (SceneMulti*)SceneManager::GetInstance().getScene(SceneManager::Scenes::SCENE_MULTI);	
 
-	SceneManager::GetInstance().SelectScene(SceneManager::Scenes::SCENE_MULTI);
+	SceneMulti* menuScene = (SceneMulti*)SceneManager::GetInstance().getScene(SceneManager::Scenes::SCENE_MENU);
+
+	SceneManager::GetInstance().SelectScene(SceneManager::Scenes::SCENE_MENU);
 	SDL_Event e;
 	while (SceneManager::GetInstance().currentScene != SceneManager::SCENE_QUIT)
 	{
