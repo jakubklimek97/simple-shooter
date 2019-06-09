@@ -44,6 +44,9 @@ void Mesh::Draw(Shader shader)
 
 Mesh::~Mesh()
 {
+	vertices.clear();
+	indices.clear();
+	textures.clear();
 }
 
 void Mesh::setupMesh()

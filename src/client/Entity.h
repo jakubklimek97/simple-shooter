@@ -6,18 +6,27 @@
 #include <glm/glm.hpp>
 
 class LightObject;
+class BoundingBox;
 class Entity
 {
 public:
 	Entity(Model& model, glm::vec3 position, float rotation, glm::vec3 scale);
+	~Entity() = default;
 	void rotateX(float radians);
 	void rotateY(float radians);
 	void rotateZ(float radians);
+	void setRotationX(float radians);
+	void setRotationY(float radians);
+	void setRotationZ(float radians);
 	void setShader(Shader& shader);
 	void setShader(Shader* shader);
 	virtual void Draw(glm::mat4 &projectionMatrix, glm::mat4& viewMatrix);
 	virtual void Draw(glm::mat4 &projectionMatrix, glm::mat4& viewMatrix,const LightObject& lightObject, const Camera& camera);
 	Shader* GetShader();
+	glm::vec3 getPosition();
+	void setPosition(const glm::vec3& pos);
+
+	friend class BoundingBox;
 protected:
 	Model& model;
 	void prepareModelMatrix();

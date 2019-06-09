@@ -22,6 +22,21 @@ void Entity::rotateZ(float radians)
 	rotationAngle.z += radians;
 }
 
+void Entity::setRotationX(float radians)
+{
+	rotationAngle.x = radians;
+}
+
+void Entity::setRotationY(float radians)
+{
+	rotationAngle.y = radians;
+}
+
+void Entity::setRotationZ(float radians)
+{
+	rotationAngle.z = radians;
+}
+
 void Entity::setShader(Shader & shader)
 {
 	setShader(&shader);
@@ -58,6 +73,16 @@ void Entity::Draw(glm::mat4 & projectionMatrix, glm::mat4 & viewMatrix, const Li
 Shader * Entity::GetShader()
 {
 	return shader;
+}
+
+glm::vec3 Entity::getPosition()
+{
+	return position;
+}
+
+void Entity::setPosition(const glm::vec3& pos)
+{
+	position = pos;
 }
 
 void Entity::prepareModelMatrix()

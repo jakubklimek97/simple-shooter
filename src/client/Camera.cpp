@@ -30,10 +30,10 @@ void Camera::moveCamera(Movement move, float deltaTime)
 {
 	if (move.none()) return;
 	if (move[Camera::MovementBits::MOVE_FORWARD]) {
-		cameraPos += deltaTime * moveSpeed * cameraFront;
+		cameraPos += deltaTime * moveSpeed * movementFront;
 	}
 	if (move[Camera::MovementBits::MOVE_BACKWARD]) {
-		cameraPos -= deltaTime * moveSpeed * cameraFront;
+		cameraPos -= deltaTime * moveSpeed * movementFront;
 	}
 	if (move[Camera::MovementBits::STRAFE_LEFT]) {
 		cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * deltaTime * moveSpeed;
@@ -55,7 +55,9 @@ void Camera::updateCameraVectors()
 	front.y = sin(glm::radians(pitch));
 	front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
 	cameraFront = glm::normalize(front);
-
+	movementFront.x = cameraFront.x;
+	movementFront.y = 0.0f;
+	movementFront.z = cameraFront.z;
 	//nie wiem dlaczego obraca kamera. Trzeba przemyslec
 	//cameraRight = glm::normalize(glm::cross(cameraFront, cameraUp)); 
 	//cameraUp = glm::normalize(glm::cross(cameraRight, cameraFront));

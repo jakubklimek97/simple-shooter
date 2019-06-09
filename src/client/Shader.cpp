@@ -48,6 +48,11 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath)
 
 }
 
+Shader & Shader::Use()
+{
+	glUseProgram(this->ID);
+	return *this;
+}
 void Shader::use()
 {
 	glUseProgram(ID);
@@ -100,4 +105,47 @@ void Shader::setMat3(const std::string & name, const glm::mat3 & mat) const
 void Shader::setMat4(const std::string & name,const glm::mat4 &mat) const
 {
 	glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, &mat[0][0]);
+}
+void Shader::SetInteger(const char *name, int value, bool useShader)
+{
+	if (useShader)
+		this->Use();
+	glUniform1i(glGetUniformLocation(this->ID, name), value);
+}
+
+void Shader::SetMatrix4(const char *name, const glm::mat4 &matrix, bool useShader)
+{
+	if (useShader)
+		this->Use();
+	glUniformMatrix4fv(glGetUniformLocation(this->ID, name), 1, GL_FALSE, glm::value_ptr(matrix));
+}
+
+void Shader::SetVector3f(const char *name, const glm::vec3 &value, bool useShader)
+{
+	if (useShader)
+		this->Use();
+	glUniform3f(glGetUniformLocation(this->ID, name), value.x, value.y, value.z);
+}
+void Shader::Compile(const char * vertexSource, const char * fragmentSource)
+{
+	GLuint sVertex, sFragment;
+	// Vertex Shader
+	sVertex = glCreateShader(GL_VERTEX_SHADER);
+	glShaderSource(sVertex, 1, &vertexSource, NULL);
+	glCompileShader(sVertex);
+	checkCompileErrors(sVertex, "VERTEX");
+	// Fragment Shader
+	sFragment = glCreateShader(GL_FRAGMENT_SHADER);
+	glShaderSource(sFragment, 1, &fragmentSource, NULL);
+	glCompileShader(sFragment);
+	checkCompileErrors(sFragment, "FRAGMENT");
+	// Shader Program
+	this->ID = glCreateProgram();
+	glAttachShader(this->ID, sVertex);
+	glAttachShader(this->ID, sFragment);
+	glLinkProgram(this->ID);
+	checkCompileErrors(this->ID, "PROGRAM");
+	// Delete the shaders as they're linked into our program now and no longer necessery
+	glDeleteShader(sVertex);
+	glDeleteShader(sFragment);
 }
