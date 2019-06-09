@@ -78,7 +78,6 @@ int main(int argc, char *argv[])
 	int czySerwer; //1- serwer, 0 - klient
 	std::cin >> czySerwer;
 	if (initSDL() < 0) return -1;
-	int serwer = parseParams(argc, argv);
 	SDL_Window* window;
 	SDL_GLContext context;
 	initOpenGL(window, context);
@@ -88,21 +87,8 @@ int main(int argc, char *argv[])
 	Loader::loadShaders();
 	Loader::loadTextures2D();
 
-	/*Entity* testBoundingBox = testowa.addObject(new Entity(kostka, glm::vec3(4.0f, 0.0f, 0.0f), 0.0f, glm::vec3(0.5f, 0.5f, 0.5f)));
-	testBoundingBox->setShader(lightShader);
-	testBoundingBox->rotateY(45.0f);
-
-	BoundingBox box(*testBoundingBox);
-	testowa.removeObject(testCube);
-	testowa.removeObject(testBoundingBox);*/
-	/*testCube->rotateZ(glm::radians(1.0f));
-		testCube->rotateY(glm::radians(1.0f));
-		testBoundingBox->rotateY(glm::radians(2.0f));*/
-		/* na razie cofnijmy sie do terenu
-		box.calculateBoundingBox();
-		box.Draw(testowa.GetProjectionMatrix(), testowa.GetViewMatrix(), boundingBoxShader);
-		*/
 	//SceneMultiplayerGame* multiplayerScene = new SceneMultiplayerGame(glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.01f, 100.0f), new Camera(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.1f, 8.0f));
+	/* aktualnie uzywane sceny  */
 	SceneMultiplayerGame* multiplayerScene = (SceneMultiplayerGame*)SceneManager::GetInstance().getScene(SceneManager::Scenes::SCENE_MULTIPLAYER);
 	SceneGame* gameScene = new SceneGame(glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.01f, 100.0f), new Camera(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.1f, 8.0f));
 	if (czySerwer) {
@@ -119,6 +105,7 @@ int main(int argc, char *argv[])
 	//Scene *ptr = multiplayerScene;
 	//ptr->InitScene();
 	
+	//SceneManager::GetInstance().SelectScene(SceneManager::Scenes::SCENE_SANDBOX);
 	SceneManager::GetInstance().SelectScene(SceneManager::Scenes::SCENE_MULTIPLAYER);
 	SDL_Event e;
 	//while (SceneManager::GetInstance().getScene()->run)

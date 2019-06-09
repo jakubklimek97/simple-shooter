@@ -9,6 +9,7 @@ public:
 		QUIT,
 		REQ_DATA_SIZE_CHANGE,
 		HIT,
+		NO_HEALTH,
 		SHOOT
 	};
 	static bool startServer(Uint16 port);

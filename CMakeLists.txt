@@ -29,9 +29,9 @@ PUBLIC "${CMAKE_CURRENT_BINARY_DIR}/glm"
 PUBLIC "${LIB_ASSIMP_INCLUDE_DIR}"
 )
 target_link_directories(simple-shooter 
-PUBLIC "${LIB_SDL2_DIR}/lib/x64"
-PUBLIC "${LIB_SDL2_image_DIR}/lib/x64"
-PUBLIC "${LIB_glew_DIR}/lib/Release/x64"
+PUBLIC "${LIB_SDL2_DIR}/lib/x86"
+PUBLIC "${LIB_SDL2_image_DIR}/lib/x86"
+PUBLIC "${LIB_glew_DIR}/lib/Release/Win32"
 PUBLIC "${LIB_ASSIMP_BINARY_DIR}"
 )
 
@@ -45,14 +45,14 @@ opengl32.lib
 )
 
 file(COPY 
-${LIB_SDL2_DIR}/lib/x64/SDL2.dll
-${LIB_SDL2_image_DIR}/lib/x64/libjpeg-9.dll 
-${LIB_SDL2_image_DIR}/lib/x64/libpng16-16.dll
-${LIB_SDL2_image_DIR}/lib/x64/libtiff-5.dll
-${LIB_SDL2_image_DIR}/lib/x64/libwebp-7.dll
-${LIB_SDL2_image_DIR}/lib/x64/SDL2_image.dll
-${LIB_SDL2_image_DIR}/lib/x64/zlib1.dll
-${LIB_glew_DIR}/bin/Release/x64/glew32.dll	
+${LIB_SDL2_DIR}/lib/x86/SDL2.dll
+${LIB_SDL2_image_DIR}/lib/x86/libjpeg-9.dll 
+${LIB_SDL2_image_DIR}/lib/x86/libpng16-16.dll
+${LIB_SDL2_image_DIR}/lib/x86/libtiff-5.dll
+${LIB_SDL2_image_DIR}/lib/x86/libwebp-7.dll
+${LIB_SDL2_image_DIR}/lib/x86/SDL2_image.dll
+${LIB_SDL2_image_DIR}/lib/x86/zlib1.dll
+${LIB_glew_DIR}/bin/Release/Win32/glew32.dll	
 DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 if(NOT ${CONFIGURE_WITH_ASSIMP})

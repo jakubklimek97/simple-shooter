@@ -41,6 +41,15 @@ void SceneManager::SelectScene(Scenes newScene)
 		newScenePtr = nullptr;
 		break;
 	}
+	case SCENE_SANDBOX: {
+		if (!sceneGamePtr)
+			//utworzenie sceny, jezeli jeszcze nie istnieje
+			sceneGamePtr = new SceneGame(glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.01f, 100.0f), 
+				new Camera(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.1f, 8.0f)
+			);
+			newScenePtr = sceneGamePtr;
+			break;
+	}
 	}
 	if (currScenePtr)
 		currScenePtr->UnInitScene();

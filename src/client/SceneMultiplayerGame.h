@@ -4,6 +4,7 @@
 #include <mutex>
 #include <deque>
 #include "Bullet.h"
+#include "Image2D.h"
 class SceneMultiplayerGame :
 	public Scene
 {
@@ -39,6 +40,10 @@ private:
 	std::deque<Bullet*> bulletContainer;
 	void deleteBullet();
 	bool sendBullet = false;
+	bool hit;
+	int health;
 	Bullet* tmpBulletPtr;
+	bool scoreBoard;
+	Image2D* imgPtr;
 };
 

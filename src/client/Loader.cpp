@@ -13,9 +13,7 @@ std::string Loader::vertexShaderPath[SHADERS_COUNT] = {
 	"boundingBox.vs",
 	"simpleColorShader.vs",
 	"bullet.vs",
-	"skybox.vs",
-	"texture.vs",
-	"texture.vs"
+	"image.vs"
 };
 std::string Loader::fragmentShaderPath[SHADERS_COUNT] = {
 	"fragment.fs",
@@ -23,14 +21,14 @@ std::string Loader::fragmentShaderPath[SHADERS_COUNT] = {
 	"boundingBox.fs",
 	"simpleColorShader.fs",
 	"bullet.fs",
-	"skybox.fs",
-	"texture.fs",
-	"texture.fs"
+	"image.fs"
 };
 std::string Loader::textures2DName[TEXTURES2D_COUNT] = {
-	"buttonSingle.png"
+	"jaWon.png",
+	"graczWon.png"
 };
 std::string Loader::textures2DPath[TEXTURES2D_COUNT] = {
+	"res/textures",
 	"res/textures"
 };
 
@@ -92,4 +90,9 @@ Model & Loader::getModel(LoadedModels modelId)
 Shader & Loader::getShader(LoadedShaders shaderId)
 {
 	return Loader::shaders[shaderId];
+}
+
+unsigned int Loader::getTexture2D(LoadedTextures2D textureId)
+{
+	return Loader::textures2D[textureId];
 }

@@ -24,17 +24,17 @@ public:
 		BOUNDING_BOX,
 		SIMPLE,
 		BULLET,
-		SKYBOX,
-		SHADER2D,
-		SHADER2D2,
+		IMAGE,
 		SHADERS_COUNT
 	};
 	enum LoadedTextures2D {
-		BUTTON_SINGLE,
+		JA_WON,
+		PRZECIWNIK_WON,
 		TEXTURES2D_COUNT
 	};
 	static Model& getModel(enum LoadedModels modelId);
 	static Shader& getShader(enum LoadedShaders shaderId);
+	static unsigned int getTexture2D(enum LoadedTextures2D textureId);
 private:
 	Loader() = default;
 	~Loader() = default;

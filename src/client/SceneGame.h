@@ -4,6 +4,7 @@
 #include <thread>
 #include <mutex>
 #include <deque>
+#include "Image2D.h"
 class SceneGame :
 	public Scene
 {
@@ -26,5 +27,6 @@ private: //zmienne uzywane przez scene (indywidualne)
 	std::mutex bulletLock;
 	std::deque<Bullet*> bulletContainer;
 	void deleteBullet();
+	Image2D* imgPtr;
 };
 
