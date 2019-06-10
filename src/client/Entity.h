@@ -6,7 +6,6 @@
 #include <glm/glm.hpp>
 
 class LightObject;
-class BoundingBox;
 class Entity
 {
 public:
@@ -25,8 +24,6 @@ public:
 	Shader* GetShader();
 	glm::vec3 getPosition();
 	void setPosition(const glm::vec3& pos);
-
-	friend class BoundingBox;
 protected:
 	Model& model;
 	void prepareModelMatrix();

@@ -58,7 +58,4 @@ void Camera::updateCameraVectors()
 	movementFront.x = cameraFront.x;
 	movementFront.y = 0.0f;
 	movementFront.z = cameraFront.z;
-	//nie wiem dlaczego obraca kamera. Trzeba przemyslec
-	//cameraRight = glm::normalize(glm::cross(cameraFront, cameraUp)); 
-	//cameraUp = glm::normalize(glm::cross(cameraRight, cameraFront));
 }

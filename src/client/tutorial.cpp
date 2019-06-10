@@ -19,7 +19,6 @@
 #include "Entity.h"
 #include "Scene.h"
 #include "LightObject.h"
-#include "BoundingBox.h"
 #include "Terrain.h"
 #include "Networking.h"
 #include "utils.h"
@@ -27,18 +26,6 @@
 #include "SceneGame.h"
 #include "SceneMultiplayerGame.h"
 #include "SceneManager.h"
-
-
-bool serverRun = false;
-void serverThread() {
-	Networking::startServer(60100);
-	bool connection;
-	do {
-		SDL_Delay(1000);
-		connection = Networking::acceptConnection();
-		std::cout << "Dalej nic..." << std::endl;
-	} while (!connection && serverRun);
-}
 
 int initSDL() {
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
@@ -79,16 +66,10 @@ int main(int argc, char *argv[])
 	SDL_Window* window;
 	SDL_GLContext context;
 	initOpenGL(window, context);
-	//wyswietlane jako siatka glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	Loader::loadModels();
 	Loader::loadShaders();
 	Loader::loadTextures2D();
-
-	//SceneMultiplayerGame* multiplayerScene = new SceneMultiplayerGame(glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.01f, 100.0f), new Camera(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.1f, 8.0f));
-	/* aktualnie uzywane sceny  */
-	//SceneMultiplayerGame* multiplayerScene = (SceneMultiplayerGame*)SceneManager::GetInstance().getScene(SceneManager::Scenes::SCENE_MULTIPLAYER);
-	//SceneGame* gameScene = new SceneGame(glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.01f, 100.0f), new Camera(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.1f, 8.0f));
 
 	SceneManager::GetInstance().SelectScene(SceneManager::Scenes::SCENE_MENU);
 	SDL_Event e;

@@ -19,8 +19,6 @@ SceneMultiplayerGame::~SceneMultiplayerGame()
 
 void SceneMultiplayerGame::InitScene()
 {
-
-
 	run = true;
 	scoreBoard = false;
 	imgPtr = new Image2D(-0.5f, 0.5f, -0.5f, 0.5f);
@@ -48,9 +46,11 @@ void SceneMultiplayerGame::InitScene()
 	Bullet::setShader(&Loader::getShader(Loader::LoadedShaders::SIMPLE));
 	if (isServer) {
 		connectionThread = new std::thread([=] {serverConnectionHandlerThread(); });
+		getCamera()->cameraPos = glm::vec3(25.0f, 0.85f, 5.0f);
 	}
 	else {
 		connectionThread = new std::thread([=] {connectionHandlerThread(); });
+		getCamera()->cameraPos = glm::vec3(25.0f, 0.85f, 45.0f);
 	}
 	
 
@@ -74,7 +74,6 @@ void SceneMultiplayerGame::UnInitScene()
 	SoundManager::Release();
 	SoundM = nullptr;
 	SH.clear();
-	//zakladam, ze pociski zostana usuniete
 }
 
 void SceneMultiplayerGame::handleEvents(SDL_Event & e)
@@ -268,7 +267,7 @@ void SceneMultiplayerGame::handleEvents(SDL_Event & e)
 					tmpThreadObject = new std::thread([=] {deleteBullet(); });
 					tmpThreadObject->detach();
 					sendBullet = true;
-					SoundM->PlaySFX("laser.wav", 0);
+					SoundM->PlaySFX("laser.wav");
 				}
 			}
 			default: break;
@@ -395,7 +394,6 @@ void SceneMultiplayerGame::serverConnectionHandlerThread() {
 			posTemp[1] = bulletTmp[4];
 			posTemp[2] = bulletTmp[5];
 			connection = Networking::sendData(posTemp);
-			if (hit) std::cout << "Trafilem" << std::endl;
 		}
 		bulletLock.unlock();
 		if (health <= 0) {
@@ -410,8 +408,11 @@ void SceneMultiplayerGame::serverConnectionHandlerThread() {
 		connection = Networking::recvControlMsg(&ctrl);
 		if (connection && (ctrl == Networking::MessageType::SHOOT || ctrl == Networking::MessageType::HIT)) {
 			if (ctrl == Networking::MessageType::HIT){
-					SoundM->PlaySFX(/*"Scream.mp3"*/ "laser.wav", 0);
+					SoundM->PlaySFX("ScreamA.wav");
 					health--;
+			}
+			else {
+				SoundM->PlaySFX("laser.wav");
 			}
 			connection = Networking::recvData(posTemp);
 			bulletTmp[0] = posTemp[0];
@@ -503,8 +504,11 @@ void SceneMultiplayerGame::connectionHandlerThread() {
 		if (connection && (ctrl == Networking::MessageType::SHOOT || ctrl == Networking::MessageType::HIT)) {
 			if (ctrl == Networking::MessageType::HIT)
 			{
-				SoundM->PlaySFX("Scream.mp3", 0);
+				SoundM->PlaySFX("ScreamA.wav");
 				health--;
+			}
+			else {
+				SoundM->PlaySFX("laser.wav");
 			}
 				
 			connection = Networking::recvData(posTemp);

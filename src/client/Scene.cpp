@@ -79,6 +79,11 @@ void Scene::movePlayer(Camera::Movement move, float deltaTime)
 	if (move.none() && notFalling && notJumping) return;
 	glm::vec3 oldPos = camera->cameraPos;
 	camera->moveCamera(move, deltaTime);
+	if (camera->cameraPos.x <= 0.0f || camera->cameraPos.z <= 0.0f
+		|| camera->cameraPos.x >= 50.0f || camera->cameraPos.z >= 50.0f) {
+		camera->cameraPos = oldPos;
+		return;
+	}
 	float newHeight = (int)(terrain->getHeight(camera->cameraPos) * 100) / 100.0f + 0.85f;
 	if (notJumping) {
 		camera->cameraPos.y = newHeight;
