@@ -24,7 +24,6 @@ public:
 	std::vector<Mesh> meshes;
 	std::string directory;
 	bool gammaCorrection;
-
 	Model(std::string const &path, bool gamma = false);
 	~Model();
 	void Draw(Shader shader);

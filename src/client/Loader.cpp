@@ -70,6 +70,14 @@ bool Loader::unloadShaders()
 
 bool Loader::unloadModels()
 {
+	for (Model& model: models) {
+		for_each(model.meshes.begin(), model.meshes.end(), [](Mesh& mesh) {
+			mesh.clearBuffers();
+		});
+		for_each(model.textures_loaded.begin(), model.textures_loaded.end(), [](Texture& tex) {
+			glDeleteTextures(1, &tex.id);
+		});
+	}
 	models.clear();
 	return true;
 }

@@ -49,6 +49,13 @@ Mesh::~Mesh()
 	textures.clear();
 }
 
+void Mesh::clearBuffers()
+{
+	glDeleteBuffers(1, &EBO);
+	glDeleteBuffers(1, &VBO);
+	glDeleteVertexArrays(1, &VAO);
+}
+
 void Mesh::setupMesh()
 {
 	glGenVertexArrays(1, &VAO);
