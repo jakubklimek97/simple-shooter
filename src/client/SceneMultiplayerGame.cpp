@@ -39,9 +39,9 @@ void SceneMultiplayerGame::InitScene()
 	SoundM->VolumeMusic(15);
 	SH.push_back(Loader::getShader(Loader::LoadedShaders::SHADER2D));
 	SH.push_back(Loader::getShader(Loader::LoadedShaders::SHADER2D2));
-	life1 = HUD(SH, "heart.png", "sand.jpg", 0.01f, 1);
-	life2 = HUD(SH, "heart.png", "sand.jpg", 0.01f, 1);
-	life3 = HUD(SH, "heart.png", "sand.jpg", 0.01f, 1);
+	life1 = new HUD(SH, "heart.png", "sand.jpg", 0.01f, 1);
+	life2 = new HUD(SH, "heart.png", "sand.jpg", 0.01f, 1);
+	life3 = new HUD(SH, "heart.png", "sand.jpg", 0.01f, 1);
 	Bullet::setShader(&Loader::getShader(Loader::LoadedShaders::SIMPLE));
 	if (isServer) {
 		connectionThread = new std::thread([=] {serverConnectionHandlerThread(); });
@@ -55,6 +55,9 @@ void SceneMultiplayerGame::InitScene()
 
 void SceneMultiplayerGame::UnInitScene()
 {
+	delete life1;
+	delete life2;
+	delete life3;
 	SoundM->HaltSFX(0);
 	SoundM->HaltMusic();
 	connectionThread->join();
@@ -323,11 +326,11 @@ void SceneMultiplayerGame::render()
 	glClear(GL_DEPTH_BUFFER_BIT);
 	Loader::getModel(Loader::LoadedModels::GUN).Draw(lightShader);
 	if (health >= 1) {
-		life1.RenderHUD(SH);
+		life1->RenderHUD(SH);
 		if (health >= 2) {
-			life2.RenderHUD(SH);
-			if(health = 3)
-				life3.RenderHUD(SH);
+			life2->RenderHUD(SH);
+			if(health == 3)
+				life3->RenderHUD(SH);
 		}
 	}
 	if (scoreBoard) {
@@ -374,6 +377,7 @@ void SceneMultiplayerGame::serverConnectionHandlerThread() {
 			posTemp[1] = bulletTmp[4];
 			posTemp[2] = bulletTmp[5];
 			connection = Networking::sendData(posTemp);
+			if (hit) std::cout << "Trafilem" << std::endl;
 		}
 		bulletLock.unlock();
 		if (health <= 0) {
@@ -388,7 +392,7 @@ void SceneMultiplayerGame::serverConnectionHandlerThread() {
 		connection = Networking::recvControlMsg(&ctrl);
 		if (connection && (ctrl == Networking::MessageType::SHOOT || ctrl == Networking::MessageType::HIT)) {
 			if (ctrl == Networking::MessageType::HIT){
-					SoundM->PlaySFX("Scream.mp3", 0);
+					SoundM->PlaySFX(/*"Scream.mp3"*/ "laser.wav", 0);
 					health--;
 			}
 			connection = Networking::recvData(posTemp);

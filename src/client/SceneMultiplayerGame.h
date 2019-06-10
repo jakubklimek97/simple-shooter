@@ -50,7 +50,7 @@ private:
 	Image2D* imgPtr;
 	SoundManager* SoundM;
 	Sound* SoundMgr;
-	HUD life1, life2, life3;
+	HUD *life1, *life2, *life3;
 	std::vector<reference_wrapper<const Shader>>SH;
 };
 
