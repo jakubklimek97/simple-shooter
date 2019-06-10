@@ -27,8 +27,6 @@ void SceneLoad::InitScene()
 	lastFrame = SDL_GetTicks() / 1000.0f;
 
 	SetLight(new LightObject(Loader::getModel(Loader::LoadedModels::CUBE), glm::vec3(0.0f, 10.0f, 0.0f), 0.0f, glm::vec3(0.2f), &Loader::getShader(Loader::LoadedShaders::SIMPLE), glm::vec3(1.0f, 1.0f, 1.0f)));
-	player2 = addObject(new Entity(Loader::getModel(Loader::LoadedModels::PLAYER), glm::vec3(20.0f, 0.0f, 7.0f), 0.0f, glm::vec3(1.0f)));
-	player2->setShader(Loader::getShader(Loader::LoadedShaders::LIGHT));
 	SDL_SetRelativeMouseMode(SDL_TRUE);
 
 	IP.reserve(255);
@@ -73,8 +71,8 @@ void SceneLoad::UnInitScene()
 	SoundM->HaltMusic();
 	SoundM->HaltSFX(1);
 	SoundM->HaltSFX(2);
-	delete player2;
 	delete Text;
+	delete Text2;
 	delete Renderer;
 	Sound::Release();
 	SoundMgr = NULL;

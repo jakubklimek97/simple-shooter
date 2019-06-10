@@ -167,6 +167,7 @@ void HUD::SetData()
 
 HUD::~HUD()
 {
+	lifenumber--;
 }
 
 void HUD::InitBuffer()
