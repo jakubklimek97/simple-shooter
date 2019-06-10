@@ -170,6 +170,14 @@ void SceneMenu::handleEvents(SDL_Event & e)
 				
 				
 			}
+			case SDLK_BACKSPACE:
+			{
+				SoundM->PlaySFX("Button.wav", 0, 1);
+				currentSelection = 0;
+				EnterPressed = false;
+				break;
+
+			}
 			default: break;
 			}
 			break;
@@ -242,20 +250,20 @@ void SceneMenu::render()
 	glEnable(GL_BLEND);
 
 	if (currentSelection == 0 && EnterPressed == false) {
-		Text->RenderText("NEW GAME", 540.0f, 153.0f, 1.0, glm::vec3(1, 0, 1));
+		Text->RenderText("NEW GAME", 545.0f, 153.0f, 1.0, glm::vec3(1, 0, 1));
 
 	}
 	else if (currentSelection == 1 && EnterPressed == false) {
-		Text->RenderText("EXIT", 600.0f, 350.0f, 1.0f, glm::vec3(1, 0, 1));
+		Text->RenderText("EXIT", 602.0f, 350.0f, 1.0f, glm::vec3(1, 0, 1));
 	
 	}
 	else if (currentSelection == 2 && EnterPressed == true) {
 
-		Text->RenderText("CLIENT", 600.0f, 125.0f, 1.0, glm::vec3(1, 0, 1));
+		Text->RenderText("CLIENT", 580.0f, 148.0f, 1.0, glm::vec3(1, 0, 1));
 	
 	}
 	else {
-	Text->RenderText("SERVER", 590.0f, 290.0f, 1.0f, glm::vec3(1, 0, 1));
+	Text->RenderText("SERVER", 565.0f, 342.0f, 1.0f, glm::vec3(1, 0, 1));
 
 	}
 	
@@ -280,7 +288,7 @@ void SceneMenu::render()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_BLEND);
 
-	Text2->RenderText("SIMPLE SHOOTER", 465.0f, 40.0f, 1.0, glm::vec3(1, 0, 1));
+	Text2->RenderText("SIMPLE SHOOTER", 435.0f, 40.0f, 1.0, glm::vec3(1, 0, 1));
 
 	glDisable(GL_BLEND);
 

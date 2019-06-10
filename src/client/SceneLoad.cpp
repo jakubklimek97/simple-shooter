@@ -45,11 +45,11 @@ void SceneLoad::InitScene()
 	Renderer = new SpriteRenderer(ResourceManager::GetShader("sprite"));
 
 	Text = new TextManager(1280, 720);
-	Text->Load("abel.ttf", 32);
+	Text->Load("abel.ttf", 40);
 
 
 	Text2 = new TextManager(1280, 720);
-	Text2->Load("virgo.ttf", 44);
+	Text2->Load("virgo.ttf", 50);
 
 
 	SoundMgr = Sound::Instance();
@@ -289,13 +289,13 @@ void SceneLoad::render()
 	if (IsClient) {
 		
 
-		Text->RenderText("IP Address:", 60.0f, 125.0f, 1.0, glm::vec3(1, 1, 1));
+		Text->RenderText("IP Address:", 60.0f, 125.0f, 1.0, glm::vec3(1, 0, 1));
 		
-		Text->RenderText(str, 200.0f, 125.0f, 1.0, glm::vec3(1, 1, 1));
+		Text->RenderText(str, 240.0f, 125.0f, 1.0, glm::vec3(1, 1, 1));
 		
 	}
 	else if (!IsClient) {
-		Text->RenderText("Waiting for client...", 600.0f, 125.0f, 1.0, glm::vec3(1, 0, 1));
+		Text->RenderText("Waiting for client...", 520.0f, 125.0f, 1.0, glm::vec3(1, 0, 1));
 		/*Text->RenderText("Is Client:", 500.0f, 125.0f, 1.0, glm::vec3(1, 0, 1));
 		if(SelectedMode) // wybrany tryb
 		Text->RenderText("Yes", 680.0f, 125.0f, 1.0, glm::vec3(1, 0, 1));
@@ -310,7 +310,7 @@ void SceneLoad::render()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_BLEND);
 
-	Text2->RenderText("SIMPLE SHOOTER", 465.0f, 40.0f, 1.0, glm::vec3(1, 0, 1));
+	Text2->RenderText("SIMPLE SHOOTER", 435.0f, 40.0f, 1.0, glm::vec3(1, 0, 1));
 
 	glDisable(GL_BLEND);
 

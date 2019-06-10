@@ -143,6 +143,7 @@ void SceneMultiplayerGame::handleEvents(SDL_Event & e)
 				}
 				case SDLK_SPACE: {
 					playerJumpStart();
+					SoundM->PlaySFX("Jump.ogg");
 					break;
 				}
 				default: break;
@@ -299,7 +300,7 @@ void SceneMultiplayerGame::render()
 	
 
 	DrawObjects();
-
+	//rysowanie skyboxa
 	MainSkybox.SetDeltatime(currentFrame);
 	MainSkybox.RenderSkybox(Loader::getShader(Loader::LoadedShaders::SKYBOX), this->GetViewMatrix(), this->GetProjectionMatrix());
 
