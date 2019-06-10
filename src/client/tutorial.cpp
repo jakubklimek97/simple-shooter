@@ -21,7 +21,6 @@
 #include "LightObject.h"
 #include "Terrain.h"
 #include "Networking.h"
-#include "utils.h"
 #include "Loader.h"
 #include "SceneGame.h"
 #include "SceneMultiplayerGame.h"
