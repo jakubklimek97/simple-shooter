@@ -19,6 +19,8 @@ SceneMultiplayerGame::~SceneMultiplayerGame()
 
 void SceneMultiplayerGame::InitScene()
 {
+
+
 	run = true;
 	scoreBoard = false;
 	imgPtr = new Image2D(-0.5f, 0.5f, -0.5f, 0.5f);
@@ -37,6 +39,7 @@ void SceneMultiplayerGame::InitScene()
 	SoundM = SoundManager::Instance();
 	SoundM->PlayMusic("DeathMatch_Boss_Theme.ogg", -1);
 	SoundM->VolumeMusic(15);
+	MainSkybox = CSkybox(Loader::getShader(Loader::LoadedShaders::SKYBOX), "res/img/right.jpg", "res/img/left.jpg", "res/img/top.jpg", "res/img/bottom.jpg", "res/img/front.jpg", "res/img/back.jpg");
 	SH.push_back(Loader::getShader(Loader::LoadedShaders::SHADER2D));
 	SH.push_back(Loader::getShader(Loader::LoadedShaders::SHADER2D2));
 	life1 = new HUD(SH, "heart.png", "sand.jpg", 0.01f, 1);
@@ -292,7 +295,15 @@ void SceneMultiplayerGame::render()
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	
+
 	DrawObjects();
+
+	MainSkybox.SetDeltatime(currentFrame);
+	MainSkybox.RenderSkybox(Loader::getShader(Loader::LoadedShaders::SKYBOX), this->GetViewMatrix(), this->GetProjectionMatrix());
+
+
 	//rysowanie pociskow
 	bulletLock.lock();
 	for (Bullet* bullet : bulletContainer) {
@@ -327,6 +338,8 @@ void SceneMultiplayerGame::render()
 	Loader::getModel(Loader::LoadedModels::GUN).Draw(lightShader);
 	if (health >= 1) {
 		life1->RenderHUD(SH);
+		life1->Incrementvalue();
+		life1->RotationIntensity();
 		if (health >= 2) {
 			life2->RenderHUD(SH);
 			if(health == 3)
@@ -338,6 +351,10 @@ void SceneMultiplayerGame::render()
 		glClear(GL_DEPTH_BUFFER_BIT);
 		imgPtr->Draw(Loader::getShader(Loader::LoadedShaders::IMAGE));
 	}
+
+
+
+
 }
 
 void SceneMultiplayerGame::setServer(bool value)

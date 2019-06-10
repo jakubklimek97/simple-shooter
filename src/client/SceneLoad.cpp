@@ -54,7 +54,6 @@ void SceneLoad::InitScene()
 
 	SoundMgr = Sound::Instance();
 	SoundM = SoundManager::Instance();
-
 	SoundM->PlayMusic("SkyFire_Title_Screen.ogg", -1);
 	SoundM->VolumeMusic(15);
 	this->connected = false;

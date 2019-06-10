@@ -8,6 +8,7 @@
 #include "Sound.h"
 #include "SoundManager.h"
 #include "HUD.h"
+#include"Skybox.h"
 class SceneMultiplayerGame :
 	public Scene
 {
@@ -52,5 +53,7 @@ private:
 	Sound* SoundMgr;
 	HUD *life1, *life2, *life3;
 	std::vector<reference_wrapper<const Shader>>SH;
+	CSkybox MainSkybox;
+
 };
 

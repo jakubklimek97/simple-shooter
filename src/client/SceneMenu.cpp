@@ -42,14 +42,16 @@ void SceneMenu::InitScene()
 	Renderer = new SpriteRenderer(ResourceManager::GetShader("sprite"));
 
 	Text = new TextManager(1280, 720);
-	Text->Load("abel.ttf", 32);
+	Text->Load("abel.ttf", 44);
 
 	Text2 = new TextManager(1280, 720);
-	Text2->Load("virgo.ttf", 44);
+	Text2->Load("virgo.ttf", 50);
 
 
 	SoundMgr = Sound::Instance();
 	SoundM = SoundManager::Instance();
+
+
 
 	SoundM->PlayMusic("SkyFire_Title_Screen.ogg", -1);
 	SoundM->VolumeMusic(15);
@@ -68,7 +70,6 @@ void SceneMenu::UnInitScene()
     SoundMgr = NULL;
 	SoundManager::Release();
 	SoundM = NULL;
-	
 }
 
 void SceneMenu::handleEvents(SDL_Event & e)
@@ -241,11 +242,11 @@ void SceneMenu::render()
 	glEnable(GL_BLEND);
 
 	if (currentSelection == 0 && EnterPressed == false) {
-		Text->RenderText("NEW GAME", 575.0f, 125.0f, 1.0, glm::vec3(1, 0, 1));
+		Text->RenderText("NEW GAME", 540.0f, 153.0f, 1.0, glm::vec3(1, 0, 1));
 
 	}
 	else if (currentSelection == 1 && EnterPressed == false) {
-		Text->RenderText("EXIT", 615.0f, 290.0f, 1.0f, glm::vec3(1, 0, 1));
+		Text->RenderText("EXIT", 600.0f, 350.0f, 1.0f, glm::vec3(1, 0, 1));
 	
 	}
 	else if (currentSelection == 2 && EnterPressed == true) {
@@ -259,9 +260,9 @@ void SceneMenu::render()
 	}
 	
 
-	Renderer->DrawSprite(ResourceManager::GetTexture("Button1"), glm::vec2(470, 90), glm::vec2(350, 100), 0.0f, glm::vec3(1,1,1));
+	Renderer->DrawSprite(ResourceManager::GetTexture("Button1"), glm::vec2(225, 90), glm::vec2(350, 100), 0.0f, glm::vec3(1,1,1));
 	
-	Renderer->DrawSprite(ResourceManager::GetTexture("Button2"), glm::vec2(470, 250), glm::vec2(350, 100), 0.0f, glm::vec3(1, 1, 1));
+	Renderer->DrawSprite(ResourceManager::GetTexture("Button2"), glm::vec2(225, 250), glm::vec2(350, 100), 0.0f, glm::vec3(1, 1, 1));
 
 
 

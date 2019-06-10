@@ -28,7 +28,6 @@ SoundManager::SoundManager()
 SoundManager::~SoundManager()
 {
 	SoundMgr = NULL;
-	Mix_Quit();
 }
 
 void SoundManager::PlayMusic(std::string filename, int loop) {

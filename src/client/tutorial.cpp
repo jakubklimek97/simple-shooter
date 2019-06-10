@@ -100,11 +100,13 @@ int main(int argc, char *argv[])
 		
 		SDL_GL_SwapWindow(window); // zostanie w glownej petli aplikacji, nie ma sensu sie powtarzac
 	}
+	SoundManager::Release();
 	Loader::unloadShaders();
 	Loader::unloadModels();
 	Loader::unloadTextures2D();
 	SDL_GL_DeleteContext(context);
 	SDL_DestroyWindow(window);
+	Mix_Quit();
 	SDLNet_Quit();
 	IMG_Quit();
 	SDL_Quit();
