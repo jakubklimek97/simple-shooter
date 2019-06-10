@@ -11,10 +11,16 @@ set(LIB_glew_DIR "" CACHE PATH "glew library")
 set(LIB_glm_DIR "" CACHE PATH "glm library")
 set(LIB_ASSIMP_INCLUDE_DIR " " CACHE PATH "Assimp include dir" )
 set(LIB_ASSIMP_BINARY_DIR "" CACHE PATH "Assimp build results")
+set(LIB_FREETYPE_INCLUDE_DIR " " CACHE PATH "Assimp include dir" )
+set(LIB_FREETYPE_BINARY_DIR "" CACHE PATH "Assimp build results")
 set(SDL2MIXERDIR "" CACHE PATH "SDL2_Mixer directory")
 option(CONFIGURE_WITH_ASSIMP "Add assimp to project" OFF)
 option(MOVE_SCRIPT_AUTO_CLOSE "Auto close file moving script" ON)
 option(DOWNLOAD_ASSIMP "Download assimp to project" OFF)
+option(DOWNLOAD_FREETYPE "Download freetype to project" OFF)
+option(CONFIGURE_WITH_FREETYPE "Add freetype to project" OFF)
+set(LIB_FREETYPE_INCLUDE_DIR "" CACHE PATH "Assimp include dir")
+set(LIB_FREETYPE_BINARY_DIR "" CACHE PATH "Assimp build results")
 
 file(GLOB ZRODLA 
 "src/client/*.cpp"
@@ -77,7 +83,10 @@ file(COPY ${SHADERY} DESTINATION  ${CMAKE_CURRENT_BINARY_DIR})
 file(TO_NATIVE_PATH "${CMAKE_CURRENT_BINARY_DIR}" MOVE_SCRIPT_BUILD_DIR)
 
 file(TO_NATIVE_PATH "${CMAKE_CURRENT_SOURCE_DIR}" MOVE_SCRIPT_SOURCE_DIR)
-
+file(COPY ${CMAKE_CURRENT_BINARY_DIR}/res/img/abel.ttf DESTINATION  ${CMAKE_CURRENT_BINARY_DIR})
+file(COPY ${CMAKE_CURRENT_BINARY_DIR}/res/img/virgo.ttf DESTINATION  ${CMAKE_CURRENT_BINARY_DIR})
+file(COPY ${CMAKE_CURRENT_BINARY_DIR}/res/img/Vac.ttf DESTINATION  ${CMAKE_CURRENT_BINARY_DIR})
+file(COPY ${CMAKE_CURRENT_BINARY_DIR}/res/img/edo.ttf DESTINATION  ${CMAKE_CURRENT_BINARY_DIR})
 configure_file(src/moveNewFiles.bat.in moveNewFiles.bat)
 
 ##SDL2_NET HERE
@@ -142,7 +151,7 @@ file(INSTALL ${LIB_SDLmixer_DIR}/libvorbisfile-3.dll
 file(INSTALL ${LIB_SDLmixer_DIR}/SDL2_mixer.dll
         DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
-
+if(${DOWNLOAD_FREETYPE})
 ##FreeType2
 include(ExternalProject)
 ExternalProject_Add(FreeType2 
@@ -153,8 +162,14 @@ ExternalProject_Add(FreeType2
 )
 ExternalProject_Add_Step(FreeType2 install)
 ExternalProject_Get_Property(FreeType2 install_dir)
-include_directories(${install_dir}/include/freetype2)
-target_link_libraries(simple-shooter ${install_dir}/lib/freetyped.lib)
+set(LIB_FREETYPE_INCLUDE_DIR "${install_dir}/include/freetype2" CACHE PATH "Assimp include dir"  FORCE)
+set(LIB_FREETYPE_BINARY_DIR "${install_dir}/lib" CACHE PATH "Assimp build results" FORCE)
+message("Generate project and build FreeType project (as release), then reconfigure again with CONFIGURE_WITH_ASSIMP")
+endif()
+if(${CONFIGURE_WITH_FREETYPE})
+include_directories(${LIB_FREETYPE_INCLUDE_DIR})
+target_link_libraries(simple-shooter ${LIB_FREETYPE_BINARY_DIR}/freetype.lib)
+endif()
 
 
 
@@ -167,14 +182,14 @@ ExternalProject_Add(Assimp
 	BUILD_COMMAND ${CMAKE_COMMAND}  --build <BINARY_DIR> --target install --config Release
 )
 ExternalProject_Get_Property(Assimp install_dir)
-set(LIB_ASSIMP_INCLUDE_DIR " ${install_dir}/include" CACHE PATH "Assimp include dir"  FORCE)
+set(LIB_ASSIMP_INCLUDE_DIR "${install_dir}/include" CACHE PATH "Assimp include dir"  FORCE)
 set(LIB_ASSIMP_BINARY_DIR "${install_dir}/lib" CACHE PATH "Assimp build results" FORCE)
 #file(GLOB ASSIMP_LIB RELATIVE "${LIB_ASSIMP_BINARY_DIR}" "${LIB_ASSIMP_BINARY_DIR}/*.lib")
 #message("Assimp found: ${ASSIMP_LIB}")
 #file(GLOB ASSIMP_DLL "${LIB_ASSIMP_BINARY_DIR}/*.dll" )
 #target_link_libraries(simple-shooter ${ASSIMP_LIB})
 #file(COPY ${ASSIMP_DLL} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-message("Generate project and build Assimp project, then reconfigure again with CONFIGURE_WITH_ASSIMP")
+message("Generate project and build Assimp project (as release), then reconfigure again with CONFIGURE_WITH_ASSIMP")
 endif()
 
 if(NOT ${CONFIGURE_WITH_ASSIMP})
