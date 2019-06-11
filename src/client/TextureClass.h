@@ -20,6 +20,7 @@ enum ETextureFiltering
 #include <queue>
 #include <map>
 #include <set>
+#define _WINSOCKAPI_ 
 #define NOMINMAX
 #include<Windows.h>
 using namespace std;
