@@ -181,7 +181,7 @@ void SceneLoad::handleEvents(SDL_Event & e)
 				break;
 			}
 
-			case SDLK_KP_ENTER: {
+			case SDLK_RETURN: {
 		
 				SoundM->PlaySFX("Type.ogg", 0);
 				std::string str(IP.begin(), IP.end());

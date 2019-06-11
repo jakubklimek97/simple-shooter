@@ -46,7 +46,7 @@ bool Networking::connect(const std::string hostname, Uint16 port)
 	SDLNet_ResolveHost(&ip, hostname.c_str(), port);
 	connectionSock = SDLNet_TCP_Open(&ip);
 	if (!connectionSock) {
-		std::cout << "Nie mozna utworzyc socketu polaczenia: " << SDLNet_GetError() << std::endl;
+		//std::cout << "Nie mozna utworzyc socketu polaczenia: " << SDLNet_GetError() << std::endl;
 		return false;
 	}
 	isConnected = true;
