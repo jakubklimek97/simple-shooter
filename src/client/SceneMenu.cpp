@@ -33,7 +33,7 @@ void SceneMenu::InitScene()
 
 	
 
-	ResourceManager::LoadShader("res/shaders/sp.vs", "res/shaders/sprite.fs", "sprite");
+	ResourceManager::LoadShader("sprite.vs", "sprite.fs", "sprite");
 	ResourceManager::LoadTexture("res/img/bottom.jpg", GL_FALSE, "background");
 	glm::mat4 projection = glm::ortho(0.0f, static_cast<GLfloat>(800), static_cast<GLfloat>(600), 0.0f, -1.0f, 1.0f);
 	ResourceManager::GetShader("sprite").Use().SetInteger("sprite", 0);

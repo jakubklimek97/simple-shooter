@@ -36,7 +36,7 @@ void SceneLoad::InitScene()
 
 
 
-	ResourceManager::LoadShader("res/shaders/sprite.vs", "res/shaders/sprite.fs", "sprite");
+	ResourceManager::LoadShader("sprite.vs", "sprite.fs", "sprite");
 	ResourceManager::LoadTexture("res/img/black_img.png", GL_FALSE, "background");
 	glm::mat4 projection = glm::ortho(0.0f, static_cast<GLfloat>(1280), static_cast<GLfloat>(720), 0.0f, -1.0f, 1.0f);
 	ResourceManager::GetShader("sprite").Use().SetInteger("sprite", 0);
